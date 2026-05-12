@@ -900,14 +900,14 @@ body {
   width: 62px;
   height: 62px;
   border-radius: 50%;
-  background: #5060C0;
+  background: #7C3AED;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(80, 96, 192, 0.45), 0 2px 8px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.45), 0 2px 8px rgba(0,0,0,0.12);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   flex-shrink: 0;
   position: relative;

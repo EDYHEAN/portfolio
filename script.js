@@ -119,6 +119,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // Auto-advance every 5s
   setInterval(() => goTo(current + 1), 5000);
 
+
+  // ─── Memoji seamless loop ────────────────────────────────────
+  const memojiVid = document.querySelector('.memoji-video');
+  if (memojiVid) {
+    memojiVid.addEventListener('timeupdate', () => {
+      if (memojiVid.duration && memojiVid.currentTime >= memojiVid.duration - 0.15) {
+        memojiVid.currentTime = 0;
+      }
+    });
+  }
+
   // ─── Chat widget ─────────────────────────────────────────────
   const chatToggle = document.getElementById('chatToggle');
   const chatPanel  = document.getElementById('chatPanel');

@@ -896,6 +896,30 @@ body {
   gap: 12px;
 }
 
+.chat-nudge {
+  position: absolute;
+  bottom: 74px;
+  right: 0;
+  background: #fff;
+  color: #12132A;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 16px 16px 4px 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.7) translateY(6px);
+  transform-origin: bottom right;
+  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.chat-nudge.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
 .chat-toggle {
   width: 62px;
   height: 62px;

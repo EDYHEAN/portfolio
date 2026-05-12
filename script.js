@@ -134,9 +134,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const chatToggle = document.getElementById('chatToggle');
   const chatPanel  = document.getElementById('chatPanel');
   const chatClose  = document.getElementById('chatClose');
+  const chatNudge  = document.getElementById('chatNudge');
+
+  const nudgeMessages = ['Pssst', 'Hey ça va ?', 'Une question ?', 'Je suis là !', 'On se connaît ?', 'Curieux ?'];
+  let nudgeTimeout;
+
+  function showNudge() {
+    if (!chatNudge || chatPanel.classList.contains('open')) return;
+    chatNudge.textContent = nudgeMessages[Math.floor(Math.random() * nudgeMessages.length)];
+    chatNudge.classList.add('visible');
+    clearTimeout(nudgeTimeout);
+    nudgeTimeout = setTimeout(() => chatNudge.classList.remove('visible'), 3500);
+    setTimeout(showNudge, 10000 + Math.random() * 10000);
+  }
+
+  setTimeout(showNudge, 5000);
 
   chatToggle?.addEventListener('click', (e) => {
     e.stopPropagation();
+    chatNudge?.classList.remove('visible');
     chatPanel.classList.toggle('open');
   });
 

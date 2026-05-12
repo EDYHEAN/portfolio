@@ -15,12 +15,12 @@
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
 
-  <div class="window">
+  <div class="window" id="mainWindow">
     <div class="window-titlebar">
       <div class="traffic-lights">
-        <span class="tl tl-red"></span>
-        <span class="tl tl-yellow"></span>
-        <span class="tl tl-green"></span>
+        <span class="tl tl-red"    id="tlRed"    data-icon="×"></span>
+        <span class="tl tl-yellow" id="tlYellow" data-icon="−"></span>
+        <span class="tl tl-green"  id="tlGreen"  data-icon="+"></span>
       </div>
       <span class="window-title">Johan Trigeard — Portfolio</span>
       <div class="titlebar-socials">
@@ -58,7 +58,7 @@
           <span class="pill">Works</span>
         </nav>
         <div class="hero-body">
-          <h2 class="hero-title">Designing with instinct.<br><em>Amplified by AI.</em></h2>
+          <h2 class="hero-title">Curieux de tout.<br><em>Créatif avant tout.</em></h2>
           <p class="hero-sub">Lead UI/UX chez Rhinov — Maisons du Monde</p>
         </div>
       </div>
@@ -254,8 +254,11 @@
       <div class="card card-music">
         <span class="music-eyebrow">En ce moment</span>
         <div class="music-info">
-          <p class="music-title">Let's Groove</p>
-          <p class="music-artist">Earth, Wind & Fire</p>
+          <img class="music-cover" src="assets/inthestone.jpg" alt="In the Stone">
+          <div>
+            <p class="music-title">In the Stone</p>
+            <p class="music-artist">Earth, Wind & Fire</p>
+          </div>
         </div>
         <div class="music-bars">
           <span></span><span></span><span></span><span></span><span></span><span></span>
@@ -264,6 +267,8 @@
 
     </main>
   </div>
+
+  <div class="win-restore" id="winRestore">Johan Trigeard — Portfolio</div>
 
   <!-- Chat Widget — Qui suis-je ? (desktop only) -->
   <div class="chat-widget" id="chatWidget">
@@ -281,6 +286,7 @@
         <div class="bubble">Je suis passionné de jeux-vidéo, de musique et plus récemment de moto. J'ai un sens de l'humour très développé, autant que ma volonté de bien faire.</div>
       </div>
     </div>
+    <div class="chat-displaced-msg" id="chatDisplacedMsg">Bah tu fais quoi là ?</div>
     <div class="chat-nudge" id="chatNudge"></div>
     <button class="chat-toggle" id="chatToggle" aria-label="Qui suis-je ?">
       <video class="memoji-video" autoplay muted playsinline>

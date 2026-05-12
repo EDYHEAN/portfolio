@@ -1,5 +1,110 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  // ─── Window controls ─────────────────────────────────────────
+  const mainWindow = document.getElementById('mainWindow');
+  const winRestore = document.getElementById('winRestore');
+  let winState = 'normal'; // 'normal' | 'minimized' | 'maximized' | 'closed'
+
+  document.getElementById('tlRed')?.addEventListener('click', () => {
+    if (winState === 'minimized') restoreFromMin();
+    winState = 'closed';
+    mainWindow.classList.add('win-closed');
+    winRestore.classList.add('visible');
+    displaceChatWidget();
+  });
+
+  winRestore?.addEventListener('click', () => {
+    mainWindow.classList.remove('win-closed');
+    winRestore.classList.remove('visible');
+    winState = 'normal';
+    restoreChatWidget();
+  });
+
+  document.getElementById('tlYellow')?.addEventListener('click', () => {
+    if (winState === 'minimized') { restoreFromMin(); }
+    else if (winState === 'normal') { minimizeWin(); displaceChatWidget(); }
+  });
+
+  mainWindow?.addEventListener('click', (e) => {
+    if (winState === 'minimized' && !e.target.closest('.tl')) restoreFromMin();
+  });
+
+  document.getElementById('tlGreen')?.addEventListener('click', () => {
+    if (winState === 'maximized') {
+      mainWindow.classList.remove('win-maximized');
+      winState = 'normal';
+    } else if (winState === 'normal') {
+      mainWindow.classList.add('win-maximized');
+      winState = 'maximized';
+    }
+  });
+
+  function minimizeWin() {
+    const rect = mainWindow.getBoundingClientRect();
+    const pillW = 240, pillH = 42;
+
+    mainWindow.style.transition = 'none';
+    mainWindow.style.cssText += `
+      position: fixed;
+      top: ${rect.top}px;
+      left: ${rect.left}px;
+      width: ${rect.width}px;
+      height: ${rect.height}px;
+      margin: 0;
+      max-width: none;
+      max-height: none;
+    `;
+    mainWindow.dataset.orig = JSON.stringify({ top: rect.top, left: rect.left, w: rect.width, h: rect.height });
+    mainWindow.offsetHeight; // reflow
+
+    const tx = 'top 0.44s cubic-bezier(0.4,0,0.2,1), left 0.44s cubic-bezier(0.4,0,0.2,1), width 0.44s cubic-bezier(0.4,0,0.2,1), height 0.44s cubic-bezier(0.4,0,0.2,1), border-radius 0.44s ease';
+    mainWindow.style.transition = tx;
+    mainWindow.style.top          = `${window.innerHeight - pillH - 16}px`;
+    mainWindow.style.left         = `${(window.innerWidth - pillW) / 2}px`;
+    mainWindow.style.width        = `${pillW}px`;
+    mainWindow.style.height       = `${pillH}px`;
+    mainWindow.style.borderRadius = '24px';
+    mainWindow.classList.add('win-minimized');
+    winState = 'minimized';
+  }
+
+  function restoreFromMin() {
+    const { top, left, w, h } = JSON.parse(mainWindow.dataset.orig);
+    const tx = 'top 0.44s cubic-bezier(0.4,0,0.2,1), left 0.44s cubic-bezier(0.4,0,0.2,1), width 0.44s cubic-bezier(0.4,0,0.2,1), height 0.44s cubic-bezier(0.4,0,0.2,1), border-radius 0.44s ease';
+    mainWindow.style.transition   = tx;
+    mainWindow.style.top          = `${top}px`;
+    mainWindow.style.left         = `${left}px`;
+    mainWindow.style.width        = `${w}px`;
+    mainWindow.style.height       = `${h}px`;
+    mainWindow.style.borderRadius = '18px';
+    mainWindow.classList.remove('win-minimized');
+    winState = 'normal';
+    setTimeout(() => { mainWindow.style.cssText = ''; }, 450);
+    restoreChatWidget();
+  }
+
+  function displaceChatWidget() {
+    const widget   = document.getElementById('chatWidget');
+    const toggle   = document.getElementById('chatToggle');
+    const panel    = document.getElementById('chatPanel');
+    if (!widget || !toggle) return;
+    panel?.classList.remove('open');
+    const r  = toggle.getBoundingClientRect();
+    const dx = window.innerWidth  / 2 - (r.left + r.width  / 2);
+    const dy = window.innerHeight / 2 - (r.top  + r.height / 2);
+    widget.style.transform = `translate(${dx}px, ${dy}px)`;
+    widget.classList.add('displaced');
+  }
+
+  function restoreChatWidget() {
+    const widget = document.getElementById('chatWidget');
+    if (!widget) return;
+    widget.style.transform = '';
+    widget.classList.remove('displaced');
+  }
+
+
+
   // XP bar
   requestAnimationFrame(() => {
     setTimeout(() => {
@@ -127,6 +232,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (memojiVid.duration && memojiVid.currentTime >= memojiVid.duration - 0.15) {
         memojiVid.currentTime = 0;
       }
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && memojiVid.paused) memojiVid.play().catch(() => {});
     });
   }
 

@@ -897,8 +897,8 @@ body {
 }
 
 .chat-toggle {
-  width: 52px;
-  height: 52px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
   background: #5060C0;
   border: none;
@@ -906,15 +906,22 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 17px;
-  letter-spacing: 0.05em;
-  color: white;
+  overflow: hidden;
   box-shadow: 0 4px 20px rgba(80, 96, 192, 0.45), 0 2px 8px rgba(0,0,0,0.12);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   flex-shrink: 0;
   position: relative;
   z-index: 0;
+}
+
+.memoji-video {
+  width: 110%;
+  height: 110%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  position: relative;
+  left: -3px;
 }
 
 .chat-toggle::before {

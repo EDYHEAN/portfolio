@@ -77,33 +77,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!thumb) return;
 
-  function render(idx, dir) {
+  function render(idx) {
     const p = projects[idx];
 
-    thumb.style.transition = 'opacity 0.16s ease, transform 0.16s ease';
-    thumb.style.opacity    = '0';
-    thumb.style.transform  = `translateX(${dir > 0 ? 14 : -14}px)`;
+    // Background color transitions smoothly, card stays visible
+    thumb.style.transition = 'background-color 0.45s ease';
+    thumb.style.background = p.color;
+
+    // Only text fades out/in
+    catEl.style.transition   = 'opacity 0.15s ease';
+    titleEl.style.transition = 'opacity 0.15s ease';
+    catEl.style.opacity      = '0';
+    titleEl.style.opacity    = '0';
 
     setTimeout(() => {
-      thumb.style.background = p.color;
-      catEl.textContent      = p.cat;
-      titleEl.textContent    = p.title;
-
-      thumb.style.transition = 'opacity 0.32s ease, transform 0.32s ease';
-      thumb.style.opacity    = '1';
-      thumb.style.transform  = 'translateX(0)';
+      catEl.textContent   = p.cat;
+      titleEl.textContent = p.title;
+      catEl.style.opacity   = '1';
+      titleEl.style.opacity = '1';
 
       dotsEl.querySelectorAll('.pdot').forEach((d, i) => {
         d.classList.toggle('active', i === idx);
       });
-    }, 160);
+    }, 150);
   }
 
   function goTo(idx) {
-    const dir = idx > current ? 1 : -1;
     current = (idx + projects.length) % projects.length;
-    render(current, dir);
+    render(current);
   }
+
+  // Init first project color without animation
+  thumb.style.background = projects[0].color;
 
   prevBtn?.addEventListener('click', () => goTo(current - 1));
   nextBtn?.addEventListener('click', () => goTo(current + 1));
@@ -113,5 +118,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Auto-advance every 5s
   setInterval(() => goTo(current + 1), 5000);
+
+  // ─── Chat widget ─────────────────────────────────────────────
+  const chatToggle = document.getElementById('chatToggle');
+  const chatPanel  = document.getElementById('chatPanel');
+  const chatClose  = document.getElementById('chatClose');
+
+  chatToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    chatPanel.classList.toggle('open');
+  });
+
+  chatClose?.addEventListener('click', () => {
+    chatPanel.classList.remove('open');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.chat-widget')) {
+      chatPanel?.classList.remove('open');
+    }
+  });
 
 });

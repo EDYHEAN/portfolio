@@ -193,7 +193,11 @@ body::after {
   align-items: center;
   padding: 0 16px;
   user-select: none;
+  cursor: grab;
 }
+
+body.win-dragging,
+body.win-dragging * { cursor: grabbing !important; }
 
 .traffic-lights { display: flex; gap: 7px; align-items: center; }
 
@@ -283,6 +287,7 @@ body::after {
     inset 0 -1px 0 rgba(155, 170, 239, 0.06);
   overflow: hidden;
   position: relative;
+  opacity: 0;
   transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
 
@@ -304,6 +309,13 @@ body::after {
     0 14px 44px rgba(155, 170, 239, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
+
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.card.card-visible { animation: cardReveal 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.card.card-entered { opacity: 1; }
 
 /* ─── SHARED ────────────────────────────────────────────────── */
 
@@ -947,6 +959,7 @@ body::after {
   color: rgba(255, 255, 255, 0.26);
 }
 
+.music-row  { display: contents; }
 .music-info { display: flex; flex-direction: row; align-items: center; gap: 12px; }
 
 .music-title {
@@ -1206,30 +1219,84 @@ body::after {
 
 @media (max-width: 960px) {
   .chat-widget { display: none; }
+  .win-restore  { display: none; }
 
-  .bento-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
-    grid-template-areas:
-      "profile  profile"
-      "about    about"
-      "skills   skills"
-      "stats    experience"
-      "connect  connect"
-      "portfolio portfolio"
-      "tools    music";
+  body {
     height: auto;
     overflow: auto;
+    align-items: flex-start;
   }
 
-  body { height: auto; overflow: auto; }
-
   .window {
+    width: 100%;
     height: auto;
+    max-width: 100%;
     max-height: none;
     border-radius: 0;
     border: none;
+    box-shadow: none;
   }
 
+  .window-titlebar { cursor: default; }
+
+  .bento-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "profile"
+      "hero"
+      "about"
+      "skills"
+      "portfolio"
+      "stats"
+      "experience"
+      "connect"
+      "tools"
+      "music";
+    height: auto;
+    overflow: visible;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  /* Profile — photo carrée */
+  .profile-photo {
+    flex: none;
+    aspect-ratio: 1;
+    height: auto;
+  }
+
+  /* Hero */
+  .hero-title { font-size: clamp(32px, 8vw, 48px); }
+
+  /* Experience — fonts plus lisibles */
+  .tl-body strong,
+  .tl-company       { font-size: 14px; }
+  .tl-body span     { font-size: 13px; }
+  .tl-date          { font-size: 11px; min-width: 50px; }
+  .tl-role-title    { font-size: 13px; }
+  .tl-role span:last-child { font-size: 12px; }
+  .card-experience  { overflow: visible; max-height: none; }
+
+  /* Portfolio — slider carré */
+  .card-portfolio { aspect-ratio: 1; }
+
+  /* Tools — respiration + icônes carrées */
+  .card-tools  { gap: 16px; }
+  .tools-grid  { grid-template-rows: auto; min-height: auto; gap: 12px; }
+  .tool-icon   { aspect-ratio: 1; }
+
+  /* Music — spectre à droite */
+  .music-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .music-info { flex: 1; }
+
+  /* Divers */
   .card-about { display: flex; }
+  .stat-num   { font-size: 40px; }
 }

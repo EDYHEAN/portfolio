@@ -39,6 +39,91 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // ─── Drag titlebar ───────────────────────────────────────────
+  const titlebar = document.querySelector('.window-titlebar');
+  let isDragging = false;
+  let dragStartX, dragStartY, winStartX, winStartY;
+  let velX = 0, velY = 0;
+  let lastMoveX = 0, lastMoveY = 0, lastMoveTime = 0;
+  let bounceAnim = null;
+
+  titlebar?.addEventListener('mousedown', (e) => {
+    if (window.innerWidth <= 960) return;
+    if (e.target.closest('.tl') || e.target.closest('.social-link') || winState !== 'normal') return;
+
+    if (bounceAnim) { cancelAnimationFrame(bounceAnim); bounceAnim = null; }
+
+    if (mainWindow.style.position !== 'fixed') {
+      const rect = mainWindow.getBoundingClientRect();
+      mainWindow.style.cssText = `position:fixed;top:${rect.top}px;left:${rect.left}px;width:${rect.width}px;height:${rect.height}px;margin:0;max-width:none;max-height:none;transition:none`;
+      mainWindow.offsetHeight;
+    }
+
+    isDragging = true;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    winStartX  = parseFloat(mainWindow.style.left);
+    winStartY  = parseFloat(mainWindow.style.top);
+    velX = 0; velY = 0;
+    lastMoveX = e.clientX; lastMoveY = e.clientY; lastMoveTime = performance.now();
+    mainWindow.style.transition = 'none';
+    document.body.classList.add('win-dragging');
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+
+    const now = performance.now();
+    const dt  = now - lastMoveTime;
+    if (dt > 0 && dt < 80) {
+      velX = velX * 0.4 + ((e.clientX - lastMoveX) / dt) * 0.6;
+      velY = velY * 0.4 + ((e.clientY - lastMoveY) / dt) * 0.6;
+    }
+    lastMoveTime = now;
+    lastMoveX = e.clientX;
+    lastMoveY = e.clientY;
+
+    const maxLeft = window.innerWidth  - mainWindow.offsetWidth;
+    const maxTop  = window.innerHeight - mainWindow.offsetHeight;
+    mainWindow.style.left = Math.max(0, Math.min(winStartX + e.clientX - dragStartX, maxLeft)) + 'px';
+    mainWindow.style.top  = Math.max(0, Math.min(winStartY + e.clientY - dragStartY, maxTop))  + 'px';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    document.body.classList.remove('win-dragging');
+
+    if (Math.sqrt(velX * velX + velY * velY) < 0.2) return;
+
+    let x  = parseFloat(mainWindow.style.left);
+    let y  = parseFloat(mainWindow.style.top);
+    let vx = velX * 16;
+    let vy = velY * 16;
+
+    function step() {
+      x += vx; y += vy;
+      vx *= 0.88; vy *= 0.88;
+
+      const maxX = window.innerWidth  - mainWindow.offsetWidth;
+      const maxY = window.innerHeight - mainWindow.offsetHeight;
+      if (x < 0)    { x = 0;    vx =  Math.abs(vx) * 0.45; }
+      if (x > maxX) { x = maxX; vx = -Math.abs(vx) * 0.45; }
+      if (y < 0)    { y = 0;    vy =  Math.abs(vy) * 0.45; }
+      if (y > maxY) { y = maxY; vy = -Math.abs(vy) * 0.45; }
+
+      mainWindow.style.left = x + 'px';
+      mainWindow.style.top  = y + 'px';
+
+      bounceAnim = (Math.abs(vx) > 0.2 || Math.abs(vy) > 0.2)
+        ? requestAnimationFrame(step)
+        : null;
+    }
+
+    bounceAnim = requestAnimationFrame(step);
+  });
+
   function minimizeWin() {
     const rect = mainWindow.getBoundingClientRect();
     const pillW = 240, pillH = 42;
@@ -142,6 +227,32 @@ document.addEventListener('DOMContentLoaded', () => {
       pill.classList.add('active');
     });
   });
+
+  // ─── Card entrance animations ─────────────────────────────────
+  const cards = document.querySelectorAll('.bento-grid .card');
+
+  function revealCard(card, delay) {
+    setTimeout(() => {
+      card.classList.add('card-visible');
+      card.addEventListener('animationend', () => {
+        card.classList.remove('card-visible');
+        card.classList.add('card-entered');
+      }, { once: true });
+    }, delay);
+  }
+
+  if (window.innerWidth > 960) {
+    cards.forEach((card, i) => revealCard(card, 80 + i * 60));
+  } else {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        revealCard(entry.target, 0);
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+    cards.forEach(card => observer.observe(card));
+  }
 
   // Portfolio carousel
   const projects = [

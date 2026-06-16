@@ -1,9 +1,92 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  // ─── Window controls ─────────────────────────────────────────
+  // ─── Shared drag engine ───────────────────────────────────────
+  let drag = null;
+  let resize = null;
+
+  document.addEventListener('mousemove', e => {
+    if (resize) {
+      const { el: re, dir, startX, startY, startW, startH, startL, startT } = resize;
+      const dx = e.clientX - startX, dy = e.clientY - startY;
+      const minW = 520, minH = 380;
+      let nW = startW, nH = startH, nL = startL, nT = startT;
+      if (dir.includes('e')) nW = Math.max(minW, startW + dx);
+      if (dir.includes('s')) nH = Math.max(minH, startH + dy);
+      if (dir.includes('w')) { nW = Math.max(minW, startW - dx); nL = startL + (startW - nW); }
+      if (dir.includes('n')) { nH = Math.max(minH, startH - dy); nT = startT + (startH - nH); }
+      re.style.width  = nW + 'px';
+      re.style.height = nH + 'px';
+      re.style.left   = nL + 'px';
+      re.style.top    = nT + 'px';
+    }
+    if (!drag) return;
+    const now = performance.now(), dt = now - drag.lt;
+    if (dt > 0 && dt < 80) {
+      drag.vx = drag.vx * 0.4 + ((e.clientX - drag.lx) / dt) * 0.6;
+      drag.vy = drag.vy * 0.4 + ((e.clientY - drag.ly) / dt) * 0.6;
+    }
+    drag.lt = now; drag.lx = e.clientX; drag.ly = e.clientY;
+    const mL = window.innerWidth  - drag.el.offsetWidth;
+    const mT = window.innerHeight - drag.el.offsetHeight;
+    drag.el.style.left = Math.max(0, Math.min(drag.wx + e.clientX - drag.sx, mL)) + 'px';
+    drag.el.style.top  = Math.max(0, Math.min(drag.wy + e.clientY - drag.sy, mT)) + 'px';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (resize) {
+      resize.el.classList.remove('pw-resizing');
+      resize = null;
+      document.body.classList.remove('pw-resizing');
+      delete document.body.dataset.resizeDir;
+    }
+    if (!drag) return;
+    document.body.classList.remove('win-dragging');
+    const el = drag.el;
+    let vx = drag.vx * 16, vy = drag.vy * 16;
+    drag = null;
+    if (Math.sqrt(vx * vx + vy * vy) < 0.2) return;
+    let x = parseFloat(el.style.left), y = parseFloat(el.style.top);
+    (function bounce() {
+      x += vx; y += vy;
+      vx *= 0.88; vy *= 0.88;
+      const mX = window.innerWidth  - el.offsetWidth;
+      const mY = window.innerHeight - el.offsetHeight;
+      if (x < 0)  { x = 0;  vx =  Math.abs(vx) * 0.45; }
+      if (x > mX) { x = mX; vx = -Math.abs(vx) * 0.45; }
+      if (y < 0)  { y = 0;  vy =  Math.abs(vy) * 0.45; }
+      if (y > mY) { y = mY; vy = -Math.abs(vy) * 0.45; }
+      el.style.left = x + 'px';
+      el.style.top  = y + 'px';
+      if (Math.abs(vx) > 0.2 || Math.abs(vy) > 0.2) requestAnimationFrame(bounce);
+    })();
+  });
+
+  function initDrag(winEl, titlebarEl, skipFn) {
+    titlebarEl.addEventListener('mousedown', e => {
+      if (window.innerWidth <= 960) return;
+      if (e.target.closest('.tl') || e.target.closest('a') || (skipFn && skipFn())) return;
+      const rect = winEl.getBoundingClientRect();
+      Object.assign(winEl.style, {
+        position: 'fixed',
+        top: rect.top + 'px', left: rect.left + 'px',
+        width: rect.width + 'px', height: rect.height + 'px',
+        margin: '0', maxWidth: 'none', maxHeight: 'none', transition: 'none',
+      });
+      winEl.offsetHeight;
+      drag = {
+        el: winEl, sx: e.clientX, sy: e.clientY,
+        wx: rect.left, wy: rect.top,
+        vx: 0, vy: 0, lx: e.clientX, ly: e.clientY, lt: performance.now(),
+      };
+      document.body.classList.add('win-dragging');
+      e.preventDefault();
+    });
+  }
+
+  // ─── Main window controls ─────────────────────────────────────
   const mainWindow = document.getElementById('mainWindow');
   const winRestore = document.getElementById('winRestore');
-  let winState = 'normal'; // 'normal' | 'minimized' | 'maximized' | 'closed'
+  let winState = 'normal';
 
   document.getElementById('tlRed')?.addEventListener('click', () => {
     if (winState === 'minimized') restoreFromMin();
@@ -21,129 +104,36 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('tlYellow')?.addEventListener('click', () => {
-    if (winState === 'minimized') { restoreFromMin(); }
+    if (winState === 'minimized') restoreFromMin();
     else if (winState === 'normal') { minimizeWin(); displaceChatWidget(); }
   });
 
-  mainWindow?.addEventListener('click', (e) => {
+  mainWindow?.addEventListener('click', e => {
     if (winState === 'minimized' && !e.target.closest('.tl')) restoreFromMin();
   });
 
   document.getElementById('tlGreen')?.addEventListener('click', () => {
-    if (winState === 'maximized') {
-      mainWindow.classList.remove('win-maximized');
-      winState = 'normal';
-    } else if (winState === 'normal') {
-      mainWindow.classList.add('win-maximized');
-      winState = 'maximized';
-    }
+    if (winState === 'maximized') { mainWindow.classList.remove('win-maximized'); winState = 'normal'; }
+    else if (winState === 'normal') { mainWindow.classList.add('win-maximized'); winState = 'maximized'; }
   });
 
-  // ─── Drag titlebar ───────────────────────────────────────────
-  const titlebar = document.querySelector('.window-titlebar');
-  let isDragging = false;
-  let dragStartX, dragStartY, winStartX, winStartY;
-  let velX = 0, velY = 0;
-  let lastMoveX = 0, lastMoveY = 0, lastMoveTime = 0;
-  let bounceAnim = null;
+  initDrag(mainWindow, document.querySelector('.window-titlebar'), () => winState !== 'normal');
 
-  titlebar?.addEventListener('mousedown', (e) => {
-    if (window.innerWidth <= 960) return;
-    if (e.target.closest('.tl') || e.target.closest('.social-link') || winState !== 'normal') return;
-
-    if (bounceAnim) { cancelAnimationFrame(bounceAnim); bounceAnim = null; }
-
-    if (mainWindow.style.position !== 'fixed') {
-      const rect = mainWindow.getBoundingClientRect();
-      mainWindow.style.cssText = `position:fixed;top:${rect.top}px;left:${rect.left}px;width:${rect.width}px;height:${rect.height}px;margin:0;max-width:none;max-height:none;transition:none`;
-      mainWindow.offsetHeight;
-    }
-
-    isDragging = true;
-    dragStartX = e.clientX;
-    dragStartY = e.clientY;
-    winStartX  = parseFloat(mainWindow.style.left);
-    winStartY  = parseFloat(mainWindow.style.top);
-    velX = 0; velY = 0;
-    lastMoveX = e.clientX; lastMoveY = e.clientY; lastMoveTime = performance.now();
-    mainWindow.style.transition = 'none';
-    document.body.classList.add('win-dragging');
-    e.preventDefault();
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-
-    const now = performance.now();
-    const dt  = now - lastMoveTime;
-    if (dt > 0 && dt < 80) {
-      velX = velX * 0.4 + ((e.clientX - lastMoveX) / dt) * 0.6;
-      velY = velY * 0.4 + ((e.clientY - lastMoveY) / dt) * 0.6;
-    }
-    lastMoveTime = now;
-    lastMoveX = e.clientX;
-    lastMoveY = e.clientY;
-
-    const maxLeft = window.innerWidth  - mainWindow.offsetWidth;
-    const maxTop  = window.innerHeight - mainWindow.offsetHeight;
-    mainWindow.style.left = Math.max(0, Math.min(winStartX + e.clientX - dragStartX, maxLeft)) + 'px';
-    mainWindow.style.top  = Math.max(0, Math.min(winStartY + e.clientY - dragStartY, maxTop))  + 'px';
-  });
-
-  document.addEventListener('mouseup', () => {
-    if (!isDragging) return;
-    isDragging = false;
-    document.body.classList.remove('win-dragging');
-
-    if (Math.sqrt(velX * velX + velY * velY) < 0.2) return;
-
-    let x  = parseFloat(mainWindow.style.left);
-    let y  = parseFloat(mainWindow.style.top);
-    let vx = velX * 16;
-    let vy = velY * 16;
-
-    function step() {
-      x += vx; y += vy;
-      vx *= 0.88; vy *= 0.88;
-
-      const maxX = window.innerWidth  - mainWindow.offsetWidth;
-      const maxY = window.innerHeight - mainWindow.offsetHeight;
-      if (x < 0)    { x = 0;    vx =  Math.abs(vx) * 0.45; }
-      if (x > maxX) { x = maxX; vx = -Math.abs(vx) * 0.45; }
-      if (y < 0)    { y = 0;    vy =  Math.abs(vy) * 0.45; }
-      if (y > maxY) { y = maxY; vy = -Math.abs(vy) * 0.45; }
-
-      mainWindow.style.left = x + 'px';
-      mainWindow.style.top  = y + 'px';
-
-      bounceAnim = (Math.abs(vx) > 0.2 || Math.abs(vy) > 0.2)
-        ? requestAnimationFrame(step)
-        : null;
-    }
-
-    bounceAnim = requestAnimationFrame(step);
-  });
 
   function minimizeWin() {
     const rect = mainWindow.getBoundingClientRect();
     const pillW = 240, pillH = 42;
-
     mainWindow.style.transition = 'none';
-    mainWindow.style.cssText += `
-      position: fixed;
-      top: ${rect.top}px;
-      left: ${rect.left}px;
-      width: ${rect.width}px;
-      height: ${rect.height}px;
-      margin: 0;
-      max-width: none;
-      max-height: none;
-    `;
+    Object.assign(mainWindow.style, {
+      position: 'fixed',
+      top: rect.top + 'px', left: rect.left + 'px',
+      width: rect.width + 'px', height: rect.height + 'px',
+      margin: '0', maxWidth: 'none', maxHeight: 'none',
+    });
     mainWindow.dataset.orig = JSON.stringify({ top: rect.top, left: rect.left, w: rect.width, h: rect.height });
-    mainWindow.offsetHeight; // reflow
-
-    const tx = 'top 0.44s cubic-bezier(0.4,0,0.2,1), left 0.44s cubic-bezier(0.4,0,0.2,1), width 0.44s cubic-bezier(0.4,0,0.2,1), height 0.44s cubic-bezier(0.4,0,0.2,1), border-radius 0.44s ease';
-    mainWindow.style.transition = tx;
+    mainWindow.offsetHeight;
+    const tx = 'top .44s cubic-bezier(.4,0,.2,1),left .44s cubic-bezier(.4,0,.2,1),width .44s cubic-bezier(.4,0,.2,1),height .44s cubic-bezier(.4,0,.2,1),border-radius .44s ease';
+    mainWindow.style.transition   = tx;
     mainWindow.style.top          = `${window.innerHeight - pillH - 16}px`;
     mainWindow.style.left         = `${(window.innerWidth - pillW) / 2}px`;
     mainWindow.style.width        = `${pillW}px`;
@@ -155,13 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function restoreFromMin() {
     const { top, left, w, h } = JSON.parse(mainWindow.dataset.orig);
-    const tx = 'top 0.44s cubic-bezier(0.4,0,0.2,1), left 0.44s cubic-bezier(0.4,0,0.2,1), width 0.44s cubic-bezier(0.4,0,0.2,1), height 0.44s cubic-bezier(0.4,0,0.2,1), border-radius 0.44s ease';
-    mainWindow.style.transition   = tx;
-    mainWindow.style.top          = `${top}px`;
-    mainWindow.style.left         = `${left}px`;
-    mainWindow.style.width        = `${w}px`;
-    mainWindow.style.height       = `${h}px`;
-    mainWindow.style.borderRadius = '18px';
+    const tx = 'top .44s cubic-bezier(.4,0,.2,1),left .44s cubic-bezier(.4,0,.2,1),width .44s cubic-bezier(.4,0,.2,1),height .44s cubic-bezier(.4,0,.2,1),border-radius .44s ease';
+    Object.assign(mainWindow.style, { transition: tx, top: `${top}px`, left: `${left}px`, width: `${w}px`, height: `${h}px`, borderRadius: '18px' });
     mainWindow.classList.remove('win-minimized');
     winState = 'normal';
     setTimeout(() => { mainWindow.style.cssText = ''; }, 450);
@@ -169,9 +154,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function displaceChatWidget() {
-    const widget   = document.getElementById('chatWidget');
-    const toggle   = document.getElementById('chatToggle');
-    const panel    = document.getElementById('chatPanel');
+    const widget = document.getElementById('chatWidget');
+    const toggle = document.getElementById('chatToggle');
+    const panel  = document.getElementById('chatPanel');
     if (!widget || !toggle) return;
     panel?.classList.remove('open');
     const r  = toggle.getBoundingClientRect();
@@ -188,7 +173,287 @@ document.addEventListener('DOMContentLoaded', () => {
     widget.classList.remove('displaced');
   }
 
+  // ─── Smooth inertia scroll ────────────────────────────────────
+  function initSmoothScroll(el) {
+    let current = 0;
+    let target  = 0;
+    let raf     = null;
+    const LERP  = 0.09;
 
+    el.addEventListener('wheel', e => {
+      e.preventDefault();
+      target = Math.min(
+        Math.max(target + e.deltaY, 0),
+        el.scrollHeight - el.clientHeight
+      );
+      if (!raf) raf = requestAnimationFrame(loop);
+    }, { passive: false });
+
+    function loop() {
+      const d = target - current;
+      current += d * LERP;
+      el.scrollTop = current;
+      if (Math.abs(d) > 0.3) {
+        raf = requestAnimationFrame(loop);
+      } else {
+        current = target;
+        el.scrollTop = current;
+        raf = null;
+      }
+    }
+  }
+
+  // ─── Project windows ──────────────────────────────────────────
+  let pwTopZ = 50;
+
+  const PROJECTS = [
+    {
+      id: 'maisons-du-monde',
+      title: 'Maisons du Monde Business — Landing page',
+      logo: 'assets/maisonsdumonde/logo_mdm.svg',
+      category: 'Product Design · B2B',
+      context: 'Refonte complète de la plateforme B2B Rhinov intégrée à l\'univers Maisons du Monde. De la research au delivery : tunnel de commande, simulateur de budget, pages secteur, design system.',
+      specs: [
+        { label: 'Année',   value: '2024–26' },
+        { label: 'Rôle',    value: 'Lead UI/UX' },
+        { label: 'Client',  value: 'MdM × Rhinov' },
+        { label: 'Secteur', value: 'B2B · Ameublement' },
+      ],
+      images: [
+        { src: 'assets/maisonsdumonde/Frame 17.png' },
+        { src: 'assets/maisonsdumonde/Frame 18.png' },
+        { src: 'assets/maisonsdumonde/Frame 19.png' },
+      ],
+      tags: ['Figma', 'Design System', 'UX Research', 'B2B', 'Web'],
+    },
+    {
+      id: 'rhinov-rebrand',
+      title: 'Rhinov — Rebranding',
+      logo: 'assets/rhinov-rebrand/logo-rhinov.svg',
+      category: 'Brand Design · Rhinov',
+      context: 'Refonte de l\'identité visuelle de Rhinov : nouveau logo, charte graphique, motion design et déclinaisons digitales. Du concept au déploiement sur l\'ensemble des supports.',
+      collaborator: { name: 'Constance Belloni', url: 'https://constancebelloni.com' },
+      specs: [
+        { label: 'Année',   value: '2025' },
+        { label: 'Rôle',    value: 'Lead Designer' },
+        { label: 'Client',  value: 'Rhinov' },
+        { label: 'Secteur', value: 'Branding · Digital' },
+      ],
+      images: [
+        { src: 'assets/rhinov-rebrand/logotype.png' },
+        { src: 'assets/rhinov-rebrand/Frame 24.png' },
+        [{ src: 'assets/rhinov-rebrand/STORY.png' },   { src: 'assets/rhinov-rebrand/STORY-1.png' }],
+        [{ src: 'assets/rhinov-rebrand/STORY-2.png' }, { src: 'assets/rhinov-rebrand/STORY-3.png' }],
+      ],
+      tags: ['Figma', 'Branding', 'Motion', 'Identité', 'Charte'],
+    },
+  ];
+
+  function buildProjectWin(project) {
+    const el = document.createElement('div');
+    el.className = 'project-win';
+    el.id = `pw-${project.id}`;
+
+    const imgs = project.images || [];
+
+    const imgsHtml = imgs.map((rowOrItem, i) => {
+      const row = Array.isArray(rowOrItem) ? rowOrItem : [rowOrItem];
+      const is2col = row.length === 2;
+      return `
+      <div class="pw-group ${is2col ? 'pw-group-2col' : ''} pw-reveal">
+        ${row.map((item, j) => `
+          <div class="pw-imgwrap">
+            <img class="pw-float-img" src="${item.src}" alt=""
+                 loading="${i === 0 && j === 0 ? 'eager' : 'lazy'}">
+          </div>`).join('')}
+      </div>`;
+    }).join('');
+
+    const specRows = (project.specs || []).map(s =>
+      `<div class="pw-spec-row"><dt>${s.label}</dt><dd>${s.value}</dd></div>`
+    ).join('');
+
+    el.innerHTML = `
+      <div class="pw-titlebar">
+        <div class="traffic-lights">
+          <span class="tl tl-red" data-icon="×"></span>
+          <span class="tl tl-yellow" data-icon="−"></span>
+          <span class="tl tl-green" data-icon="+"></span>
+        </div>
+        <span class="pw-title-label">${project.title}</span>
+        <div style="width:60px"></div>
+      </div>
+
+      <div class="pw-body">
+
+        <div class="pw-main">
+
+          <!-- Intro strip -->
+          <div class="pw-ed-intro pw-reveal">
+            <span class="pw-cat-tag">${project.category} — ${(project.specs || [])[0]?.value || ''}</span>
+          </div>
+
+          ${imgsHtml}
+
+          <!-- Context text -->
+          <div class="pw-context-block pw-reveal" style="--rv-delay:.06s">
+            <p>${project.context}</p>
+          </div>
+
+          <!-- Closing Trexa-style -->
+          <div class="pw-closing pw-reveal" style="--rv-delay:.08s">
+            <div class="pw-closing-rule">
+              <div class="pw-author-avatar"></div>
+            </div>
+            <span class="pw-closing-name">Johan Trigeard</span>
+            <span class="pw-closing-role">Lead UI/UX Designer · B2B · Product</span>
+            ${project.collaborator ? `<p class="pw-closing-collab">Co-réalisé avec <a href="${project.collaborator.url}" target="_blank" rel="noopener">${project.collaborator.name}</a></p>` : ''}
+            <a href="mailto:johan.trigeard@gmail.com" class="pw-cta">Get in touch</a>
+          </div>
+
+        </div>
+
+        <aside class="pw-aside">
+          <div class="pw-aside-top">
+            ${project.logo ? `<img class="pw-aside-logo" src="${project.logo}" alt="${project.title} logo">` : ''}
+            <span class="pw-aside-proj-lbl">Projet</span>
+            <h3 class="pw-aside-title">${project.title.toUpperCase()}</h3>
+            <p class="pw-aside-cat">${project.category}</p>
+            <p class="pw-aside-ctx">${project.context}</p>
+          </div>
+          <div class="pw-aside-bottom">
+            <dl class="pw-specs">${specRows}</dl>
+            <div class="pw-aside-tags">
+              ${project.tags.map(t => `<span class="pw-tag">${t}</span>`).join('')}
+            </div>
+          </div>
+        </aside>
+
+      </div>
+
+      <div class="pw-rh" data-dir="n"></div>
+      <div class="pw-rh" data-dir="ne"></div>
+      <div class="pw-rh" data-dir="e"></div>
+      <div class="pw-rh" data-dir="se"></div>
+      <div class="pw-rh" data-dir="s"></div>
+      <div class="pw-rh" data-dir="sw"></div>
+      <div class="pw-rh" data-dir="w"></div>
+      <div class="pw-rh" data-dir="nw"></div>
+    `;
+
+    // Traffic lights
+    el.querySelector('.tl-red').addEventListener('click', () => {
+      el.style.display = 'none';
+      el.classList.remove('pw-open');
+    });
+    el.querySelector('.tl-yellow').addEventListener('click', () => {
+      if (el.classList.contains('pw-minimized')) restorePW(el);
+      else minimizePW(el);
+    });
+    el.addEventListener('click', e => {
+      if (el.classList.contains('pw-minimized') && !e.target.closest('.tl')) restorePW(el);
+    });
+    el.querySelector('.tl-green').addEventListener('click', () => {
+      el.style.transition = '';
+      if (el.classList.contains('pw-maximized')) {
+        el.classList.remove('pw-maximized');
+        const s = el.dataset.preMax ? JSON.parse(el.dataset.preMax) : null;
+        if (s) { el.style.left = s.l; el.style.top = s.t; el.style.width = s.w; el.style.height = s.h; }
+      } else {
+        el.dataset.preMax = JSON.stringify({ l: el.style.left, t: el.style.top, w: el.style.width, h: el.style.height });
+        el.classList.add('pw-maximized');
+      }
+    });
+
+    // Multi-edge resize
+    el.querySelectorAll('.pw-rh').forEach(handle => {
+      handle.addEventListener('mousedown', e => {
+        e.stopPropagation();
+        const rect = el.getBoundingClientRect();
+        const dir = handle.dataset.dir;
+        el.classList.add('pw-resizing');
+        document.body.classList.add('pw-resizing');
+        document.body.dataset.resizeDir = dir;
+        resize = { el, dir, startX: e.clientX, startY: e.clientY,
+          startW: rect.width, startH: rect.height, startL: rect.left, startT: rect.top };
+        e.preventDefault();
+      });
+    });
+
+    el.addEventListener('mousedown', () => focusPW(el), true);
+    initDrag(el, el.querySelector('.pw-titlebar'));
+    document.body.appendChild(el);
+
+    const mainEl = el.querySelector('.pw-main');
+
+    // Smooth inertia scroll
+    initSmoothScroll(mainEl);
+
+    // Scroll reveal (rooted to pw-main)
+    const revObs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('pw-in-view');
+          revObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, root: mainEl });
+    el.querySelectorAll('.pw-reveal').forEach(r => revObs.observe(r));
+
+    return el;
+  }
+
+  function minimizePW(el) {
+    const rect = el.getBoundingClientRect();
+    const pillW = 200, pillH = 42;
+    el.style.transition = 'none';
+    Object.assign(el.style, { position:'fixed', top:rect.top+'px', left:rect.left+'px', width:rect.width+'px', height:rect.height+'px', margin:'0' });
+    el.dataset.origPW = JSON.stringify({ t:rect.top, l:rect.left, w:rect.width, h:rect.height });
+    el.offsetHeight;
+    const tx = 'top .44s cubic-bezier(.4,0,.2,1),left .44s cubic-bezier(.4,0,.2,1),width .44s cubic-bezier(.4,0,.2,1),height .44s cubic-bezier(.4,0,.2,1),border-radius .44s ease';
+    el.style.transition = tx;
+    el.style.top          = `${window.innerHeight - pillH - 20}px`;
+    el.style.left         = `${(window.innerWidth - pillW) / 2 + 140}px`;
+    el.style.width        = `${pillW}px`;
+    el.style.height       = `${pillH}px`;
+    el.style.borderRadius = '24px';
+    el.classList.add('pw-minimized');
+  }
+
+  function restorePW(el) {
+    if (!el.classList.contains('pw-minimized')) return;
+    const { t, l, w, h } = JSON.parse(el.dataset.origPW);
+    const tx = 'top .44s cubic-bezier(.4,0,.2,1),left .44s cubic-bezier(.4,0,.2,1),width .44s cubic-bezier(.4,0,.2,1),height .44s cubic-bezier(.4,0,.2,1),border-radius .44s ease';
+    el.style.transition = tx;
+    el.style.top = t+'px'; el.style.left = l+'px'; el.style.width = w+'px'; el.style.height = h+'px'; el.style.borderRadius = '16px';
+    el.classList.remove('pw-minimized');
+  }
+
+  function openProject(projectId) {
+    const project = PROJECTS.find(p => p.id === projectId);
+    if (!project) return;
+    let el = document.getElementById(`pw-${project.id}`);
+    if (!el) el = buildProjectWin(project);
+
+    // Center if no position saved
+    if (!el.style.left) {
+      const w = Math.min(1100, window.innerWidth - 40);
+      const h = Math.min(760, window.innerHeight - 40);
+      el.style.left   = Math.round((window.innerWidth  - w) / 2) + 'px';
+      el.style.top    = Math.round((window.innerHeight - h) / 2) + 'px';
+      el.style.width  = w + 'px';
+      el.style.height = h + 'px';
+    }
+
+    el.style.display = 'flex';
+    el.classList.remove('pw-minimized');
+    focusPW(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('pw-open')));
+  }
+
+  function focusPW(el) {
+    el.style.zIndex = ++pwTopZ;
+  }
 
   // XP bar
   requestAnimationFrame(() => {
@@ -209,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.stat-num').forEach(counter => {
     const target = parseInt(counter.dataset.target, 10);
     const suffix = counter.dataset.suffix || '';
-    const steps = 60;
+    const steps  = 60;
     let step = 0;
     setTimeout(() => {
       const timer = setInterval(() => {
@@ -254,77 +519,81 @@ document.addEventListener('DOMContentLoaded', () => {
     cards.forEach(card => observer.observe(card));
   }
 
-  // Portfolio carousel
-  const projects = [
-    {
-      title: 'Rhinov App',
-      cat: 'UI Design',
-      desc: 'Redesign de l’interface mobile et web du service de décoration d’intérieur.',
-      year: '2024',
-      color: '#1B5EFF',
-      tags: ['Figma', 'Mobile'],
-    },
-    {
-      title: 'Infograpik UI',
-      cat: 'Game UI',
-      desc: 'Interface jeu-vidéo pour start-up suisse — direction artistique et motion.',
-      year: '2022',
-      color: '#3D72FF',
-      tags: ['After Effects', 'UI'],
-    },
-    {
-      title: 'Fière Allure',
-      cat: 'Branding',
-      desc: 'Identité visuelle complète et direction artistique pour start-up bordelaise.',
-      year: '2020',
-      color: '#6B9FFF',
-      tags: ['Illustrator', 'Brand'],
-    },
+  // ─── Portfolio carousel ───────────────────────────────────────
+  const carouselProjects = [
+    { title: 'Maisons du Monde', cat: 'Product Design', color: '#2C3A28', img: 'assets/maisonsdumonde/chambre.jpg', logo: 'assets/maisonsdumonde/logo_mdm.svg',                        id: 'maisons-du-monde' },
+    { title: 'Rhinov Rebrand',   cat: 'Brand Design',   color: '#0f0f0f', img: 'assets/rhinov-rebrand/element.png', logo: 'assets/rhinov-rebrand/logo-rhinov.svg', logoColor: '#8C6848', id: 'rhinov-rebrand' },
   ];
 
   let current = 0;
 
   const thumb   = document.getElementById('projectThumb');
-  const catEl   = document.getElementById('projectCat');
-  const titleEl = document.getElementById('projectTitle');
+  const logoEl  = document.getElementById('portfolioProjectLogo');
   const dotsEl  = document.getElementById('pdots');
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
 
   if (!thumb) return;
 
+  // SVG color rewriter — fetch SVG, swap fill, return data URI (cached)
+  const svgColorCache = {};
+  async function svgColored(src, color) {
+    const key = `${src}::${color}`;
+    if (svgColorCache[key]) return svgColorCache[key];
+    const text = await fetch(src).then(r => {
+      if (!r.ok) throw new Error(`SVG fetch failed: ${r.status}`);
+      return r.text();
+    });
+    const recolored = text
+      .replace(/fill="#000100"/g, `fill="${color}"`)
+      .replace(/fill="black"/g,   `fill="${color}"`)
+      .replace(/fill="#000"/g,    `fill="${color}"`);
+    const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(recolored);
+    svgColorCache[key] = url;
+    return url;
+  }
+
   function render(idx) {
-    const p = projects[idx];
-
-    // Background color transitions smoothly, card stays visible
-    thumb.style.transition = 'background-color 0.45s ease';
-    thumb.style.background = p.color;
-
-    // Only text fades out/in
-    catEl.style.transition   = 'opacity 0.15s ease';
-    titleEl.style.transition = 'opacity 0.15s ease';
-    catEl.style.opacity      = '0';
-    titleEl.style.opacity    = '0';
-
-    setTimeout(() => {
-      catEl.textContent   = p.cat;
-      titleEl.textContent = p.title;
-      catEl.style.opacity   = '1';
-      titleEl.style.opacity = '1';
-
-      dotsEl.querySelectorAll('.pdot').forEach((d, i) => {
-        d.classList.toggle('active', i === idx);
-      });
-    }, 150);
+    const p = carouselProjects[idx];
+    if (p.img) {
+      thumb.style.backgroundImage    = `url('${p.img}')`;
+      thumb.style.backgroundSize     = 'cover';
+      thumb.style.backgroundPosition = 'center';
+      thumb.style.backgroundColor    = p.color;
+    } else {
+      thumb.style.backgroundImage = '';
+      thumb.style.backgroundColor = p.color;
+    }
+    if (logoEl) {
+      if (p.logo) {
+        logoEl.style.display = 'block';
+        if (p.logoColor) {
+          logoEl.src = '';
+          logoEl.style.filter = 'none';
+          logoEl.style.opacity = '1';
+          svgColored(p.logo, p.logoColor)
+            .then(url => { logoEl.src = url; })
+            .catch(() => { logoEl.style.filter = 'brightness(0) invert(1)'; logoEl.src = p.logo; });
+        } else {
+          logoEl.src = '';
+          logoEl.style.filter = 'brightness(0) invert(1)';
+          logoEl.style.opacity = '0.88';
+          logoEl.src = p.logo;
+        }
+      } else {
+        logoEl.src = '';
+        logoEl.style.display = 'none';
+      }
+    }
+    dotsEl.querySelectorAll('.pdot').forEach((d, i) => d.classList.toggle('active', i === idx));
   }
 
   function goTo(idx) {
-    current = (idx + projects.length) % projects.length;
+    current = (idx + carouselProjects.length) % carouselProjects.length;
     render(current);
   }
 
-  // Init first project color without animation
-  thumb.style.background = projects[0].color;
+  render(0);
 
   prevBtn?.addEventListener('click', () => goTo(current - 1));
   nextBtn?.addEventListener('click', () => goTo(current + 1));
@@ -332,24 +601,37 @@ document.addEventListener('DOMContentLoaded', () => {
     d.addEventListener('click', () => { if (i !== current) goTo(i); });
   });
 
-  // Auto-advance every 5s
   setInterval(() => goTo(current + 1), 5000);
 
+  // Open project window on portfolio card click
+  document.querySelector('.card-portfolio')?.addEventListener('click', e => {
+    if (e.target.closest('.parrow') || e.target.closest('.pdot')) return;
+    const id = carouselProjects[current]?.id;
+    if (id) openProject(id);
+  });
 
-  // ─── Memoji seamless loop ────────────────────────────────────
+  // ─── Memoji seamless loop ─────────────────────────────────────
   const memojiVid = document.querySelector('.memoji-video');
   if (memojiVid) {
+    const memojiRestart = () => {
+      memojiVid.currentTime = 0;
+      memojiVid.play().catch(() => {});
+    };
     memojiVid.addEventListener('timeupdate', () => {
-      if (memojiVid.duration && memojiVid.currentTime >= memojiVid.duration - 0.15) {
-        memojiVid.currentTime = 0;
-      }
+      if (memojiVid.duration && memojiVid.currentTime >= memojiVid.duration - 0.15)
+        memojiRestart();
     });
+    memojiVid.addEventListener('ended', memojiRestart);
+    memojiVid.addEventListener('stalled', () => memojiVid.play().catch(() => {}));
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden && memojiVid.paused) memojiVid.play().catch(() => {});
     });
+    setInterval(() => {
+      if (!document.hidden && memojiVid.paused) memojiVid.play().catch(() => {});
+    }, 2000);
   }
 
-  // ─── Chat widget ─────────────────────────────────────────────
+  // ─── Chat widget ──────────────────────────────────────────────
   const chatToggle = document.getElementById('chatToggle');
   const chatPanel  = document.getElementById('chatPanel');
   const chatClose  = document.getElementById('chatClose');
@@ -369,20 +651,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setTimeout(showNudge, 5000);
 
-  chatToggle?.addEventListener('click', (e) => {
+  chatToggle?.addEventListener('click', e => {
     e.stopPropagation();
     chatNudge?.classList.remove('visible');
     chatPanel.classList.toggle('open');
   });
 
-  chatClose?.addEventListener('click', () => {
-    chatPanel.classList.remove('open');
-  });
+  chatClose?.addEventListener('click', () => chatPanel.classList.remove('open'));
 
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.chat-widget')) {
-      chatPanel?.classList.remove('open');
-    }
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.chat-widget')) chatPanel?.classList.remove('open');
   });
 
 });

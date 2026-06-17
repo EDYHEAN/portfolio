@@ -751,37 +751,42 @@
     return url;
   }
 
+  // Build slide track
+  const track = document.createElement('div');
+  track.className = 'pw-carousel-track';
+  carouselProjects.forEach(p => {
+    const slide = document.createElement('div');
+    slide.className = 'pw-carousel-slide';
+    slide.style.backgroundColor = p.color;
+    if (p.img) slide.style.backgroundImage = `url('${p.img}')`;
+    track.appendChild(slide);
+  });
+  thumb.insertBefore(track, thumb.firstChild);
+
+  function renderLogo(p) {
+    if (!logoEl) return;
+    if (!p.logo) { logoEl.style.display = 'none'; return; }
+    logoEl.style.display = 'block';
+    logoEl.style.opacity = '0';
+    if (p.logoColor) {
+      logoEl.style.filter = 'none';
+      svgColored(p.logo, p.logoColor)
+        .then(url => { logoEl.src = url; logoEl.style.opacity = '1'; })
+        .catch(() => { logoEl.style.filter = 'brightness(0) invert(1)'; logoEl.src = p.logo; logoEl.style.opacity = '1'; });
+    } else {
+      logoEl.style.filter = 'brightness(0) invert(1)';
+      logoEl.src = p.logo;
+      logoEl.style.opacity = '0.88';
+    }
+  }
+
   function render(idx) {
     const p = carouselProjects[idx];
-    if (p.img) {
-      thumb.style.backgroundImage    = `url('${p.img}')`;
-      thumb.style.backgroundSize     = 'cover';
-      thumb.style.backgroundPosition = 'center';
-      thumb.style.backgroundColor    = p.color;
-    } else {
-      thumb.style.backgroundImage = '';
-      thumb.style.backgroundColor = p.color;
-    }
+    track.style.transform = `translateX(-${idx * 100}%)`;
+    // Logo: fade out then fade in new one mid-slide
     if (logoEl) {
-      if (p.logo) {
-        logoEl.style.display = 'block';
-        if (p.logoColor) {
-          logoEl.src = '';
-          logoEl.style.filter = 'none';
-          logoEl.style.opacity = '1';
-          svgColored(p.logo, p.logoColor)
-            .then(url => { logoEl.src = url; })
-            .catch(() => { logoEl.style.filter = 'brightness(0) invert(1)'; logoEl.src = p.logo; });
-        } else {
-          logoEl.src = '';
-          logoEl.style.filter = 'brightness(0) invert(1)';
-          logoEl.style.opacity = '0.88';
-          logoEl.src = p.logo;
-        }
-      } else {
-        logoEl.src = '';
-        logoEl.style.display = 'none';
-      }
+      logoEl.style.opacity = '0';
+      setTimeout(() => renderLogo(p), 180);
     }
     dotsEl.querySelectorAll('.pdot').forEach((d, i) => d.classList.toggle('active', i === idx));
   }
@@ -791,7 +796,8 @@
     render(current);
   }
 
-  render(0);
+  renderLogo(carouselProjects[0]);
+  dotsEl.querySelectorAll('.pdot').forEach((d, i) => d.classList.toggle('active', i === 0));
 
   prevBtn?.addEventListener('click', () => goTo(current - 1));
   nextBtn?.addEventListener('click', () => goTo(current + 1));

@@ -233,6 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: 'Brand Design · Rhinov',
       context: 'Refonte de l\'identité visuelle de Rhinov : nouveau logo, charte graphique, motion design et déclinaisons digitales. Du concept au déploiement sur l\'ensemble des supports.',
       collaborator: { name: 'Constance Belloni', url: 'https://constancebelloni.com' },
+      figma: 'https://www.figma.com/design/KbGmDnR1LTCRJwM6IjZApg/Johan-x-Rhinov?node-id=0-1&p=f&t=4PnVbQX3Wx3FTjXY-0',
       specs: [
         { label: 'Année',   value: '2025' },
         { label: 'Rôle',    value: 'Lead Designer' },
@@ -242,6 +243,8 @@ document.addEventListener('DOMContentLoaded', () => {
       images: [
         { src: 'assets/rhinov-rebrand/logotype.png' },
         { src: 'assets/rhinov-rebrand/Frame 24.png' },
+        { src: 'assets/rhinov-rebrand/mock-rhinov-1.jpeg' },
+        { src: 'assets/rhinov-rebrand/mock-rhinov-2.jpeg', zoom: true },
         [{ src: 'assets/rhinov-rebrand/STORY.png' },   { src: 'assets/rhinov-rebrand/STORY-1.png' }],
         [{ src: 'assets/rhinov-rebrand/STORY-2.png' }, { src: 'assets/rhinov-rebrand/STORY-3.png' }],
       ],
@@ -263,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="pw-group ${is2col ? 'pw-group-2col' : ''} pw-reveal">
         ${row.map((item, j) => `
           <div class="pw-imgwrap">
-            <img class="pw-float-img" src="${item.src}" alt=""
+            <img class="pw-float-img${item.zoom ? ' pw-float-img-zoom' : ''}" src="${item.src}" alt=""
                  loading="${i === 0 && j === 0 ? 'eager' : 'lazy'}">
           </div>`).join('')}
       </div>`;
@@ -299,6 +302,17 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="pw-context-block pw-reveal" style="--rv-delay:.06s">
             <p>${project.context}</p>
           </div>
+
+          <!-- Figma embed -->
+          ${project.figma ? `
+          <div class="pw-figma-embed pw-reveal" style="--rv-delay:.07s">
+            <div class="pw-figma-label">Explorer le projet</div>
+            <iframe
+              src="https://www.figma.com/embed?embed_host=share&url=${encodeURIComponent(project.figma)}"
+              allowfullscreen
+              loading="lazy">
+            </iframe>
+          </div>` : ''}
 
           <!-- Closing Trexa-style -->
           <div class="pw-closing pw-reveal" style="--rv-delay:.08s">
@@ -432,6 +446,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function openProject(projectId) {
     const project = PROJECTS.find(p => p.id === projectId);
     if (!project) return;
+
+    if (window.innerWidth <= 960) {
+      openProjectSheet(project);
+      return;
+    }
+
     let el = document.getElementById(`pw-${project.id}`);
     if (!el) el = buildProjectWin(project);
 
@@ -453,6 +473,120 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function focusPW(el) {
     el.style.zIndex = ++pwTopZ;
+  }
+
+  function openProjectSheet(project) {
+    document.querySelector('.pw-sheet-wrap')?.remove();
+
+    const imgs = project.images || [];
+    const imgsHtml = imgs.map((rowOrItem, i) => {
+      const row = Array.isArray(rowOrItem) ? rowOrItem : [rowOrItem];
+      const is2col = row.length === 2;
+      return `
+      <div class="pw-group ${is2col ? 'pw-group-2col' : ''}">
+        ${row.map((item, j) => `
+          <div class="pw-imgwrap">
+            <img class="pw-float-img${item.zoom ? ' pw-float-img-zoom' : ''}" src="${item.src}" alt="" loading="${i === 0 && j === 0 ? 'eager' : 'lazy'}">
+          </div>`).join('')}
+      </div>`;
+    }).join('');
+
+    const specRows = (project.specs || []).map(s =>
+      `<div class="pw-spec-row"><dt>${s.label}</dt><dd>${s.value}</dd></div>`
+    ).join('');
+
+    const wrap = document.createElement('div');
+    wrap.className = 'pw-sheet-wrap';
+    wrap.innerHTML = `
+      <div class="pw-sheet-backdrop"></div>
+      <div class="pw-sheet">
+        <div class="pw-sheet-handle-wrap">
+          <div class="pw-sheet-handle"></div>
+        </div>
+        <div class="pw-sheet-header">
+          <div class="pw-sheet-meta">
+            ${project.logo ? `<img class="pw-sheet-logo" src="${project.logo}" alt="">` : ''}
+            <div class="pw-sheet-title-wrap">
+              <span class="pw-cat-tag">${project.category}</span>
+              <h2 class="pw-sheet-title">${project.title}</h2>
+            </div>
+          </div>
+          <button class="pw-sheet-close" aria-label="Fermer">×</button>
+        </div>
+        <div class="pw-sheet-scroll">
+          ${imgsHtml}
+          <div class="pw-context-block">
+            <p>${project.context}</p>
+          </div>
+          <div class="pw-sheet-info">
+            <dl class="pw-specs">${specRows}</dl>
+            <div class="pw-aside-tags">
+              ${project.tags.map(t => `<span class="pw-tag">${t}</span>`).join('')}
+            </div>
+          </div>
+          ${project.figma ? `
+          <div class="pw-figma-link-mobile">
+            <a href="${project.figma}" target="_blank" rel="noopener" class="pw-figma-btn">
+              <svg width="14" height="14" viewBox="0 0 38 57" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0Z" fill="currentColor" opacity=".6"/><path d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v9.5a9.5 9.5 0 0 1-19 0Z" fill="currentColor" opacity=".4"/><path d="M19 0v19h9.5a9.5 9.5 0 0 0 0-19H19Z" fill="currentColor" opacity=".9"/><path d="M0 9.5A9.5 9.5 0 0 0 9.5 19H19V0H9.5A9.5 9.5 0 0 0 0 9.5Z" fill="currentColor"/><path d="M0 28.5A9.5 9.5 0 0 0 9.5 38H19V19H9.5A9.5 9.5 0 0 0 0 28.5Z" fill="currentColor" opacity=".7"/></svg>
+              Explorer le projet Figma
+            </a>
+          </div>` : ''}
+          <div class="pw-closing">
+            <div class="pw-closing-rule"><div class="pw-author-avatar"></div></div>
+            <span class="pw-closing-name">Johan Trigeard</span>
+            <span class="pw-closing-role">Lead UI/UX Designer · B2B · Product</span>
+            ${project.collaborator ? `<p class="pw-closing-collab">Co-réalisé avec <a href="${project.collaborator.url}" target="_blank" rel="noopener">${project.collaborator.name}</a></p>` : ''}
+            <a href="mailto:johan.trigeard@gmail.com" class="pw-cta">Get in touch</a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(wrap);
+    document.body.style.overflow = 'hidden';
+
+    const sheet = wrap.querySelector('.pw-sheet');
+    const backdrop = wrap.querySelector('.pw-sheet-backdrop');
+    const scrollEl = wrap.querySelector('.pw-sheet-scroll');
+
+    function closeSheet() {
+      sheet.style.transform = 'translateY(100%)';
+      backdrop.style.opacity = '0';
+      document.body.style.overflow = '';
+      setTimeout(() => wrap.remove(), 450);
+    }
+
+    wrap.querySelector('.pw-sheet-close').addEventListener('click', closeSheet);
+    backdrop.addEventListener('click', closeSheet);
+
+    let touchStartY = 0;
+    sheet.addEventListener('touchstart', e => {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    sheet.addEventListener('touchmove', e => {
+      const dy = e.touches[0].clientY - touchStartY;
+      if (dy > 0 && scrollEl.scrollTop <= 0) {
+        sheet.style.transition = 'none';
+        sheet.style.transform = `translateY(${Math.min(dy, window.innerHeight * 0.6)}px)`;
+      }
+    }, { passive: true });
+
+    sheet.addEventListener('touchend', e => {
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      sheet.style.transition = '';
+      if (dy > 80 && scrollEl.scrollTop <= 0) {
+        closeSheet();
+      } else {
+        sheet.style.transform = 'translateY(0)';
+      }
+    });
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      wrap.classList.add('pw-sheet-active');
+      sheet.style.transform = 'translateY(0)';
+      backdrop.style.opacity = '1';
+    }));
   }
 
   // XP bar

@@ -1352,6 +1352,18 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   position: relative;
 }
 
+.pw-imgwrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.09;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
 .pw-group-2col .pw-imgwrap {
   max-width: none;
   flex: 1;
@@ -1363,6 +1375,12 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   height: auto;
   display: block;
   border-radius: 10px;
+}
+
+.pw-float-img-zoom {
+  height: 340px;
+  object-fit: cover;
+  object-position: center 25%;
 }
 
 
@@ -1608,6 +1626,175 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
 .pw-open .pw-spec-row:nth-child(4) { animation: pw-fadein 0.4s ease 0.66s both; }
 .pw-open .pw-aside-tags .pw-tag    { animation: pw-fadein 0.4s ease 0.72s both; }
 
+/* ─── FIGMA EMBED ────────────────────────────────────────────── */
+
+.pw-figma-embed {
+  margin: 16px 28px 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.pw-figma-label {
+  padding: 10px 16px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: #fafafa;
+}
+
+.pw-figma-embed iframe {
+  width: 100%;
+  height: 500px;
+  border: none;
+  display: block;
+  background: #f0f0f0;
+}
+
+.pw-figma-link-mobile {
+  display: none;
+  margin: 8px 20px 16px;
+}
+
+.pw-figma-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  border-radius: 28px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #0a0a0a;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.pw-figma-btn:hover { background: rgba(0, 0, 0, 0.1); }
+
+/* ─── MOBILE BOTTOM SHEET ────────────────────────────────────── */
+
+.pw-sheet-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  pointer-events: none;
+}
+
+.pw-sheet-wrap.pw-sheet-active { pointer-events: auto; }
+
+.pw-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.pw-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 92vh;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+  overflow: hidden;
+  will-change: transform;
+}
+
+.pw-sheet-handle-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 6px;
+  flex-shrink: 0;
+}
+
+.pw-sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.pw-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 20px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+
+.pw-sheet-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pw-sheet-logo {
+  width: 44px;
+  height: auto;
+  opacity: 0.65;
+  filter: grayscale(1);
+  flex-shrink: 0;
+}
+
+.pw-sheet-title-wrap { min-width: 0; }
+
+.pw-sheet-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 21px;
+  line-height: 1;
+  color: #0a0a0a;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pw-sheet-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.06);
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+  margin-left: 12px;
+  transition: background 0.18s;
+}
+
+.pw-sheet-close:hover { background: rgba(0, 0, 0, 0.12); }
+
+.pw-sheet-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-bottom: 48px;
+}
+
+.pw-sheet-info {
+  padding: 0 20px 20px;
+}
+
 /* ─── MOBILE ─────────────────────────────────────────────────── */
 
 @media (max-width: 960px) {
@@ -1693,4 +1880,8 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   /* Divers */
   .card-about { display: flex; }
   .stat-num   { font-size: 40px; }
+
+  /* Figma — iframe caché, lien bouton à la place */
+  .pw-figma-embed     { display: none; }
+  .pw-figma-link-mobile { display: flex; }
 }

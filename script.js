@@ -216,7 +216,7 @@
       specs: [
         { label: 'AnnÃ©e',   value: '2024â€“26' },
         { label: 'RÃ´le',    value: 'Lead UI/UX' },
-        { label: 'Client',  value: 'MdM Ã— Rhinov' },
+        { label: 'Client',  value: 'MdM &times; Rhinov' },
         { label: 'Secteur', value: 'B2B Â· Ameublement' },
       ],
       images: [
@@ -279,7 +279,7 @@
     el.innerHTML = `
       <div class="pw-titlebar">
         <div class="traffic-lights">
-          <span class="tl tl-red" data-icon="Ã—"></span>
+          <span class="tl tl-red" data-icon="&times;"></span>
           <span class="tl tl-yellow" data-icon="âˆ'"></span>
           <span class="tl tl-green" data-icon="+"></span>
         </div>
@@ -575,7 +575,7 @@
               <h2 class="pw-sheet-title">${project.title}</h2>
             </div>
           </div>
-          <button class="pw-sheet-close" aria-label="Fermer">Ã—</button>
+          <button class="pw-sheet-close" aria-label="Fermer">&times;</button>
         </div>
         <div class="pw-sheet-scroll">
           ${imgsHtml}

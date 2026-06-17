@@ -867,6 +867,18 @@
 
   chatToggle?.addEventListener('click', e => {
     e.stopPropagation();
+    const widget = document.getElementById('chatWidget');
+    if (widget?.classList.contains('displaced')) {
+      if (winState === 'closed') {
+        mainWindow.classList.remove('win-closed');
+        winRestore.classList.remove('visible');
+        winState = 'normal';
+      } else if (winState === 'minimized') {
+        restoreFromMin();
+      }
+      restoreChatWidget();
+      return;
+    }
     chatNudge?.classList.remove('visible');
     chatPanel.classList.toggle('open');
   });

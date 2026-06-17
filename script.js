@@ -213,6 +213,7 @@
       logo: 'assets/maisonsdumonde/logo_mdm.svg',
       category: 'Product Design · B2B',
       context: 'Refonte complète de la plateforme B2B Rhinov intégrée à l\'univers Maisons du Monde. De la research au delivery : tunnel de commande, simulateur de budget, pages secteur, design system.',
+      figma: 'https://www.figma.com/design/KbGmDnR1LTCRJwM6IjZApg/Johan-is-designing?node-id=2023-7663&p=f&t=4PnVbQX3Wx3FTjXY-0',
       specs: [
         { label: 'Année',   value: '2024â€“26' },
         { label: 'Rôle',    value: 'Lead UI/UX' },

@@ -280,7 +280,7 @@
       <div class="pw-titlebar">
         <div class="traffic-lights">
           <span class="tl tl-red" data-icon="Ã—"></span>
-          <span class="tl tl-yellow" data-icon="âˆ’"></span>
+          <span class="tl tl-yellow" data-icon="âˆ'"></span>
           <span class="tl tl-green" data-icon="+"></span>
         </div>
         <span class="pw-title-label">${project.title}</span>
@@ -497,7 +497,7 @@
       <div class="pw-mosaic-inner">
         <div class="pw-mosaic-header">
           <span class="pw-mosaic-label">Projets</span>
-          <button class="pw-mosaic-close">Ã—</button>
+          <button class="pw-mosaic-close">&times;</button>
         </div>
         <div class="pw-mosaic-grid">${cardsHtml}</div>
       </div>`;
@@ -799,9 +799,18 @@
     d.addEventListener('click', () => { if (i !== current) goTo(i); });
   });
 
-  setInterval(() => goTo(current + 1), 5000);
+  let carouselTimer;
+  function startCarouselTimer() {
+    clearInterval(carouselTimer);
+    carouselTimer = setInterval(() => goTo(current + 1), 5000);
+  }
+  startCarouselTimer();
 
-  // "Tous les projets" â†’ open mosaic
+  const portfolioCard = document.querySelector('.card-portfolio');
+  portfolioCard?.addEventListener('mouseenter', () => clearInterval(carouselTimer));
+  portfolioCard?.addEventListener('mouseleave', () => startCarouselTimer());
+
+  // "Tous les projets" â†' open mosaic
   document.querySelector('.portfolio-all-link')?.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
@@ -809,7 +818,7 @@
   });
 
   // Open project window on portfolio card click (not on controls or mosaic link)
-  document.querySelector('.card-portfolio')?.addEventListener('click', e => {
+  portfolioCard?.addEventListener('click', e => {
     if (e.target.closest('.parrow') || e.target.closest('.pdot') || e.target.closest('.portfolio-all-link')) return;
     const id = carouselProjects[current]?.id;
     if (id) openProject(id);

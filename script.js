@@ -209,15 +209,15 @@
   const PROJECTS = [
     {
       id: 'maisons-du-monde',
-      title: 'Maisons du Monde Business â€” Landing page',
+      title: 'Maisons du Monde Business — Landing page',
       logo: 'assets/maisonsdumonde/logo_mdm.svg',
-      category: 'Product Design Â· B2B',
-      context: 'Refonte complÃ¨te de la plateforme B2B Rhinov intÃ©grÃ©e Ã  l\'univers Maisons du Monde. De la research au delivery : tunnel de commande, simulateur de budget, pages secteur, design system.',
+      category: 'Product Design · B2B',
+      context: 'Refonte complète de la plateforme B2B Rhinov intégrée à l\'univers Maisons du Monde. De la research au delivery : tunnel de commande, simulateur de budget, pages secteur, design system.',
       specs: [
-        { label: 'AnnÃ©e',   value: '2024â€“26' },
-        { label: 'RÃ´le',    value: 'Lead UI/UX' },
+        { label: 'Année',   value: '2024â€“26' },
+        { label: 'Rôle',    value: 'Lead UI/UX' },
         { label: 'Client',  value: 'MdM &times; Rhinov' },
-        { label: 'Secteur', value: 'B2B Â· Ameublement' },
+        { label: 'Secteur', value: 'B2B · Ameublement' },
       ],
       images: [
         { src: 'assets/maisonsdumonde/Frame 17.jpg' },
@@ -228,17 +228,17 @@
     },
     {
       id: 'rhinov-rebrand',
-      title: 'Rhinov â€” Rebranding',
+      title: 'Rhinov — Rebranding',
       logo: 'assets/rhinov-rebrand/logo-rhinov.svg',
-      category: 'Brand Design Â· Rhinov',
-      context: 'Refonte de l\'identitÃ© visuelle de Rhinov : nouveau logo, charte graphique, motion design et dÃ©clinaisons digitales. Du concept au dÃ©ploiement sur l\'ensemble des supports.',
+      category: 'Brand Design · Rhinov',
+      context: 'Refonte de l\'identité visuelle de Rhinov : nouveau logo, charte graphique, motion design et déclinaisons digitales. Du concept au déploiement sur l\'ensemble des supports.',
       collaborator: { name: 'Constance Belloni', url: 'https://constancebelloni.com' },
       figma: 'https://www.figma.com/design/KbGmDnR1LTCRJwM6IjZApg/Johan-x-Rhinov?node-id=0-1&p=f&t=4PnVbQX3Wx3FTjXY-0',
       specs: [
-        { label: 'AnnÃ©e',   value: '2025' },
-        { label: 'RÃ´le',    value: 'Lead Designer' },
+        { label: 'Année',   value: '2025' },
+        { label: 'Rôle',    value: 'Lead Designer' },
         { label: 'Client',  value: 'Rhinov' },
-        { label: 'Secteur', value: 'Branding Â· Digital' },
+        { label: 'Secteur', value: 'Branding · Digital' },
       ],
       images: [
         { src: 'assets/rhinov-rebrand/logotype.jpg' },
@@ -248,7 +248,7 @@
         [{ src: 'assets/rhinov-rebrand/STORY.jpg' },   { src: 'assets/rhinov-rebrand/STORY-1.jpg' }],
         [{ src: 'assets/rhinov-rebrand/STORY-2.jpg' }, { src: 'assets/rhinov-rebrand/STORY-3.jpg' }],
       ],
-      tags: ['Figma', 'Branding', 'Motion', 'IdentitÃ©', 'Charte'],
+      tags: ['Figma', 'Branding', 'Motion', 'Identité', 'Charte'],
     },
   ];
 
@@ -293,7 +293,7 @@
 
           <!-- Intro strip -->
           <div class="pw-ed-intro pw-reveal">
-            <span class="pw-cat-tag">${project.category} â€” ${(project.specs || [])[0]?.value || ''}</span>
+            <span class="pw-cat-tag">${project.category} — ${(project.specs || [])[0]?.value || ''}</span>
           </div>
 
           ${imgsHtml}
@@ -320,8 +320,8 @@
               <div class="pw-author-avatar"></div>
             </div>
             <span class="pw-closing-name">Johan Trigeard</span>
-            <span class="pw-closing-role">Lead UI/UX Designer Â· B2B Â· Product</span>
-            ${project.collaborator ? `<p class="pw-closing-collab">Co-rÃ©alisÃ© avec <a href="${project.collaborator.url}" target="_blank" rel="noopener">${project.collaborator.name}</a></p>` : ''}
+            <span class="pw-closing-role">Lead UI/UX Designer · B2B · Product</span>
+            ${project.collaborator ? `<p class="pw-closing-collab">Co-réalisé avec <a href="${project.collaborator.url}" target="_blank" rel="noopener">${project.collaborator.name}</a></p>` : ''}
             <a href="mailto:johan.trigeard@gmail.com" class="pw-cta">Get in touch</a>
           </div>
 
@@ -598,8 +598,8 @@
           <div class="pw-closing">
             <div class="pw-closing-rule"><div class="pw-author-avatar"></div></div>
             <span class="pw-closing-name">Johan Trigeard</span>
-            <span class="pw-closing-role">Lead UI/UX Designer Â· B2B Â· Product</span>
-            ${project.collaborator ? `<p class="pw-closing-collab">Co-rÃ©alisÃ© avec <a href="${project.collaborator.url}" target="_blank" rel="noopener">${project.collaborator.name}</a></p>` : ''}
+            <span class="pw-closing-role">Lead UI/UX Designer · B2B · Product</span>
+            ${project.collaborator ? `<p class="pw-closing-collab">Co-réalisé avec <a href="${project.collaborator.url}" target="_blank" rel="noopener">${project.collaborator.name}</a></p>` : ''}
             <a href="mailto:johan.trigeard@gmail.com" class="pw-cta">Get in touch</a>
           </div>
         </div>
@@ -733,7 +733,7 @@
 
   if (!thumb) return;
 
-  // SVG color rewriter â€” fetch SVG, swap fill, return data URI (cached)
+  // SVG color rewriter — fetch SVG, swap fill, return data URI (cached)
   const svgColorCache = {};
   async function svgColored(src, color) {
     const key = `${src}::${color}`;
@@ -851,7 +851,7 @@
   const chatClose  = document.getElementById('chatClose');
   const chatNudge  = document.getElementById('chatNudge');
 
-  const nudgeMessages = ['Pssst', 'Hey Ã§a va ?', 'Une question ?', 'Je suis lÃ  !', 'On se connaÃ®t ?', 'Curieux ?'];
+  const nudgeMessages = ['Pssst', 'Hey ça va ?', 'Une question ?', 'Je suis là !', 'On se connaît ?', 'Curieux ?'];
   let nudgeTimeout;
 
   function showNudge() {

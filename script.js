@@ -1,6 +1,6 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
 
-  // ─── Shared drag engine ───────────────────────────────────────
+  // â”€â”€â”€ Shared drag engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   let drag = null;
   let resize = null;
 
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ─── Main window controls ─────────────────────────────────────
+  // â”€â”€â”€ Main window controls â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const mainWindow = document.getElementById('mainWindow');
   const winRestore = document.getElementById('winRestore');
   let winState = 'normal';
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     widget.classList.remove('displaced');
   }
 
-  // ─── Smooth inertia scroll ────────────────────────────────────
+  // â”€â”€â”€ Smooth inertia scroll â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   function initSmoothScroll(el) {
     let current = 0;
     let target  = 0;
@@ -203,52 +203,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ─── Project windows ──────────────────────────────────────────
+  // â”€â”€â”€ Project windows â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   let pwTopZ = 50;
 
   const PROJECTS = [
     {
       id: 'maisons-du-monde',
-      title: 'Maisons du Monde Business — Landing page',
+      title: 'Maisons du Monde Business â€” Landing page',
       logo: 'assets/maisonsdumonde/logo_mdm.svg',
-      category: 'Product Design · B2B',
-      context: 'Refonte complète de la plateforme B2B Rhinov intégrée à l\'univers Maisons du Monde. De la research au delivery : tunnel de commande, simulateur de budget, pages secteur, design system.',
+      category: 'Product Design Â· B2B',
+      context: 'Refonte complÃ¨te de la plateforme B2B Rhinov intÃ©grÃ©e Ã  l\'univers Maisons du Monde. De la research au delivery : tunnel de commande, simulateur de budget, pages secteur, design system.',
       specs: [
-        { label: 'Année',   value: '2024–26' },
-        { label: 'Rôle',    value: 'Lead UI/UX' },
-        { label: 'Client',  value: 'MdM × Rhinov' },
-        { label: 'Secteur', value: 'B2B · Ameublement' },
+        { label: 'AnnÃ©e',   value: '2024â€“26' },
+        { label: 'RÃ´le',    value: 'Lead UI/UX' },
+        { label: 'Client',  value: 'MdM Ã— Rhinov' },
+        { label: 'Secteur', value: 'B2B Â· Ameublement' },
       ],
       images: [
-        { src: 'assets/maisonsdumonde/Frame 17.png' },
-        { src: 'assets/maisonsdumonde/Frame 18.png' },
-        { src: 'assets/maisonsdumonde/Frame 19.png' },
+        { src: 'assets/maisonsdumonde/Frame 17.jpg' },
+        { src: 'assets/maisonsdumonde/Frame 18.jpg' },
+        { src: 'assets/maisonsdumonde/Frame 19.jpg' },
       ],
       tags: ['Figma', 'Design System', 'UX Research', 'B2B', 'Web'],
     },
     {
       id: 'rhinov-rebrand',
-      title: 'Rhinov — Rebranding',
+      title: 'Rhinov â€” Rebranding',
       logo: 'assets/rhinov-rebrand/logo-rhinov.svg',
-      category: 'Brand Design · Rhinov',
-      context: 'Refonte de l\'identité visuelle de Rhinov : nouveau logo, charte graphique, motion design et déclinaisons digitales. Du concept au déploiement sur l\'ensemble des supports.',
+      category: 'Brand Design Â· Rhinov',
+      context: 'Refonte de l\'identitÃ© visuelle de Rhinov : nouveau logo, charte graphique, motion design et dÃ©clinaisons digitales. Du concept au dÃ©ploiement sur l\'ensemble des supports.',
       collaborator: { name: 'Constance Belloni', url: 'https://constancebelloni.com' },
       figma: 'https://www.figma.com/design/KbGmDnR1LTCRJwM6IjZApg/Johan-x-Rhinov?node-id=0-1&p=f&t=4PnVbQX3Wx3FTjXY-0',
       specs: [
-        { label: 'Année',   value: '2025' },
-        { label: 'Rôle',    value: 'Lead Designer' },
+        { label: 'AnnÃ©e',   value: '2025' },
+        { label: 'RÃ´le',    value: 'Lead Designer' },
         { label: 'Client',  value: 'Rhinov' },
-        { label: 'Secteur', value: 'Branding · Digital' },
+        { label: 'Secteur', value: 'Branding Â· Digital' },
       ],
       images: [
-        { src: 'assets/rhinov-rebrand/logotype.png' },
-        { src: 'assets/rhinov-rebrand/Frame 24.png' },
+        { src: 'assets/rhinov-rebrand/logotype.jpg' },
+        { src: 'assets/rhinov-rebrand/Frame 24.jpg' },
         { src: 'assets/rhinov-rebrand/mock-rhinov-1.jpeg' },
         { src: 'assets/rhinov-rebrand/mock-rhinov-2.jpeg', zoom: true },
-        [{ src: 'assets/rhinov-rebrand/STORY.png' },   { src: 'assets/rhinov-rebrand/STORY-1.png' }],
-        [{ src: 'assets/rhinov-rebrand/STORY-2.png' }, { src: 'assets/rhinov-rebrand/STORY-3.png' }],
+        [{ src: 'assets/rhinov-rebrand/STORY.jpg' },   { src: 'assets/rhinov-rebrand/STORY-1.jpg' }],
+        [{ src: 'assets/rhinov-rebrand/STORY-2.jpg' }, { src: 'assets/rhinov-rebrand/STORY-3.jpg' }],
       ],
-      tags: ['Figma', 'Branding', 'Motion', 'Identité', 'Charte'],
+      tags: ['Figma', 'Branding', 'Motion', 'IdentitÃ©', 'Charte'],
     },
   ];
 
@@ -279,8 +279,8 @@ document.addEventListener('DOMContentLoaded', () => {
     el.innerHTML = `
       <div class="pw-titlebar">
         <div class="traffic-lights">
-          <span class="tl tl-red" data-icon="×"></span>
-          <span class="tl tl-yellow" data-icon="−"></span>
+          <span class="tl tl-red" data-icon="Ã—"></span>
+          <span class="tl tl-yellow" data-icon="âˆ’"></span>
           <span class="tl tl-green" data-icon="+"></span>
         </div>
         <span class="pw-title-label">${project.title}</span>
@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <!-- Intro strip -->
           <div class="pw-ed-intro pw-reveal">
-            <span class="pw-cat-tag">${project.category} — ${(project.specs || [])[0]?.value || ''}</span>
+            <span class="pw-cat-tag">${project.category} â€” ${(project.specs || [])[0]?.value || ''}</span>
           </div>
 
           ${imgsHtml}
@@ -320,8 +320,8 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="pw-author-avatar"></div>
             </div>
             <span class="pw-closing-name">Johan Trigeard</span>
-            <span class="pw-closing-role">Lead UI/UX Designer · B2B · Product</span>
-            ${project.collaborator ? `<p class="pw-closing-collab">Co-réalisé avec <a href="${project.collaborator.url}" target="_blank" rel="noopener">${project.collaborator.name}</a></p>` : ''}
+            <span class="pw-closing-role">Lead UI/UX Designer Â· B2B Â· Product</span>
+            ${project.collaborator ? `<p class="pw-closing-collab">Co-rÃ©alisÃ© avec <a href="${project.collaborator.url}" target="_blank" rel="noopener">${project.collaborator.name}</a></p>` : ''}
             <a href="mailto:johan.trigeard@gmail.com" class="pw-cta">Get in touch</a>
           </div>
 
@@ -475,6 +475,70 @@ document.addEventListener('DOMContentLoaded', () => {
     el.style.zIndex = ++pwTopZ;
   }
 
+  function openMosaic() {
+    if (document.getElementById('pw-mosaic')) return;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'pw-mosaic';
+    overlay.className = 'pw-mosaic';
+
+    const cardsHtml = carouselProjects.map((p, i) => `
+      <div class="pw-mosaic-card" data-id="${p.id}" style="--i:${i}; background-color:${p.color}; background-image:url('${p.img}')">
+        <div class="pw-mosaic-card-overlay"></div>
+        <img class="pw-mosaic-logo" data-idx="${i}" src="" alt="${p.title}">
+        <div class="pw-mosaic-info">
+          <span class="pw-mosaic-cat">${p.cat}</span>
+          <h3 class="pw-mosaic-title">${p.title}</h3>
+        </div>
+      </div>`).join('');
+
+    overlay.innerHTML = `
+      <div class="pw-mosaic-bg"></div>
+      <div class="pw-mosaic-inner">
+        <div class="pw-mosaic-header">
+          <span class="pw-mosaic-label">Projets</span>
+          <button class="pw-mosaic-close">Ã—</button>
+        </div>
+        <div class="pw-mosaic-grid">${cardsHtml}</div>
+      </div>`;
+
+    document.body.appendChild(overlay);
+
+    // Logos (reuse svgColored)
+    overlay.querySelectorAll('.pw-mosaic-logo').forEach(img => {
+      const p = carouselProjects[+img.dataset.idx];
+      if (p.logoColor) {
+        img.style.opacity = '1';
+        svgColored(p.logo, p.logoColor)
+          .then(url => { img.src = url; })
+          .catch(() => { img.style.filter = 'brightness(0) invert(1)'; img.src = p.logo; });
+      } else {
+        img.style.filter = 'brightness(0) invert(1)';
+        img.style.opacity = '0.88';
+        img.src = p.logo;
+      }
+    });
+
+    function closeMosaic() {
+      overlay.classList.remove('pw-mosaic-open');
+      overlay.classList.add('pw-mosaic-closing');
+      setTimeout(() => overlay.remove(), 560);
+    }
+
+    overlay.querySelector('.pw-mosaic-close').addEventListener('click', closeMosaic);
+    overlay.querySelector('.pw-mosaic-bg').addEventListener('click', closeMosaic);
+
+    overlay.querySelectorAll('.pw-mosaic-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const id = card.dataset.id;
+        closeMosaic();
+        setTimeout(() => openProject(id), 320);
+      });
+    });
+
+    requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('pw-mosaic-open')));
+  }
+
   function openProjectSheet(project) {
     document.querySelector('.pw-sheet-wrap')?.remove();
 
@@ -511,7 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <h2 class="pw-sheet-title">${project.title}</h2>
             </div>
           </div>
-          <button class="pw-sheet-close" aria-label="Fermer">×</button>
+          <button class="pw-sheet-close" aria-label="Fermer">Ã—</button>
         </div>
         <div class="pw-sheet-scroll">
           ${imgsHtml}
@@ -534,8 +598,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="pw-closing">
             <div class="pw-closing-rule"><div class="pw-author-avatar"></div></div>
             <span class="pw-closing-name">Johan Trigeard</span>
-            <span class="pw-closing-role">Lead UI/UX Designer · B2B · Product</span>
-            ${project.collaborator ? `<p class="pw-closing-collab">Co-réalisé avec <a href="${project.collaborator.url}" target="_blank" rel="noopener">${project.collaborator.name}</a></p>` : ''}
+            <span class="pw-closing-role">Lead UI/UX Designer Â· B2B Â· Product</span>
+            ${project.collaborator ? `<p class="pw-closing-collab">Co-rÃ©alisÃ© avec <a href="${project.collaborator.url}" target="_blank" rel="noopener">${project.collaborator.name}</a></p>` : ''}
             <a href="mailto:johan.trigeard@gmail.com" class="pw-cta">Get in touch</a>
           </div>
         </div>
@@ -627,7 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ─── Card entrance animations ─────────────────────────────────
+  // â”€â”€â”€ Card entrance animations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const cards = document.querySelectorAll('.bento-grid .card');
 
   function revealCard(card, delay) {
@@ -653,10 +717,10 @@ document.addEventListener('DOMContentLoaded', () => {
     cards.forEach(card => observer.observe(card));
   }
 
-  // ─── Portfolio carousel ───────────────────────────────────────
+  // â”€â”€â”€ Portfolio carousel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const carouselProjects = [
     { title: 'Maisons du Monde', cat: 'Product Design', color: '#2C3A28', img: 'assets/maisonsdumonde/chambre.jpg', logo: 'assets/maisonsdumonde/logo_mdm.svg',                        id: 'maisons-du-monde' },
-    { title: 'Rhinov Rebrand',   cat: 'Brand Design',   color: '#0f0f0f', img: 'assets/rhinov-rebrand/element.png', logo: 'assets/rhinov-rebrand/logo-rhinov.svg', logoColor: '#8C6848', id: 'rhinov-rebrand' },
+    { title: 'Rhinov Rebrand',   cat: 'Brand Design',   color: '#0f0f0f', img: 'assets/rhinov-rebrand/element.jpg', logo: 'assets/rhinov-rebrand/logo-rhinov.svg', logoColor: '#8C6848', id: 'rhinov-rebrand' },
   ];
 
   let current = 0;
@@ -669,7 +733,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!thumb) return;
 
-  // SVG color rewriter — fetch SVG, swap fill, return data URI (cached)
+  // SVG color rewriter â€” fetch SVG, swap fill, return data URI (cached)
   const svgColorCache = {};
   async function svgColored(src, color) {
     const key = `${src}::${color}`;
@@ -737,14 +801,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setInterval(() => goTo(current + 1), 5000);
 
-  // Open project window on portfolio card click
+  // "Tous les projets" â†’ open mosaic
+  document.querySelector('.portfolio-all-link')?.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    openMosaic();
+  });
+
+  // Open project window on portfolio card click (not on controls or mosaic link)
   document.querySelector('.card-portfolio')?.addEventListener('click', e => {
-    if (e.target.closest('.parrow') || e.target.closest('.pdot')) return;
+    if (e.target.closest('.parrow') || e.target.closest('.pdot') || e.target.closest('.portfolio-all-link')) return;
     const id = carouselProjects[current]?.id;
     if (id) openProject(id);
   });
 
-  // ─── Memoji seamless loop ─────────────────────────────────────
+  // â”€â”€â”€ Memoji seamless loop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const memojiVid = document.querySelector('.memoji-video');
   if (memojiVid) {
     const memojiRestart = () => {
@@ -765,13 +836,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2000);
   }
 
-  // ─── Chat widget ──────────────────────────────────────────────
+  // â”€â”€â”€ Chat widget â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const chatToggle = document.getElementById('chatToggle');
   const chatPanel  = document.getElementById('chatPanel');
   const chatClose  = document.getElementById('chatClose');
   const chatNudge  = document.getElementById('chatNudge');
 
-  const nudgeMessages = ['Pssst', 'Hey ça va ?', 'Une question ?', 'Je suis là !', 'On se connaît ?', 'Curieux ?'];
+  const nudgeMessages = ['Pssst', 'Hey Ã§a va ?', 'Une question ?', 'Je suis lÃ  !', 'On se connaÃ®t ?', 'Curieux ?'];
   let nudgeTimeout;
 
   function showNudge() {
@@ -798,3 +869,4 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 });
+

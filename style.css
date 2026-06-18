@@ -282,6 +282,8 @@ body.win-dragging * { cursor: grabbing !important; }
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
     inset 0 -1px 0 rgba(var(--blue-rgb), 0.06);
   overflow: hidden;
+  min-width: 0;
+  min-height: 0;
   position: relative;
   opacity: 0;
   transition: transform 0.22s ease, box-shadow 0.22s ease;
@@ -2311,30 +2313,51 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
 
 /* ─── MOBILE ─────────────────────────────────────────────────── */
 
-/* ─── BENTO PROGRESSIF — paliers intermédiaires ─────────────── */
-/* La fenêtre reste "macOS", mais le bento passe en rows auto et
-   scrolle en interne : les blocs se réorganisent au lieu de s'écraser. */
+/* ─── BENTO FLUIDE — réempilement progressif ────────────────── */
+/* Dès qu'on réduit (≤1240) : la PAGE scrolle, la fenêtre grandit en
+   hauteur, et chaque card prend sa hauteur NATURELLE. Les blocs se
+   réempilent en colonnes décroissantes (3 → 2 → 1) jusqu'au mobile.
+   Plus rien n'est écrasé, cropé ni déformé. */
+
+@media (max-width: 1240px) {
+  body {
+    height: auto;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    align-items: flex-start;
+  }
+
+  .window {
+    height: auto;
+    max-height: none;
+    transition: none;
+  }
+
+  .bento-grid {
+    grid-template-rows: auto;
+    grid-auto-rows: auto;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* cards remplies en absolu → hauteur explicite sinon elles s'effondrent */
+  .profile-photo   { flex: none; height: 240px; }
+  .card-experience { overflow: visible; max-height: none; }
+  .card-portfolio  { aspect-ratio: 16 / 9; height: auto; }
+  .card-showreel   { aspect-ratio: 16 / 9; }
+}
 
 @media (max-width: 1240px) and (min-width: 961px) {
   .bento-grid {
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto;
-    grid-auto-rows: auto;
     grid-template-areas:
       "profile    hero         skills"
       "portfolio  portfolio    portfolio"
       "connect    stats        stats"
       "experience experience   experience"
       "tools      tools        music";
-    overflow-y: auto;
-    scrollbar-width: none;
   }
-  .bento-grid::-webkit-scrollbar { display: none; }
-
-  .profile-photo   { flex: none; height: 200px; }
-  .card-experience { overflow: visible; max-height: none; }
-  .card-showreel   { aspect-ratio: 16 / 9; }
-  .card-portfolio  { aspect-ratio: auto; height: 360px; }
 }
 
 @media (max-width: 1040px) and (min-width: 961px) {
@@ -2366,7 +2389,8 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
 
   body {
     height: auto;
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
     align-items: flex-start;
   }
 

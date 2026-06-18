@@ -1,5 +1,8 @@
 ﻿document.addEventListener('DOMContentLoaded', () => {
 
+  // Mode focus : true quand le viewer vidéo est ouvert (on gèle l'arrière-plan)
+  const viewerOpen = () => document.body.classList.contains('viewer-open');
+
   // â”€â”€â”€ Shared drag engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   let drag = null;
   let resize = null;
@@ -571,7 +574,6 @@
         </div>
         <div class="pw-sheet-header">
           <div class="pw-sheet-meta">
-            ${project.logo ? `<img class="pw-sheet-logo" src="${project.logo}" alt="">` : ''}
             <div class="pw-sheet-title-wrap">
               <span class="pw-cat-tag">${project.category}</span>
               <h2 class="pw-sheet-title">${project.title}</h2>
@@ -584,12 +586,6 @@
           <div class="pw-context-block">
             <p>${project.context}</p>
           </div>
-          <div class="pw-sheet-info">
-            <dl class="pw-specs">${specRows}</dl>
-            <div class="pw-aside-tags">
-              ${project.tags.map(t => `<span class="pw-tag">${t}</span>`).join('')}
-            </div>
-          </div>
           ${project.figma ? `
           <div class="pw-figma-link-mobile">
             <a href="${project.figma}" target="_blank" rel="noopener" class="pw-figma-btn">
@@ -597,6 +593,12 @@
               Explorer le projet Figma
             </a>
           </div>` : ''}
+          <div class="pw-sheet-info">
+            <dl class="pw-specs">${specRows}</dl>
+            <div class="pw-aside-tags">
+              ${project.tags.map(t => `<span class="pw-tag">${t}</span>`).join('')}
+            </div>
+          </div>
           <div class="pw-closing">
             <div class="pw-closing-rule"><div class="pw-author-avatar"></div></div>
             <span class="pw-closing-name">Johan Trigeard</span>
@@ -850,7 +852,7 @@
       if (!document.hidden && memojiVid.paused) memojiVid.play().catch(() => {});
     });
     setInterval(() => {
-      if (!document.hidden && memojiVid.paused) memojiVid.play().catch(() => {});
+      if (!document.hidden && !viewerOpen() && memojiVid.paused) memojiVid.play().catch(() => {});
     }, 2000);
   }
 
@@ -921,19 +923,123 @@
     hueSlider.addEventListener('input', () => applyAccent(parseInt(hueSlider.value, 10)));
   }
 
-  // ─── Fake BPM — "je suis en vie" ────────────────────────────
-  const bpmValueEl = document.getElementById('bpmValue');
+  // ─── BPM + statut de vie (corrélés) ─────────────────────────
+  const bpmValueEl   = document.getElementById('bpmValue');
+  const statusTextEl = document.getElementById('statusText');
   if (bpmValueEl) {
     const heart = document.querySelector('.bpm-heart');
-    let bpm = 72;
+
+    const ACTIVITIES = [
+      { label: 'Chilling',  emoji: '🛋️', min: 60,  max: 70  },
+      { label: 'Designing', emoji: '🎨', min: 70,  max: 82  },
+      { label: 'Ptit café', emoji: '☕', min: 74,  max: 86  },
+      { label: 'Gaming',    emoji: '🎮', min: 82,  max: 96  },
+      { label: 'Walking',   emoji: '🚶', min: 88,  max: 104 },
+      { label: 'Training',  emoji: '🏋️', min: 120, max: 150 },
+    ];
+    const SLEEP = { label: 'Sleeping', emoji: '😴', min: 48, max: 56 };
+
+    const isSleepTime = () => {
+      // ancré sur l'heure de Bordeaux, pas celle du visiteur
+      const parts = new Intl.DateTimeFormat('fr-FR', {
+        timeZone: 'Europe/Paris', hourCycle: 'h23', hour: '2-digit', minute: '2-digit',
+      }).formatToParts(new Date());
+      const h = +parts.find(p => p.type === 'hour').value;
+      const mn = +parts.find(p => p.type === 'minute').value;
+      const m = h * 60 + mn;
+      return m >= 22 * 60 + 30 || m < 7 * 60; // 22h30 → 7h00
+    };
+
+    let activity = isSleepTime() ? SLEEP : ACTIVITIES[Math.floor(Math.random() * ACTIVITIES.length)];
+    let bpm = Math.round((activity.min + activity.max) / 2);
+
+    const applyActivity = a => {
+      activity = a;
+      if (statusTextEl) statusTextEl.textContent = a.label;
+      bpm = Math.round((a.min + a.max) / 2);
+    };
+
     const tick = () => {
+      if (viewerOpen()) return;
+      if (isSleepTime() && activity.label !== SLEEP.label) applyActivity(SLEEP);
       bpm += Math.round((Math.random() - 0.5) * 6);
-      bpm = Math.max(63, Math.min(82, bpm));
+      bpm = Math.max(activity.min, Math.min(activity.max, bpm));
       bpmValueEl.textContent = bpm;
       heart?.style.setProperty('--bpm-dur', (60 / bpm).toFixed(2) + 's');
     };
+
+    const rotate = () => {
+      if (!isSleepTime() && !viewerOpen()) applyActivity(ACTIVITIES[Math.floor(Math.random() * ACTIVITIES.length)]);
+      setTimeout(rotate, 20000 + Math.random() * 25000); // nouveau statut toutes les 20–45s
+    };
+
+    applyActivity(activity);
     tick();
     setInterval(tick, 2200);
+    setTimeout(rotate, 20000 + Math.random() * 25000);
+  }
+
+  // ─── Compteur de réunions (humour) ──────────────────────────
+  const meetingsEl = document.getElementById('meetingsValue');
+  if (meetingsEl) {
+    const BASE = 752;                 // point de départ (clin d'œil)
+    const NS   = 'edyhean-portfolio'; // namespace du compteur
+    const KEY  = 'reunions';
+
+    const fmt = n => n.toLocaleString('fr-FR');
+
+    function animateMeetingsTo(target) {
+      const start = parseInt(meetingsEl.textContent.replace(/\D/g, ''), 10) || BASE;
+      if (target <= start) { meetingsEl.textContent = fmt(target); return; }
+      const steps = 28, inc = (target - start) / steps;
+      let i = 0;
+      const t = setInterval(() => {
+        i++;
+        meetingsEl.textContent = fmt(Math.round(start + inc * i));
+        if (i >= steps) { meetingsEl.textContent = fmt(target); clearInterval(t); }
+      }, 18);
+    }
+
+    meetingsEl.textContent = fmt(BASE); // valeur immédiate, même si le réseau traîne
+
+    // Compteur global (+1 par visite) — repli localStorage si le service ne répond pas
+    fetch(`https://abacus.jasoncameron.dev/hit/${NS}/${KEY}`)
+      .then(r => r.json())
+      .then(d => {
+        if (typeof d.value !== 'number') throw new Error('bad payload');
+        animateMeetingsTo(BASE + d.value);
+      })
+      .catch(() => {
+        const local = (parseInt(localStorage.getItem('reunions') || '0', 10) || 0) + 1;
+        localStorage.setItem('reunions', local);
+        animateMeetingsTo(BASE + local);
+      });
+  }
+
+  // ─── Onglets Chrome (jitter léger) ──────────────────────────
+  const chromeEl = document.getElementById('chromeTabs');
+  if (chromeEl) {
+    let tabs = 137;
+    chromeEl.textContent = tabs;
+    setInterval(() => {
+      if (viewerOpen()) return;
+      tabs += Math.round((Math.random() - 0.45) * 6); // légère tendance à monter
+      tabs = Math.max(108, Math.min(214, tabs));
+      chromeEl.textContent = tabs;
+    }, 2400);
+  }
+
+  // ─── Tokens / jour (compteur qui défile) ────────────────────
+  const tokensEl = document.getElementById('tokensDay');
+  if (tokensEl) {
+    let tokens = 1200000 + Math.floor(Math.random() * 80000);
+    const render = () => { tokensEl.textContent = (tokens / 1e6).toFixed(2) + 'M'; };
+    render();
+    setInterval(() => {
+      if (viewerOpen()) return;
+      tokens += Math.floor(Math.random() * 6000) + 2000;
+      render();
+    }, 800);
   }
 
   // ─── Hellobar (en chantier) ─────────────────────────────────
@@ -957,6 +1063,7 @@
     brandsTrack.innerHTML = set + set; // dupliqué pour boucle sans couture
     let bIdx = 0;
     const stepBrands = () => {
+      if (viewerOpen()) return;
       bIdx++;
       const node = brandsTrack.children[bIdx];
       if (!node) return;
@@ -977,24 +1084,25 @@
   const showreelCard = document.getElementById('showreelCard');
   const showreelLightbox = document.getElementById('showreelLightbox');
   const showreelLightboxClose = document.getElementById('showreelLightboxClose');
-  const showreelLightboxVideo = document.getElementById('showreelLightboxVideo');
+  const showreelEmbed = document.getElementById('showreelEmbed');
+
+  const VIMEO_SRC = 'https://player.vimeo.com/video/591673847?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&title=0&byline=0&portrait=0&dnt=1';
 
   function openShowreel() {
     if (!showreelLightbox) return;
-    if (showreelCard?.classList.contains('is-soon')) return; // vidéo pas encore dispo
+    document.body.classList.add('viewer-open'); // gèle l'arrière-plan (perf focus player)
+    document.querySelector('.memoji-video')?.pause(); // memoji du chat
     showreelLightbox.classList.add('open');
     showreelLightbox.setAttribute('aria-hidden', 'false');
-    if (showreelLightboxVideo) {
-      showreelLightboxVideo.currentTime = 0;
-      showreelLightboxVideo.muted = false;
-      showreelLightboxVideo.play()?.catch(() => {});
-    }
+    if (showreelEmbed) showreelEmbed.src = VIMEO_SRC; // charge & autoplay Vimeo
   }
   function closeShowreel() {
     if (!showreelLightbox) return;
+    document.body.classList.remove('viewer-open');
     showreelLightbox.classList.remove('open');
     showreelLightbox.setAttribute('aria-hidden', 'true');
-    showreelLightboxVideo?.pause();
+    if (showreelEmbed) showreelEmbed.src = ''; // stoppe la lecture
+    document.querySelector('.memoji-video')?.play().catch(() => {}); // relance memoji
   }
 
   showreelCard?.addEventListener('click', openShowreel);

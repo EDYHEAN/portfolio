@@ -18,10 +18,6 @@
     <button class="hellobar-close" id="hellobarClose" aria-label="Masquer">✕</button>
   </div>
 
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-
   <div class="window" id="mainWindow">
     <div class="window-titlebar">
       <div class="traffic-lights">
@@ -45,21 +41,21 @@
       <!-- 1. Profile Card -->
       <div class="card card-profile">
         <div class="profile-photo">
-          <div class="avatar">JT</div>
+          <div class="avatar"><img src="assets/profile.jpg" alt="Johan Trigeard"></div>
+          <div class="photo-meta">
+            <div class="bpm-badge">
+              <svg class="bpm-heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              <span class="bpm-badge-text"><span id="bpmValue">72</span> <span class="bpm-badge-unit">BPM</span></span>
+            </div>
+            <span class="status-chip">
+              <span class="status-dot"></span>
+              <span id="statusText">Chilling</span>
+            </span>
+          </div>
         </div>
         <div class="profile-info">
-          <h1 class="name">Johan<br>Trigeard</h1>
+          <h1 class="name">Johan Trigeard</h1>
           <p class="role">Lead UI/UX Designer<br>&amp; Product Designer</p>
-          <p class="location">
-            <svg width="10" height="13" viewBox="0 0 12 16" fill="none"><path d="M6 0C3.24 0 1 2.24 1 5c0 3.75 5 11 5 11s5-7.25 5-11c0-2.76-2.24-5-5-5zm0 6.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" fill="currentColor" opacity=".7"/></svg>
-            Bordeaux, France
-          </p>
-          <div class="hue-gauge">
-            <div class="hue-gauge-head">
-              <span class="hue-gauge-swatch" id="hueSwatch"></span>
-            </div>
-            <input type="range" class="hue-slider" id="hueSlider" min="0" max="360" value="231" aria-label="Couleur d'accentuation du site">
-          </div>
         </div>
       </div>
 
@@ -68,6 +64,15 @@
         <div class="hero-body">
           <h2 class="hero-title">Curieux de tout.<br><em>Créatif avant tout.</em></h2>
           <p class="hero-sub">Lead UI/UX chez Rhinov ·<br>Maisons du Monde</p>
+          <p class="location">
+            <svg width="10" height="13" viewBox="0 0 12 16" fill="none"><path d="M6 0C3.24 0 1 2.24 1 5c0 3.75 5 11 5 11s5-7.25 5-11c0-2.76-2.24-5-5-5zm0 6.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" fill="currentColor" opacity=".7"/></svg>
+            Bordeaux, France
+          </p>
+          <a href="assets/cv-johan-trigeard.pdf" download="Johan-Trigeard-CV.pdf" class="hero-cv">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a1 1 0 0 1 1 1v9.59l2.3-2.3a1 1 0 0 1 1.4 1.42l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 1.4-1.42l2.3 2.3V4a1 1 0 0 1 1-1ZM5 18a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v1a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1a1 1 0 0 1 1-1Z"/></svg>
+            <span class="hero-cv-sep" aria-hidden="true"></span>
+            <span>Télécharger mon CV</span>
+          </a>
         </div>
       </div>
 
@@ -169,16 +174,23 @@
       <div class="card card-stats">
         <div class="stats-kpis">
           <div class="stat">
-            <span class="stat-num stat-bpm">
-              <svg class="bpm-heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-              <span id="bpmValue">72</span>
-            </span>
-            <span class="stat-lbl">BPM · en vie</span>
+            <span class="stat-num" data-target="7" data-suffix="+">0</span>
+            <span class="stat-lbl">Ans d'expérience</span>
           </div>
           <div class="stat-sep"></div>
           <div class="stat">
-            <span class="stat-num" data-target="7" data-suffix="+">0</span>
-            <span class="stat-lbl">Ans d'expérience</span>
+            <span class="stat-num" id="chromeTabs">137</span>
+            <span class="stat-lbl">Onglets Chrome</span>
+          </div>
+          <div class="stat-sep"></div>
+          <div class="stat">
+            <span class="stat-num" id="tokensDay">1.20M</span>
+            <span class="stat-lbl">Tokens / jour</span>
+          </div>
+          <div class="stat-sep"></div>
+          <div class="stat stat-meetings">
+            <span class="stat-num" id="meetingsValue">752</span>
+            <span class="stat-lbl">Réunions</span>
           </div>
         </div>
         <div class="brands-block">
@@ -192,15 +204,17 @@
       </div>
 
       <!-- 7. Showreel Card -->
-      <div class="card card-showreel is-soon" id="showreelCard" role="button" tabindex="0" aria-label="Showreel — bientôt disponible">
-        <video class="showreel-video" id="showreelVideo" autoplay muted loop playsinline preload="metadata" poster="assets/maisonsdumonde/chambre.jpg">
-          <source src="assets/showreel.mp4" type="video/mp4">
-        </video>
-        <span class="showreel-eyebrow">Showreel</span>
-        <span class="showreel-play" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        </span>
-        <span class="showreel-soon">✨ Coming soon</span>
+      <div class="card card-showreel" id="showreelCard" role="button" tabindex="0" aria-label="Voir le showreel">
+        <span class="showreel-grid" aria-hidden="true"></span>
+        <div class="showreel-content">
+          <span class="showreel-play" aria-hidden="true">
+            <span class="showreel-play-ring"></span>
+            <span class="showreel-play-ring showreel-play-ring--2"></span>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </span>
+          <span class="showreel-word">SHOWREEL</span>
+          <span class="showreel-tag">Motion Design</span>
+        </div>
       </div>
 
       <!-- 8. Portfolio Card -->
@@ -285,6 +299,12 @@
     </main>
   </div>
 
+  <!-- Hue rail — accent dynamique, sticky bord gauche (desktop) -->
+  <div class="hue-rail" id="hueRail">
+    <span class="hue-gauge-swatch" id="hueSwatch"></span>
+    <input type="range" class="hue-slider" id="hueSlider" min="0" max="360" value="231" aria-label="Couleur d'accentuation du site">
+  </div>
+
   <div class="win-restore" id="winRestore">Johan Trigeard — Portfolio</div>
 
   <!-- Chat Widget — Qui suis-je ? (desktop only) -->
@@ -316,9 +336,7 @@
   <div class="showreel-lightbox" id="showreelLightbox" aria-hidden="true">
     <button class="showreel-lightbox-close" id="showreelLightboxClose" aria-label="Fermer">✕</button>
     <div class="showreel-lightbox-frame">
-      <video id="showreelLightboxVideo" controls playsinline preload="metadata" poster="assets/maisonsdumonde/chambre.jpg">
-        <source src="assets/showreel.mp4" type="video/mp4">
-      </video>
+      <iframe id="showreelEmbed" src="" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen title="Showreel — Johan Trigeard"></iframe>
     </div>
   </div>
 

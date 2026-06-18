@@ -221,6 +221,7 @@
         { label: 'Secteur', value: 'B2B · Ameublement' },
       ],
       images: [
+        { src: 'assets/maisonsdumonde/allstar-1.png' },
         { src: 'assets/maisonsdumonde/Frame 17.jpg' },
         { src: 'assets/maisonsdumonde/Frame 18.jpg' },
         { src: 'assets/maisonsdumonde/Frame 19.jpg' },
@@ -672,6 +673,7 @@
   // Stats counter
   document.querySelectorAll('.stat-num').forEach(counter => {
     const target = parseInt(counter.dataset.target, 10);
+    if (!Number.isFinite(target)) return; // ex. BPM : géré à part
     const suffix = counter.dataset.suffix || '';
     const steps  = 60;
     let step = 0;
@@ -894,6 +896,117 @@
 
   document.addEventListener('click', e => {
     if (!e.target.closest('.chat-widget')) chatPanel?.classList.remove('open');
+  });
+
+  // ─── Hue gauge — accent dynamique ───────────────────────────
+  const hueSlider = document.getElementById('hueSlider');
+
+  function hslToRgbStr(h, s, l) {
+    s /= 100; l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
+    return `${Math.round(255 * f(0))}, ${Math.round(255 * f(8))}, ${Math.round(255 * f(4))}`;
+  }
+
+  function applyAccent(hue) {
+    const root = document.documentElement.style;
+    root.setProperty('--blue-rgb',      hslToRgbStr(hue, 68, 77));
+    root.setProperty('--blue-mid-rgb',  hslToRgbStr(hue, 60, 67));
+    root.setProperty('--blue-deep-rgb', hslToRgbStr(hue, 45, 53));
+  }
+
+  if (hueSlider) {
+    applyAccent(parseInt(hueSlider.value, 10)); // défaut = violet (231), reset au refresh
+    hueSlider.addEventListener('input', () => applyAccent(parseInt(hueSlider.value, 10)));
+  }
+
+  // ─── Fake BPM — "je suis en vie" ────────────────────────────
+  const bpmValueEl = document.getElementById('bpmValue');
+  if (bpmValueEl) {
+    const heart = document.querySelector('.bpm-heart');
+    let bpm = 72;
+    const tick = () => {
+      bpm += Math.round((Math.random() - 0.5) * 6);
+      bpm = Math.max(63, Math.min(82, bpm));
+      bpmValueEl.textContent = bpm;
+      heart?.style.setProperty('--bpm-dur', (60 / bpm).toFixed(2) + 's');
+    };
+    tick();
+    setInterval(tick, 2200);
+  }
+
+  // ─── Hellobar (en chantier) ─────────────────────────────────
+  const hellobar = document.getElementById('hellobar');
+  document.getElementById('hellobarClose')?.addEventListener('click', () => hellobar?.classList.add('hidden'));
+
+  // ─── Brand wall — carousel de logos ─────────────────────────
+  const BRANDS = [
+    { name: 'Maisons du Monde', src: 'assets/maisonsdumonde/logo_mdm.svg' },
+    { name: 'Rhinov',           src: 'assets/rhinov-rebrand/logo-rhinov.svg' },
+    { name: 'Activision',       src: 'assets/Activision.svg' },
+    { name: 'Webedia',          src: 'assets/Webedia-logo-2022.svg' },
+    { name: 'Samsung',          src: 'assets/Samsung.svg' },
+    { name: 'Lapeyre',          src: 'assets/lapeyre.svg' },
+    { name: 'Ledvance',         src: 'assets/ledvance.svg' },
+    { name: 'ixina',            src: 'assets/ixina.svg' },
+  ];
+  const brandsTrack = document.getElementById('brandsTrack');
+  if (brandsTrack && BRANDS.length) {
+    const set = BRANDS.map(b => `<img src="${b.src}" alt="${b.name}" title="${b.name}">`).join('');
+    brandsTrack.innerHTML = set + set; // dupliqué pour boucle sans couture
+    let bIdx = 0;
+    const stepBrands = () => {
+      bIdx++;
+      const node = brandsTrack.children[bIdx];
+      if (!node) return;
+      brandsTrack.style.transition = 'transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)';
+      brandsTrack.style.transform = `translateX(-${node.offsetLeft}px)`;
+      if (bIdx >= BRANDS.length) {
+        setTimeout(() => {              // retour sans couture sur le set dupliqué
+          brandsTrack.style.transition = 'none';
+          brandsTrack.style.transform = 'translateX(0)';
+          bIdx = 0;
+        }, 720);
+      }
+    };
+    setInterval(stepBrands, 2600);
+  }
+
+  // ─── Showreel lightbox ──────────────────────────────────────
+  const showreelCard = document.getElementById('showreelCard');
+  const showreelLightbox = document.getElementById('showreelLightbox');
+  const showreelLightboxClose = document.getElementById('showreelLightboxClose');
+  const showreelLightboxVideo = document.getElementById('showreelLightboxVideo');
+
+  function openShowreel() {
+    if (!showreelLightbox) return;
+    if (showreelCard?.classList.contains('is-soon')) return; // vidéo pas encore dispo
+    showreelLightbox.classList.add('open');
+    showreelLightbox.setAttribute('aria-hidden', 'false');
+    if (showreelLightboxVideo) {
+      showreelLightboxVideo.currentTime = 0;
+      showreelLightboxVideo.muted = false;
+      showreelLightboxVideo.play()?.catch(() => {});
+    }
+  }
+  function closeShowreel() {
+    if (!showreelLightbox) return;
+    showreelLightbox.classList.remove('open');
+    showreelLightbox.setAttribute('aria-hidden', 'true');
+    showreelLightboxVideo?.pause();
+  }
+
+  showreelCard?.addEventListener('click', openShowreel);
+  showreelCard?.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openShowreel(); }
+  });
+  showreelLightboxClose?.addEventListener('click', closeShowreel);
+  showreelLightbox?.addEventListener('click', e => {
+    if (e.target === showreelLightbox) closeShowreel();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && showreelLightbox?.classList.contains('open')) closeShowreel();
   });
 
 });

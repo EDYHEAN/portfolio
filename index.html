@@ -13,6 +13,11 @@
 </head>
 <body>
 
+  <div class="hellobar" id="hellobar">
+    <span class="hellobar-text">🚧 Portfolio en chantier, ça bouge encore par ici !</span>
+    <button class="hellobar-close" id="hellobarClose" aria-label="Masquer">✕</button>
+  </div>
+
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
@@ -44,23 +49,25 @@
         </div>
         <div class="profile-info">
           <h1 class="name">Johan<br>Trigeard</h1>
-          <p class="role">UI/UX Designer</p>
+          <p class="role">Lead UI/UX Designer<br>&amp; Product Designer</p>
           <p class="location">
             <svg width="10" height="13" viewBox="0 0 12 16" fill="none"><path d="M6 0C3.24 0 1 2.24 1 5c0 3.75 5 11 5 11s5-7.25 5-11c0-2.76-2.24-5-5-5zm0 6.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" fill="currentColor" opacity=".7"/></svg>
             Bordeaux, France
           </p>
-          <a href="mailto:johan.trigeard@gmail.com" class="btn-cta">Contactez-moi</a>
+          <div class="hue-gauge">
+            <div class="hue-gauge-head">
+              <span class="hue-gauge-swatch" id="hueSwatch"></span>
+            </div>
+            <input type="range" class="hue-slider" id="hueSlider" min="0" max="360" value="231" aria-label="Couleur d'accentuation du site">
+          </div>
         </div>
       </div>
 
       <!-- 2. Hero Card -->
       <div class="card card-hero">
-        <nav class="nav-pills">
-          <span class="pill active">Home</span>
-        </nav>
         <div class="hero-body">
           <h2 class="hero-title">Curieux de tout.<br><em>Créatif avant tout.</em></h2>
-          <p class="hero-sub">Lead UI/UX chez Rhinov — Maisons du Monde</p>
+          <p class="hero-sub">Lead UI/UX chez Rhinov ·<br>Maisons du Monde</p>
         </div>
       </div>
 
@@ -76,17 +83,17 @@
                 <div class="tl-role">
                   <span class="tl-role-date">jan. 2026 →</span>
                   <span class="tl-role-title">Lead UI/UX</span>
-                  <span>Pilotage UX des produits digitaux, lien équipes produit &amp; tech.</span>
+                  <span>Pilotage UX produits, lien équipes produit &amp; tech.</span>
                 </div>
                 <div class="tl-role">
                   <span class="tl-role-date">jan. 2024</span>
                   <span class="tl-role-title">Lead UI Designer</span>
-                  <span>Interfaces web/mobile, design system &amp; coordination cycle agile.</span>
+                  <span>Interfaces web/mobile, design system, cycle agile.</span>
                 </div>
                 <div class="tl-role">
                   <span class="tl-role-date">fév. 2023</span>
                   <span class="tl-role-title">Graphic Designer</span>
-                  <span>Assets marketing &amp; contribution aux interfaces produit.</span>
+                  <span>Assets marketing &amp; interfaces produit.</span>
                 </div>
               </div>
             </div>
@@ -95,14 +102,14 @@
             <span class="tl-date">2020–22</span>
             <div class="tl-body">
               <strong>Motion Designer · Infograpik</strong>
-              <span>Animation 2D, logotype &amp; charte graphique pour une start-up jeu-vidéo suisse. Clients : Twitch, Activision, Microsoft.</span>
+              <span>Animation 2D &amp; branding pour une start-up gaming suisse. Clients : Twitch, Activision, Microsoft.</span>
             </div>
           </div>
           <div class="tl-item">
             <span class="tl-date">2018–20</span>
             <div class="tl-body">
               <strong>Web Designer · Intento &amp; Fière Allure</strong>
-              <span>Sites Wordpress, charte graphique, logotype &amp; print pour deux start-ups bordelaises.</span>
+              <span>Sites WordPress, branding &amp; print pour deux start-ups bordelaises.</span>
             </div>
           </div>
         </div>
@@ -160,27 +167,40 @@
 
       <!-- 6. Stats Card -->
       <div class="card card-stats">
-        <div class="stat">
-          <span class="stat-num" data-target="7" data-suffix="+">0</span>
-          <span class="stat-lbl">Ans d'XP</span>
+        <div class="stats-kpis">
+          <div class="stat">
+            <span class="stat-num stat-bpm">
+              <svg class="bpm-heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              <span id="bpmValue">72</span>
+            </span>
+            <span class="stat-lbl">BPM · en vie</span>
+          </div>
+          <div class="stat-sep"></div>
+          <div class="stat">
+            <span class="stat-num" data-target="7" data-suffix="+">0</span>
+            <span class="stat-lbl">Ans d'expérience</span>
+          </div>
         </div>
-        <div class="stat-sep"></div>
-        <div class="stat">
-          <span class="stat-num" data-target="50" data-suffix="+">0</span>
-          <span class="stat-lbl">Projets</span>
+        <div class="brands-block">
+          <div class="brands-head">
+            <span class="brands-eyebrow">On a collaboré</span>
+          </div>
+          <div class="brands" id="brands">
+            <div class="brands-track" id="brandsTrack"></div>
+          </div>
         </div>
       </div>
 
-      <!-- 7. Connect Card -->
-      <div class="card card-connect">
-        <div class="connect-top">
-          <div class="fl-badge"><span class="avail-dot"></span>Disponible</div>
-        </div>
-        <p class="connect-phrase">Je suis <em>disponible</em> et j'ai déjà hâte qu'on travaille ensemble.</p>
-        <div class="connect-bottom">
-          <span class="fl-eyebrow">Freelance · depuis 2019</span>
-          <a href="mailto:johan.trigeard@gmail.com" class="email-link">→ johan.trigeard@gmail.com</a>
-        </div>
+      <!-- 7. Showreel Card -->
+      <div class="card card-showreel is-soon" id="showreelCard" role="button" tabindex="0" aria-label="Showreel — bientôt disponible">
+        <video class="showreel-video" id="showreelVideo" autoplay muted loop playsinline preload="metadata" poster="assets/maisonsdumonde/chambre.jpg">
+          <source src="assets/showreel.mp4" type="video/mp4">
+        </video>
+        <span class="showreel-eyebrow">Showreel</span>
+        <span class="showreel-play" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </span>
+        <span class="showreel-soon">✨ Coming soon</span>
       </div>
 
       <!-- 8. Portfolio Card -->
@@ -290,6 +310,16 @@
         <source src="assets/memoji-loop.webm" type="video/webm">
       </video>
     </button>
+  </div>
+
+  <!-- Showreel lightbox -->
+  <div class="showreel-lightbox" id="showreelLightbox" aria-hidden="true">
+    <button class="showreel-lightbox-close" id="showreelLightboxClose" aria-label="Fermer">✕</button>
+    <div class="showreel-lightbox-frame">
+      <video id="showreelLightboxVideo" controls playsinline preload="metadata" poster="assets/maisonsdumonde/chambre.jpg">
+        <source src="assets/showreel.mp4" type="video/mp4">
+      </video>
+    </div>
   </div>
 
   <script src="script.js"></script>

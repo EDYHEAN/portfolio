@@ -906,6 +906,7 @@ body.win-dragging * { cursor: grabbing !important; }
 }
 
 .card-showreel.is-soon { cursor: default; }
+.card-showreel.is-soon .showreel-video { display: none; }
 .card-showreel.is-soon .showreel-play { display: none; }
 .card-showreel.is-soon .showreel-soon { display: inline-flex; }
 

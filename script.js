@@ -212,7 +212,7 @@
   const PROJECTS = [
     {
       id: 'maisons-du-monde',
-      title: 'Maisons du Monde Business — Landing page',
+      title: 'Maisons du Monde Business · Landing page',
       logo: 'assets/maisonsdumonde/logo_mdm.svg',
       category: 'Product Design · B2B',
       context: 'Refonte complète de la plateforme B2B Rhinov intégrée à l\'univers Maisons du Monde. De la research au delivery : tunnel de commande, simulateur de budget, pages secteur, design system.',
@@ -232,8 +232,31 @@
       tags: ['Figma', 'Design System', 'UX Research', 'B2B', 'Web'],
     },
     {
+      id: 'rhinov-ia',
+      title: 'Rhinov iA · Assistant déco par IA',
+      logo: 'assets/rhinov-ia/logo_rhinovia.svg',
+      category: 'Product Design · IA',
+      context: 'Conception d\'un assistant de décoration conversationnel propulsé par l\'IA, imaginé par les décorateurs Rhinov. De la landing à l\'expérience de chat : recommandations produits, palettes de couleurs sur-mesure, projections avant/après et mise en situation, le tout gratuit et instantané.',
+      figma: 'https://www.figma.com/design/KbGmDnR1LTCRJwM6IjZApg/Johan-is-designing?node-id=2023-9517&t=8MVtXKu0g9fA5bNk-1',
+      specs: [
+        { label: 'Année',   value: '2025' },
+        { label: 'Rôle',    value: 'Lead UI/UX' },
+        { label: 'Client',  value: 'Rhinov' },
+        { label: 'Secteur', value: 'IA · Déco' },
+      ],
+      images: [
+        { src: 'assets/rhinov-ia/hero-landing.jpg' },
+        { src: 'assets/rhinov-ia/chat-palette.jpg' },
+        [{ src: 'assets/rhinov-ia/avant-apres.jpg' }, { src: 'assets/rhinov-ia/result-canape.jpg' }],
+        { src: 'assets/rhinov-ia/mood-fauteuil.jpg' },
+        [{ src: 'assets/rhinov-ia/feature-expertise.jpg' }, { src: 'assets/rhinov-ia/feature-conseils.jpg' }, { src: 'assets/rhinov-ia/feature-palettes.jpg' }],
+        { src: 'assets/rhinov-ia/branding.jpg' },
+      ],
+      tags: ['Figma', 'Product Design', 'IA', 'UX', 'Web'],
+    },
+    {
       id: 'rhinov-rebrand',
-      title: 'Rhinov — Rebranding',
+      title: 'Rhinov · Rebranding',
       logo: 'assets/rhinov-rebrand/logo-rhinov.svg',
       category: 'Brand Design · Rhinov',
       context: 'Refonte de l\'identité visuelle de Rhinov : nouveau logo, charte graphique, motion design et déclinaisons digitales. Du concept au déploiement sur l\'ensemble des supports.',
@@ -266,9 +289,9 @@
 
     const imgsHtml = imgs.map((rowOrItem, i) => {
       const row = Array.isArray(rowOrItem) ? rowOrItem : [rowOrItem];
-      const is2col = row.length === 2;
+      const colClass = row.length > 1 ? `pw-group-${row.length}col` : '';
       return `
-      <div class="pw-group ${is2col ? 'pw-group-2col' : ''} pw-reveal">
+      <div class="pw-group ${colClass} pw-reveal">
         ${row.map((item, j) => `
           <div class="pw-imgwrap">
             <img class="pw-float-img${item.zoom ? ' pw-float-img-zoom' : ''}" src="${item.src}" alt=""
@@ -298,7 +321,7 @@
 
           <!-- Intro strip -->
           <div class="pw-ed-intro pw-reveal">
-            <span class="pw-cat-tag">${project.category} — ${(project.specs || [])[0]?.value || ''}</span>
+            <span class="pw-cat-tag">${project.category} · ${(project.specs || [])[0]?.value || ''}</span>
           </div>
 
           ${imgsHtml}
@@ -550,9 +573,9 @@
     const imgs = project.images || [];
     const imgsHtml = imgs.map((rowOrItem, i) => {
       const row = Array.isArray(rowOrItem) ? rowOrItem : [rowOrItem];
-      const is2col = row.length === 2;
+      const colClass = row.length > 1 ? `pw-group-${row.length}col` : '';
       return `
-      <div class="pw-group ${is2col ? 'pw-group-2col' : ''}">
+      <div class="pw-group ${colClass}">
         ${row.map((item, j) => `
           <div class="pw-imgwrap">
             <img class="pw-float-img${item.zoom ? ' pw-float-img-zoom' : ''}" src="${item.src}" alt="" loading="${i === 0 && j === 0 ? 'eager' : 'lazy'}">
@@ -727,6 +750,7 @@
   // â”€â”€â”€ Portfolio carousel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const carouselProjects = [
     { title: 'Maisons du Monde', cat: 'Product Design', color: '#2C3A28', img: 'assets/maisonsdumonde/chambre.jpg', logo: 'assets/maisonsdumonde/logo_mdm.svg',                        id: 'maisons-du-monde' },
+    { title: 'Rhinov iA',        cat: 'Product Design', color: '#1b1614', img: 'assets/rhinov-ia/cover.jpg',         logo: 'assets/rhinov-ia/logo_rhinovia.svg',                        id: 'rhinov-ia' },
     { title: 'Rhinov Rebrand',   cat: 'Brand Design',   color: '#0f0f0f', img: 'assets/rhinov-rebrand/element.jpg', logo: 'assets/rhinov-rebrand/logo-rhinov.svg', logoColor: '#8C6848', id: 'rhinov-rebrand' },
   ];
 

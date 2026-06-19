@@ -835,9 +835,9 @@ body.win-dragging * { cursor: grabbing !important; }
 }
 
 .brands-track img {
-  /* boîte uniforme pour tous les logos → tailles harmonisées, sans déformation */
-  width: 84px;
-  height: 26px;
+  /* hauteur normalisée + correction optique par logo (--s) → présence visuelle homogène */
+  height: calc(20px * var(--s, 1));
+  width: auto;
   object-fit: contain;
   /* nuance de gris uniforme, quelles que soient les couleurs source */
   filter: brightness(0) invert(0.62);
@@ -1540,14 +1540,15 @@ body.win-dragging * { cursor: grabbing !important; }
   height: 32px;
   border-radius: 50%;
   background: rgba(255,255,255,0.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 12px;
-  letter-spacing: 0.05em;
-  color: white;
+  overflow: hidden;
   flex-shrink: 0;
+}
+
+.chat-avatar-sm img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .chat-header-info {
@@ -1855,7 +1856,7 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ccc 0%, #aaa 100%);
+  background: #ddd url('assets/profile.jpg') center / cover no-repeat;
   margin: 0 22px;
   flex-shrink: 0;
   border: 1px solid rgba(0,0,0,0.07);
@@ -2612,10 +2613,13 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   .stats-kpis { flex-wrap: wrap; gap: 16px 10px; }
   .stats-kpis .stat-sep { display: none; }
   .stats-kpis .stat { flex: 1 1 40%; }
+  /* "On a collaboré" : de l'air pour ne pas coller aux KPI */
+  .card-stats .brands-block { margin-top: 16px; }
+  .card-stats .brands-head { transform: none; }
 
-  /* Figma — iframe caché, lien bouton à la place */
+  /* Figma — iframe caché, lien bouton à la place (centré) */
   .pw-figma-embed     { display: none; }
-  .pw-figma-link-mobile { display: flex; }
+  .pw-figma-link-mobile { display: flex; justify-content: center; }
 
   /* Mosaïque — plein écran mobile */
   .pw-mosaic-inner {

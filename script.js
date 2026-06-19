@@ -224,7 +224,7 @@
         { label: 'Secteur', value: 'B2B · Ameublement' },
       ],
       images: [
-        { src: 'assets/maisonsdumonde/allstar-1.png' },
+        { src: 'assets/maisonsdumonde/allstar-1.webp' },
         { src: 'assets/maisonsdumonde/Frame 17.jpg' },
         { src: 'assets/maisonsdumonde/Frame 18.jpg' },
         { src: 'assets/maisonsdumonde/Frame 19.jpg' },
@@ -627,27 +627,35 @@
     wrap.querySelector('.pw-sheet-close').addEventListener('click', closeSheet);
     backdrop.addEventListener('click', closeSheet);
 
+    // Pull-to-dismiss : on n'engage le drag QUE si le geste démarre tout en haut
+    // du scroll. Sinon on laisse le scroll natif tranquille (sinon il se bloque).
     let touchStartY = 0;
+    let pulling = false;
     sheet.addEventListener('touchstart', e => {
       touchStartY = e.touches[0].clientY;
+      pulling = scrollEl.scrollTop <= 0; // décidé une seule fois, au départ
     }, { passive: true });
 
     sheet.addEventListener('touchmove', e => {
+      if (!pulling) return;
       const dy = e.touches[0].clientY - touchStartY;
-      if (dy > 0 && scrollEl.scrollTop <= 0) {
-        sheet.style.transition = 'none';
-        sheet.style.transform = `translateY(${Math.min(dy, window.innerHeight * 0.6)}px)`;
+      if (dy <= 0) {                 // l'utilisateur remonte → c'est un scroll, on lâche
+        pulling = false;
+        sheet.style.transition = '';
+        sheet.style.transform = 'translateY(0)';
+        return;
       }
+      sheet.style.transition = 'none';
+      sheet.style.transform = `translateY(${Math.min(dy, window.innerHeight * 0.6)}px)`;
     }, { passive: true });
 
     sheet.addEventListener('touchend', e => {
+      if (!pulling) return;
       const dy = e.changedTouches[0].clientY - touchStartY;
       sheet.style.transition = '';
-      if (dy > 80 && scrollEl.scrollTop <= 0) {
-        closeSheet();
-      } else {
-        sheet.style.transform = 'translateY(0)';
-      }
+      if (dy > 80) closeSheet();
+      else sheet.style.transform = 'translateY(0)';
+      pulling = false;
     });
 
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -1047,19 +1055,20 @@
   document.getElementById('hellobarClose')?.addEventListener('click', () => hellobar?.classList.add('hidden'));
 
   // ─── Brand wall — carousel de logos ─────────────────────────
+  // scale = correction optique par logo pour une présence visuelle homogène
   const BRANDS = [
-    { name: 'Maisons du Monde', src: 'assets/maisonsdumonde/logo_mdm.svg' },
-    { name: 'Rhinov',           src: 'assets/rhinov-rebrand/logo-rhinov.svg' },
-    { name: 'Activision',       src: 'assets/Activision.svg' },
-    { name: 'Webedia',          src: 'assets/Webedia-logo-2022.svg' },
-    { name: 'Samsung',          src: 'assets/Samsung.svg' },
-    { name: 'Lapeyre',          src: 'assets/lapeyre.svg' },
-    { name: 'Ledvance',         src: 'assets/ledvance.svg' },
-    { name: 'ixina',            src: 'assets/ixina.svg' },
+    { name: 'Maisons du Monde', src: 'assets/maisonsdumonde/logo_mdm.svg', scale: 1.25 },
+    { name: 'Rhinov',           src: 'assets/rhinov-rebrand/logo-rhinov.svg', scale: 1.15 },
+    { name: 'Activision',       src: 'assets/Activision.svg', scale: 0.9 },
+    { name: 'Webedia',          src: 'assets/Webedia-logo-2022.svg', scale: 0.7 },
+    { name: 'Samsung',          src: 'assets/Samsung.svg', scale: 0.66 },
+    { name: 'Lapeyre',          src: 'assets/lapeyre.svg', scale: 1.1 },
+    { name: 'Ledvance',         src: 'assets/ledvance.svg', scale: 1.0 },
+    { name: 'ixina',            src: 'assets/ixina.svg', scale: 0.8 },
   ];
   const brandsTrack = document.getElementById('brandsTrack');
   if (brandsTrack && BRANDS.length) {
-    const set = BRANDS.map(b => `<img src="${b.src}" alt="${b.name}" title="${b.name}">`).join('');
+    const set = BRANDS.map(b => `<img src="${b.src}" alt="${b.name}" title="${b.name}" style="--s:${b.scale || 1}" loading="lazy" decoding="async">`).join('');
     brandsTrack.innerHTML = set + set; // dupliqué pour boucle sans couture
     let bIdx = 0;
     const stepBrands = () => {

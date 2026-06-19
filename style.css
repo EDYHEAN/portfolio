@@ -1457,14 +1457,14 @@ body.win-dragging * { cursor: grabbing !important; }
   width: 62px;
   height: 62px;
   border-radius: 50%;
-  background: #7C3AED;
+  background: var(--blue-deep);
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.45), 0 2px 8px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 20px rgba(var(--blue-deep-rgb), 0.45), 0 2px 8px rgba(0,0,0,0.12);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   flex-shrink: 0;
   position: relative;
@@ -1486,7 +1486,7 @@ body.win-dragging * { cursor: grabbing !important; }
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: #7C3AED; /* violet en dur, indépendant du hue slider */
+  background: var(--blue-deep); /* suit l'accent du hue slider */
   z-index: -1;
   animation: chat-ping 2.2s ease-out infinite;
 }
@@ -1498,7 +1498,7 @@ body.win-dragging * { cursor: grabbing !important; }
 
 .chat-toggle:hover {
   transform: scale(1.08);
-  box-shadow: 0 8px 28px rgba(124, 58, 237, 0.6);
+  box-shadow: 0 8px 28px rgba(var(--blue-deep-rgb), 0.6);
 }
 
 .chat-panel {

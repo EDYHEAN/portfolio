@@ -1486,7 +1486,7 @@ body.win-dragging * { cursor: grabbing !important; }
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: var(--blue-deep);
+  background: #7C3AED; /* violet en dur, indépendant du hue slider */
   z-index: -1;
   animation: chat-ping 2.2s ease-out infinite;
 }
@@ -1498,7 +1498,7 @@ body.win-dragging * { cursor: grabbing !important; }
 
 .chat-toggle:hover {
   transform: scale(1.08);
-  box-shadow: 0 8px 28px rgba(var(--blue-deep-rgb), 0.6);
+  box-shadow: 0 8px 28px rgba(124, 58, 237, 0.6);
 }
 
 .chat-panel {

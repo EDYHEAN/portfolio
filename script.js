@@ -1076,12 +1076,12 @@
   // scale = correction optique par logo pour une présence visuelle homogène
   const BRANDS = [
     { name: 'Maisons du Monde', src: 'assets/maisonsdumonde/logo_mdm.svg', scale: 1.25 },
-    { name: 'Rhinov',           src: 'assets/rhinov-rebrand/logo-rhinov.svg', scale: 1.15 },
+    { name: 'Rhinov',           src: 'assets/rhinov-rebrand/logo-rhinov.svg', scale: 1.8 },
     { name: 'Activision',       src: 'assets/Activision.svg', scale: 0.9 },
     { name: 'Webedia',          src: 'assets/Webedia-logo-2022.svg', scale: 0.7 },
     { name: 'Samsung',          src: 'assets/Samsung.svg', scale: 0.66 },
-    { name: 'Lapeyre',          src: 'assets/lapeyre.svg', scale: 1.1 },
-    { name: 'Ledvance',         src: 'assets/ledvance.svg', scale: 1.0 },
+    { name: 'Lapeyre',          src: 'assets/lapeyre.svg', scale: 1.55 },
+    { name: 'Ledvance',         src: 'assets/ledvance.svg', scale: 1.3 },
     { name: 'ixina',            src: 'assets/ixina.svg', scale: 0.8 },
   ];
   const brandsTrack = document.getElementById('brandsTrack');

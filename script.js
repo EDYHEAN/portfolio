@@ -615,7 +615,6 @@
 
     const sheet = wrap.querySelector('.pw-sheet');
     const backdrop = wrap.querySelector('.pw-sheet-backdrop');
-    const scrollEl = wrap.querySelector('.pw-sheet-scroll');
 
     function closeSheet() {
       sheet.style.transform = 'translateY(100%)';
@@ -627,35 +626,30 @@
     wrap.querySelector('.pw-sheet-close').addEventListener('click', closeSheet);
     backdrop.addEventListener('click', closeSheet);
 
-    // Pull-to-dismiss : on n'engage le drag QUE si le geste démarre tout en haut
-    // du scroll. Sinon on laisse le scroll natif tranquille (sinon il se bloque).
+    // Swipe-pour-fermer limité à la POIGNÉE uniquement : le contenu scrolle
+    // en natif, sans aucun handler touch dessus → plus d'interférence de scroll.
+    const handleWrap = wrap.querySelector('.pw-sheet-handle-wrap');
     let touchStartY = 0;
-    let pulling = false;
-    sheet.addEventListener('touchstart', e => {
+    let dragging = false;
+    handleWrap.addEventListener('touchstart', e => {
       touchStartY = e.touches[0].clientY;
-      pulling = scrollEl.scrollTop <= 0; // décidé une seule fois, au départ
+      dragging = true;
     }, { passive: true });
 
-    sheet.addEventListener('touchmove', e => {
-      if (!pulling) return;
+    handleWrap.addEventListener('touchmove', e => {
+      if (!dragging) return;
       const dy = e.touches[0].clientY - touchStartY;
-      if (dy <= 0) {                 // l'utilisateur remonte → c'est un scroll, on lâche
-        pulling = false;
-        sheet.style.transition = '';
-        sheet.style.transform = 'translateY(0)';
-        return;
-      }
       sheet.style.transition = 'none';
-      sheet.style.transform = `translateY(${Math.min(dy, window.innerHeight * 0.6)}px)`;
+      sheet.style.transform = `translateY(${Math.max(0, Math.min(dy, window.innerHeight * 0.6))}px)`;
     }, { passive: true });
 
-    sheet.addEventListener('touchend', e => {
-      if (!pulling) return;
+    handleWrap.addEventListener('touchend', e => {
+      if (!dragging) return;
       const dy = e.changedTouches[0].clientY - touchStartY;
       sheet.style.transition = '';
       if (dy > 80) closeSheet();
       else sheet.style.transform = 'translateY(0)';
-      pulling = false;
+      dragging = false;
     });
 
     requestAnimationFrame(() => requestAnimationFrame(() => {

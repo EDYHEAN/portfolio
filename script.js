@@ -734,15 +734,37 @@
     }, delay);
   }
 
-  if (window.innerWidth > 960) {
-    cards.forEach((card, i) => revealCard(card, 80 + i * 60));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduceMotion) {
+    cards.forEach(card => card.classList.add('card-entered'));
+  } else if (window.innerWidth > 960) {
+    // Reveal en cercle depuis le centre : on trie par distance au centre de la
+    // grille pour que le bento s'assemble vers l'extérieur, plutôt qu'en ordre DOM.
+    const grid = document.querySelector('.bento-grid');
+    const g = grid.getBoundingClientRect();
+    const cx = g.left + g.width / 2;
+    const cy = g.top + g.height / 2;
+    const order = Array.from(cards)
+      .map(card => {
+        const r = card.getBoundingClientRect();
+        const dx = (r.left + r.width / 2) - cx;
+        const dy = (r.top + r.height / 2) - cy;
+        return { card, score: Math.hypot(dx, dy) };
+      })
+      .sort((a, b) => a.score - b.score);
+    order.forEach(({ card }, i) => revealCard(card, 90 + i * 120));
   } else {
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        revealCard(entry.target, 0);
-        observer.unobserve(entry.target);
-      });
+      // Les cartes visibles au chargement arrivent dans le même lot : on les
+      // étage (stagger) pour que le 1er écran s'assemble une par une. Les cartes
+      // révélées plus tard au scroll arrivent seules → délai 0.
+      entries
+        .filter(entry => entry.isIntersecting)
+        .forEach((entry, i) => {
+          revealCard(entry.target, i * 110);
+          observer.unobserve(entry.target);
+        });
     }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
     cards.forEach(card => observer.observe(card));
   }

@@ -1292,12 +1292,19 @@ body.win-dragging * { cursor: grabbing !important; }
   min-height: 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: auto;
-  align-content: center;
+  grid-template-rows: repeat(3, 1fr);
   gap: 8px;
 }
 
-.tool-icon { aspect-ratio: 1; }
+/* Icônes dimensionnées par la hauteur de ligne pour toujours tenir
+   dans la carte (2 lignes du bento) sans déborder sur le label « Outils ». */
+.tool-icon {
+  aspect-ratio: 1;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  justify-self: center;
+}
 
 .tool-icon {
   border-radius: 12px;
@@ -2605,7 +2612,7 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   /* Tools — respiration + icônes carrées */
   .card-tools  { gap: 16px; }
   .tools-grid  { grid-template-rows: auto; min-height: auto; gap: 12px; }
-  .tool-icon   { aspect-ratio: 1; }
+  .tool-icon   { aspect-ratio: 1; height: auto; width: 100%; justify-self: stretch; }
 
   /* Music — spectre à droite */
   .music-row {

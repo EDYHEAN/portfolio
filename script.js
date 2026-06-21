@@ -278,6 +278,27 @@
       ],
       tags: ['Figma', 'Branding', 'Motion', 'Identité', 'Charte'],
     },
+    {
+      id: 'myfrenchtool',
+      title: 'MyFrenchTool · Annuaire SaaS français',
+      logo: 'assets/myfrenchtool/logo-dark.svg',
+      category: 'Product & Brand Design · Dev',
+      context: 'Produit personnel conçu et développé de A à Z : un annuaire indépendant des meilleurs outils SaaS français pour indés, TPE et PME, sélectionnés pour leur ancrage français, leur conformité RGPD et leur hébergement européen. De la marque (logo coq, charte bleu France, design system) aux fiches outil bento, en passant par le quiz de recommandation, les comparatifs et le blog SEO. Stack Next.js · React · Tailwind, en production sur myfrenchtool.com.',
+      figma: 'https://www.figma.com/design/C2Ybw2JX1HFypuMYefmT2Z/Johan-is-re-designing?node-id=0-1&t=Alo2eexOVZja494L-1',
+      specs: [
+        { label: 'Année',   value: '2026' },
+        { label: 'Rôle',    value: 'Design & Dev' },
+        { label: 'Client',  value: 'Projet perso' },
+        { label: 'Secteur', value: 'SaaS · Annuaire' },
+      ],
+      images: [
+        { src: 'assets/myfrenchtool/home-hero.webp' },
+        { src: 'assets/myfrenchtool/tool-aircall.webp' },
+        { src: 'assets/myfrenchtool/mobile1.webp' },
+        { src: 'assets/myfrenchtool/brand-logo.webp' },
+      ],
+      tags: ['Next.js', 'React', 'Tailwind', 'Design System', 'SEO', 'Branding'],
+    },
   ];
 
   function buildProjectWin(project) {
@@ -774,6 +795,7 @@
     { title: 'Maisons du Monde', cat: 'Product Design', color: '#2C3A28', img: 'assets/maisonsdumonde/chambre.jpg', logo: 'assets/maisonsdumonde/logo_mdm.svg',                        id: 'maisons-du-monde' },
     { title: 'Rhinov iA',        cat: 'Product Design', color: '#1b1614', img: 'assets/rhinov-ia/cover.jpg',         logo: 'assets/rhinov-ia/logo_rhinovia.svg',                        id: 'rhinov-ia' },
     { title: 'Rhinov Rebrand',   cat: 'Brand Design',   color: '#0f0f0f', img: 'assets/rhinov-rebrand/element.jpg', logo: 'assets/rhinov-rebrand/logo-rhinov.svg', logoColor: '#8C6848', id: 'rhinov-rebrand' },
+    { title: 'MyFrenchTool',     cat: 'Product · Brand', color: '#0052CC', img: 'assets/myfrenchtool/cover-bg.svg', logo: 'assets/myfrenchtool/logo.svg', logoScale: 1.4,           id: 'myfrenchtool' },
   ];
 
   let current = 0;
@@ -821,6 +843,9 @@
     if (!p.logo) { logoEl.style.display = 'none'; return; }
     logoEl.style.display = 'block';
     logoEl.style.opacity = '0';
+    // Correction optique par projet (sinon valeurs par défaut du CSS)
+    logoEl.style.width    = p.logoScale ? `${62 * p.logoScale}%` : '';
+    logoEl.style.maxWidth = p.logoScale ? `${170 * p.logoScale}px` : '';
     if (p.logoColor) {
       logoEl.style.filter = 'none';
       svgColored(p.logo, p.logoColor)

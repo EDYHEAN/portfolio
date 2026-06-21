@@ -1,0 +1,20 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mft-base" x1="0" y1="0" x2="1200" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1A6FE0"/>
+      <stop offset="0.55" stop-color="#0052CC"/>
+      <stop offset="1" stop-color="#003C99"/>
+    </linearGradient>
+    <radialGradient id="mft-glow" cx="0.28" cy="0.22" r="0.85">
+      <stop offset="0" stop-color="#3E8BF0" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#3E8BF0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="mft-shade" cx="0.85" cy="0.95" r="0.9">
+      <stop offset="0" stop-color="#002A6B" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#002A6B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#mft-base)"/>
+  <rect width="1200" height="800" fill="url(#mft-glow)"/>
+  <rect width="1200" height="800" fill="url(#mft-shade)"/>
+</svg>

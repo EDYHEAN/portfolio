@@ -238,6 +238,7 @@
       category: 'Product Design · IA',
       context: 'Conception d\'un assistant de décoration conversationnel propulsé par l\'IA, imaginé par les décorateurs Rhinov. De la landing à l\'expérience de chat : recommandations produits, palettes de couleurs sur-mesure, projections avant/après et mise en situation, le tout gratuit et instantané.',
       figma: 'https://www.figma.com/design/KbGmDnR1LTCRJwM6IjZApg/Johan-is-designing?node-id=2023-9517&t=8MVtXKu0g9fA5bNk-1',
+      url: 'https://ia.rhinov.fr/login/',
       specs: [
         { label: 'Année',   value: '2025' },
         { label: 'Rôle',    value: 'Lead UI/UX' },
@@ -262,6 +263,7 @@
       context: 'Refonte de l\'identité visuelle de Rhinov : nouveau logo, charte graphique, motion design et déclinaisons digitales. Du concept au déploiement sur l\'ensemble des supports.',
       collaborator: { name: 'Constance Belloni', url: 'https://constancebelloni.com' },
       figma: 'https://www.figma.com/design/KbGmDnR1LTCRJwM6IjZApg/Johan-x-Rhinov?node-id=0-1&p=f&t=4PnVbQX3Wx3FTjXY-0',
+      url: 'https://www.rhinov.fr/',
       specs: [
         { label: 'Année',   value: '2025' },
         { label: 'Rôle',    value: 'Lead Designer' },
@@ -282,12 +284,13 @@
       id: 'myfrenchtool',
       title: 'MyFrenchTool · Annuaire SaaS français',
       logo: 'assets/myfrenchtool/logo-dark.svg',
-      category: 'Product & Brand Design · Dev',
-      context: 'Produit personnel conçu et développé de A à Z : un annuaire indépendant des meilleurs outils SaaS français pour indés, TPE et PME, sélectionnés pour leur ancrage français, leur conformité RGPD et leur hébergement européen. De la marque (logo coq, charte bleu France, design system) aux fiches outil bento, en passant par le quiz de recommandation, les comparatifs et le blog SEO. Stack Next.js · React · Tailwind, en production sur myfrenchtool.com.',
+      category: 'Product & Brand Design',
+      context: 'Produit personnel conçu de A à Z : un annuaire indépendant des meilleurs outils SaaS français pour indés, TPE et PME, sélectionnés pour leur ancrage français, leur conformité RGPD et leur hébergement européen. De la marque (logo coq, charte bleu France, design system) aux fiches outil bento, en passant par le quiz de recommandation, les comparatifs et le blog SEO. En ligne sur myfrenchtool.com.',
       figma: 'https://www.figma.com/design/C2Ybw2JX1HFypuMYefmT2Z/Johan-is-re-designing?node-id=0-1&t=Alo2eexOVZja494L-1',
+      url: 'https://myfrenchtool.com',
       specs: [
         { label: 'Année',   value: '2026' },
-        { label: 'Rôle',    value: 'Design & Dev' },
+        { label: 'Rôle',    value: 'Design produit & marque' },
         { label: 'Client',  value: 'Projet perso' },
         { label: 'Secteur', value: 'SaaS · Annuaire' },
       ],
@@ -297,7 +300,7 @@
         { src: 'assets/myfrenchtool/mobile1.webp' },
         { src: 'assets/myfrenchtool/brand-logo.webp' },
       ],
-      tags: ['Next.js', 'React', 'Tailwind', 'Design System', 'SEO', 'Branding'],
+      tags: ['Branding', 'Design System', 'UX', 'SEO', 'Web'],
     },
   ];
 
@@ -324,6 +327,10 @@
     const specRows = (project.specs || []).map(s =>
       `<div class="pw-spec-row"><dt>${s.label}</dt><dd>${s.value}</dd></div>`
     ).join('');
+
+    const liveHost = project.url
+      ? project.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')
+      : '';
 
     el.innerHTML = `
       <div class="pw-titlebar">
@@ -382,6 +389,7 @@
             <span class="pw-aside-proj-lbl">Projet</span>
             <h3 class="pw-aside-title">${project.title.toUpperCase()}</h3>
             <p class="pw-aside-cat">${project.category}</p>
+            ${project.url ? `<a class="pw-aside-link" href="${project.url}" target="_blank" rel="noopener"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>${liveHost}</a>` : ''}
             <p class="pw-aside-ctx">${project.context}</p>
           </div>
           <div class="pw-aside-bottom">
@@ -608,6 +616,10 @@
       `<div class="pw-spec-row"><dt>${s.label}</dt><dd>${s.value}</dd></div>`
     ).join('');
 
+    const liveHost = project.url
+      ? project.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')
+      : '';
+
     const wrap = document.createElement('div');
     wrap.className = 'pw-sheet-wrap';
     wrap.innerHTML = `
@@ -621,6 +633,7 @@
             <div class="pw-sheet-title-wrap">
               <span class="pw-cat-tag">${project.category}</span>
               <h2 class="pw-sheet-title">${project.title}</h2>
+              ${project.url ? `<a class="pw-aside-link" href="${project.url}" target="_blank" rel="noopener"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>${liveHost}</a>` : ''}
             </div>
           </div>
           <button class="pw-sheet-close" aria-label="Fermer">&times;</button>

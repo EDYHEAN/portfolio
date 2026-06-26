@@ -117,7 +117,13 @@
 
   document.getElementById('tlGreen')?.addEventListener('click', () => {
     if (winState === 'maximized') { mainWindow.classList.remove('win-maximized'); winState = 'normal'; }
-    else if (winState === 'normal') { mainWindow.classList.add('win-maximized'); winState = 'maximized'; }
+    else if (winState === 'normal') {
+      // Un drag précédent laisse des styles inline (width/height/max/position)
+      // qui écrasent la classe → on les efface pour que .win-maximized s'applique.
+      mainWindow.style.cssText = '';
+      mainWindow.classList.add('win-maximized');
+      winState = 'maximized';
+    }
   });
 
   initDrag(mainWindow, document.querySelector('.window-titlebar'), () => winState !== 'normal');

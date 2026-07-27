@@ -827,7 +827,7 @@
 
   if (!thumb) return;
 
-  // SVG color rewriter — fetch SVG, swap fill, return data URI (cached)
+  // SVG color rewriter : fetch SVG, swap fill, return data URI (cached)
   const svgColorCache = {};
   async function svgColored(src, color) {
     const key = `${src}::${color}`;
@@ -992,7 +992,7 @@
     if (!e.target.closest('.chat-widget')) chatPanel?.classList.remove('open');
   });
 
-  // ─── Hue gauge — accent dynamique ───────────────────────────
+  // ─── Hue gauge : accent dynamique ───────────────────────────
   const hueSlider = document.getElementById('hueSlider');
 
   function hslToRgbStr(h, s, l) {
@@ -1094,7 +1094,7 @@
 
     meetingsEl.textContent = fmt(BASE); // valeur immédiate, même si le réseau traîne
 
-    // Compteur global (+1 par visite) — repli localStorage si le service ne répond pas
+    // Compteur global (+1 par visite), repli localStorage si le service ne répond pas
     fetch(`https://abacus.jasoncameron.dev/hit/${NS}/${KEY}`)
       .then(r => r.json())
       .then(d => {
@@ -1138,7 +1138,7 @@
   const hellobar = document.getElementById('hellobar');
   document.getElementById('hellobarClose')?.addEventListener('click', () => hellobar?.classList.add('hidden'));
 
-  // ─── Brand wall — carousel de logos ─────────────────────────
+  // ─── Brand wall : carousel de logos ─────────────────────────
   // scale = correction optique par logo pour une présence visuelle homogène
   const BRANDS = [
     { name: 'Maisons du Monde', src: 'assets/maisonsdumonde/logo_mdm.svg', scale: 1.25 },

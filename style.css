@@ -6,7 +6,7 @@
 
 :root {
   --bg:         #EDEEF8;
-  /* Accent piloté par la jauge de couleur (hue dynamique) — voir script.js */
+  /* Accent piloté par la jauge de couleur (hue dynamique), voir script.js */
   --blue-rgb:       155, 170, 239;
   --blue-mid-rgb:   122, 143, 224;
   --blue-deep-rgb:  80, 96, 192;
@@ -242,7 +242,7 @@ body.win-dragging * { cursor: grabbing !important; }
   padding: 14px;
 }
 
-/* ─── BASE CARD — LIQUID GLASS ──────────────────────────────── */
+/* ─── BASE CARD : LIQUID GLASS ──────────────────────────────── */
 
 .card {
   background: rgba(255, 255, 255, 0.62);
@@ -367,7 +367,7 @@ body.win-dragging * { cursor: grabbing !important; }
   filter: contrast(1.05) saturate(0.9) brightness(1.02);
 }
 
-/* tint accent (soft-light) — suit le sélecteur de couleur */
+/* tint accent (soft-light) : suit le sélecteur de couleur */
 .profile-photo::before {
   content: '';
   position: absolute;
@@ -380,7 +380,7 @@ body.win-dragging * { cursor: grabbing !important; }
   pointer-events: none;
 }
 
-/* scrim bas — lisibilité du badge BPM */
+/* scrim bas : lisibilité du badge BPM */
 .profile-photo::after {
   content: '';
   display: block;
@@ -406,7 +406,7 @@ body.win-dragging * { cursor: grabbing !important; }
   gap: 8px;
 }
 
-/* Statut de vie — discret, ferré à droite */
+/* Statut de vie : discret, ferré à droite */
 .status-chip {
   display: inline-flex;
   align-items: center;
@@ -431,7 +431,7 @@ body.win-dragging * { cursor: grabbing !important; }
   animation: pulse 2s ease-in-out infinite;
 }
 
-/* BPM — badge flottant blanc */
+/* BPM : badge flottant blanc */
 .bpm-badge {
   display: inline-flex;
   align-items: center;
@@ -864,7 +864,7 @@ body.win-dragging * { cursor: grabbing !important; }
   50%       { opacity: 0.5; transform: scale(0.85); }
 }
 
-/* ─── HUE RAIL (accent dynamique — sticky bord gauche) ──────── */
+/* ─── HUE RAIL (accent dynamique, sticky bord gauche) ──────── */
 
 .hue-rail {
   position: fixed;
@@ -949,7 +949,7 @@ body.win-dragging * { cursor: grabbing !important; }
   display: flex;
   align-items: center;
   justify-content: center;
-  /* fond statique, teinté accent — aucune vidéo (perf) */
+  /* fond statique, teinté accent, aucune vidéo (perf) */
   background:
     radial-gradient(120% 110% at 18% 0%, rgba(var(--blue-deep-rgb), 0.6), transparent 58%),
     radial-gradient(100% 100% at 100% 100%, rgba(var(--blue-rgb), 0.38), transparent 55%),
@@ -998,7 +998,7 @@ body.win-dragging * { cursor: grabbing !important; }
 }
 .showreel-play svg { width: 15px; height: 15px; margin-left: 2px; }
 
-/* anneaux qui pulsent — invite au clic, induit la vidéo */
+/* anneaux qui pulsent : invite au clic, induit la vidéo */
 .showreel-play-ring {
   position: absolute;
   inset: 0;
@@ -1738,7 +1738,7 @@ body[data-resize-dir="e"] *, body[data-resize-dir="w"] * { cursor: ew-resize !im
 body[data-resize-dir="ne"] *, body[data-resize-dir="sw"] * { cursor: nesw-resize !important; }
 body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize !important; }
 
-/* ── Window body — scroll container for sticky sidebar pattern */
+/* ── Window body : scroll container for sticky sidebar pattern */
 /* ── Body = direct 2-col grid, clips overflow */
 .pw-body {
   flex: 1;
@@ -1782,7 +1782,7 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   max-width: 440px;
 }
 
-/* ── Image groups — centered column, no distortion */
+/* ── Image groups : centered column, no distortion */
 .pw-group {
   padding: 20px 28px 12px;
   display: flex;
@@ -1844,7 +1844,7 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   margin: 0 auto;
 }
 
-/* ── Closing — Trexa-style: rule + avatar + name + CTA */
+/* ── Closing, Trexa-style: rule + avatar + name + CTA */
 .pw-closing {
   margin: 24px 28px 36px;
   display: flex;
@@ -1944,7 +1944,7 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
 
 .pw-aside-link:hover { color: rgba(var(--blue-deep-rgb), 1); }
 
-/* ── Sidebar — full height flex column */
+/* ── Sidebar : full height flex column */
 .pw-aside {
   display: flex;
   flex-direction: column;
@@ -2124,7 +2124,7 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   -webkit-backdrop-filter: blur(32px) saturate(140%);
 }
 
-/* Closing — inner + cards fade out upward */
+/* Closing : inner + cards fade out upward */
 .pw-mosaic-closing .pw-mosaic-inner {
   animation: mosaicInnerOut 0.4s cubic-bezier(0.4, 0, 1, 1) both;
 }
@@ -2201,7 +2201,7 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-/* Container entrance — blur + scale + fade */
+/* Container entrance : blur + scale + fade */
 .pw-mosaic-open .pw-mosaic-inner {
   animation: mosaicInnerIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -2211,7 +2211,7 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   to   { opacity: 1; transform: scale(1) translateY(0);       filter: blur(0px); }
 }
 
-/* Header — slides in from top */
+/* Header : slides in from top */
 .pw-mosaic-open .pw-mosaic-header {
   animation: mosaicHeaderIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both;
 }
@@ -2221,7 +2221,7 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Cards — spring overshoot stagger */
+/* Cards : spring overshoot stagger */
 .pw-mosaic-open .pw-mosaic-card {
   animation: mosaicCardIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   animation-delay: calc(var(--i) * 0.22s + 0.14s);
@@ -2462,7 +2462,7 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
 
 /* ─── MOBILE ─────────────────────────────────────────────────── */
 
-/* ─── BENTO FLUIDE — réempilement progressif ────────────────── */
+/* ─── BENTO FLUIDE : réempilement progressif ────────────────── */
 /* Dès qu'on réduit (≤1240) : la PAGE scrolle, la fenêtre grandit en
    hauteur, et chaque card prend sa hauteur NATURELLE. Les blocs se
    réempilent en colonnes décroissantes (3 → 2 → 1) jusqu'au mobile.
@@ -2526,7 +2526,7 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   .chat-widget { display: none; }
   .hue-rail    { display: none; }
 
-  /* Barre chantier — pill flottante sticky en bas */
+  /* Barre chantier : pill flottante sticky en bas */
   .hellobar {
     font-size: 11px;
     max-width: calc(100vw - 24px);
@@ -2587,7 +2587,7 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
     gap: 12px;
   }
 
-  /* Profile — photo carrée */
+  /* Profile : photo carrée */
   .profile-photo {
     flex: none;
     aspect-ratio: 1;
@@ -2597,7 +2597,7 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   /* Hero */
   .hero-title { font-size: clamp(32px, 8vw, 48px); }
 
-  /* Experience — plus lisible ET plus aéré */
+  /* Experience : plus lisible ET plus aéré */
   .card-experience  { overflow: visible; max-height: none; }
   .timeline         { gap: 18px; }
   .tl-item          { gap: 12px; }
@@ -2617,23 +2617,23 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   .card-experience .tags-wrap     { gap: 7px; }
   .card-experience .tag           { font-size: 11px; padding: 4px 11px; }
 
-  /* Portfolio — slider carré */
+  /* Portfolio : slider carré */
   .card-portfolio { aspect-ratio: 1; height: auto; }
 
-  /* Showreel — card 16:9 */
+  /* Showreel : card 16:9 */
   .card-showreel { aspect-ratio: 16 / 9; }
 
-  /* Viewer vidéo — padding réduit + frame qui respecte les marges */
+  /* Viewer vidéo : padding réduit + frame qui respecte les marges */
   .showreel-lightbox { padding: 16px; }
   .showreel-lightbox-frame { width: 100%; }
   .showreel-lightbox-close { top: 14px; right: 14px; }
 
-  /* Tools — respiration + icônes carrées */
+  /* Tools : respiration + icônes carrées */
   .card-tools  { gap: 16px; }
   .tools-grid  { grid-template-rows: auto; min-height: auto; gap: 12px; }
   .tool-icon   { aspect-ratio: 1; height: auto; width: 100%; justify-self: stretch; }
 
-  /* Music — spectre à droite */
+  /* Music : spectre à droite */
   .music-row {
     display: flex;
     flex-direction: row;
@@ -2653,11 +2653,11 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   .card-stats .brands-block { margin-top: 16px; }
   .card-stats .brands-head { transform: none; }
 
-  /* Figma — iframe caché, lien bouton à la place (centré) */
+  /* Figma : iframe caché, lien bouton à la place (centré) */
   .pw-figma-embed     { display: none; }
   .pw-figma-link-mobile { display: flex; justify-content: center; }
 
-  /* Mosaïque — plein écran mobile */
+  /* Mosaïque : plein écran mobile */
   .pw-mosaic-inner {
     width: calc(100% - 32px);
     max-height: calc(100vh - 40px);

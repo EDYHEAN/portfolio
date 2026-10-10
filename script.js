@@ -3,7 +3,10 @@
   // Mode focus : true quand le viewer vidéo est ouvert (on gèle l'arrière-plan)
   const viewerOpen = () => document.body.classList.contains('viewer-open');
 
-  // â”€â”€â”€ Shared drag engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Shared drag engine ───────────────────────────────────────
+  // Transition réduire / restaurer, commune à la fenêtre principale et aux fenêtres projet
+  const WIN_TX = 'top .44s cubic-bezier(.4,0,.2,1),left .44s cubic-bezier(.4,0,.2,1),width .44s cubic-bezier(.4,0,.2,1),height .44s cubic-bezier(.4,0,.2,1),border-radius .44s ease';
+
   let drag = null;
   let resize = null;
 
@@ -86,7 +89,7 @@
     });
   }
 
-  // â”€â”€â”€ Main window controls â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Main window controls ─────────────────────────────────────
   const mainWindow = document.getElementById('mainWindow');
   const winRestore = document.getElementById('winRestore');
   let winState = 'normal';
@@ -141,8 +144,7 @@
     });
     mainWindow.dataset.orig = JSON.stringify({ top: rect.top, left: rect.left, w: rect.width, h: rect.height });
     mainWindow.offsetHeight;
-    const tx = 'top .44s cubic-bezier(.4,0,.2,1),left .44s cubic-bezier(.4,0,.2,1),width .44s cubic-bezier(.4,0,.2,1),height .44s cubic-bezier(.4,0,.2,1),border-radius .44s ease';
-    mainWindow.style.transition   = tx;
+    mainWindow.style.transition   = WIN_TX;
     mainWindow.style.top          = `${window.innerHeight - pillH - 16}px`;
     mainWindow.style.left         = `${(window.innerWidth - pillW) / 2}px`;
     mainWindow.style.width        = `${pillW}px`;
@@ -154,8 +156,7 @@
 
   function restoreFromMin() {
     const { top, left, w, h } = JSON.parse(mainWindow.dataset.orig);
-    const tx = 'top .44s cubic-bezier(.4,0,.2,1),left .44s cubic-bezier(.4,0,.2,1),width .44s cubic-bezier(.4,0,.2,1),height .44s cubic-bezier(.4,0,.2,1),border-radius .44s ease';
-    Object.assign(mainWindow.style, { transition: tx, top: `${top}px`, left: `${left}px`, width: `${w}px`, height: `${h}px`, borderRadius: '18px' });
+    Object.assign(mainWindow.style, { transition: WIN_TX, top: `${top}px`, left: `${left}px`, width: `${w}px`, height: `${h}px`, borderRadius: '18px' });
     mainWindow.classList.remove('win-minimized');
     winState = 'normal';
     setTimeout(() => { mainWindow.style.cssText = ''; }, 450);
@@ -182,7 +183,7 @@
     widget.classList.remove('displaced');
   }
 
-  // â”€â”€â”€ Smooth inertia scroll â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Smooth inertia scroll ────────────────────────────────────
   function initSmoothScroll(el) {
     let current = 0;
     let target  = 0;
@@ -212,7 +213,7 @@
     }
   }
 
-  // â”€â”€â”€ Project windows â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Project windows ──────────────────────────────────────────
   let pwTopZ = 50;
 
   const PROJECTS = [
@@ -224,7 +225,7 @@
       context: 'Refonte complète de la plateforme B2B Rhinov intégrée à l\'univers Maisons du Monde. De la research au delivery : tunnel de commande, simulateur de budget, pages secteur, design system.',
       figma: 'https://www.figma.com/design/KbGmDnR1LTCRJwM6IjZApg/Johan-is-designing?node-id=2023-7663&p=f&t=4PnVbQX3Wx3FTjXY-0',
       specs: [
-        { label: 'Année',   value: '2024â€“26' },
+        { label: 'Année',   value: '2024–26' },
         { label: 'Rôle',    value: 'Lead UI/UX' },
         { label: 'Client',  value: 'MdM &times; Rhinov' },
         { label: 'Secteur', value: 'B2B · Ameublement' },
@@ -308,20 +309,58 @@
       ],
       tags: ['Branding', 'Design System', 'UX', 'SEO', 'Web'],
     },
+    {
+      id: 'vinyl-run',
+      title: 'Vinyl Run · Disquaire indépendant',
+      logo: 'assets/vinyl-run/logo.svg',
+      category: 'Web Design · Commerce local',
+      context: 'Site vitrine et magazine de Vinyl Run, disquaire indépendant à Saint-Pierre (La Réunion) depuis 2017. Une direction artistique sombre et jaune fluo, une carte de l\'île dessinée en courbes de niveau, un lecteur de musiques réunionnaises intégré et tout l\'inventaire Discogs consultable en temps réel. Le magazine (guides, portraits, histoire du vinyle péi) fait venir les curieux par le SEO, et un chat en direct les met en relation avec le disquaire. Site bilingue FR / EN.',
+      url: 'https://www.vinyl-run.com',
+      specs: [
+        { label: 'Année',   value: '2026' },
+        { label: 'Rôle',    value: 'Design & développement' },
+        { label: 'Client',  value: 'Vinyl Run' },
+        { label: 'Secteur', value: 'Musique · Retail' },
+      ],
+      images: [
+        { src: 'assets/vinyl-run/home-hero.webp' },
+        { src: 'assets/vinyl-run/inventaire.webp' },
+        [{ src: 'assets/vinyl-run/mobile-hero.webp' }, { src: 'assets/vinyl-run/mobile-inventaire.webp' }],
+        { src: 'assets/vinyl-run/boutique.webp' },
+        { src: 'assets/vinyl-run/magazine.webp' },
+      ],
+      tags: ['Direction artistique', 'Web Design', 'SEO', 'Discogs', 'Web'],
+    },
+    {
+      id: 'nookdex',
+      title: 'NookDex · Collection Pokémon TCG',
+      logo: 'assets/nookdex/logo.webp',
+      category: 'Product Design · Jeu',
+      context: 'Produit personnel conçu de A à Z : une app pour suivre sa collection de cartes Pokémon, dessinée comme un petit bureau peint à la main. Chaque extension devient un classeur sur l\'étagère, le vieil ordinateur affiche la valeur de la collection, et le chat dort à côté des boosters. Derrière l\'ambiance cosy : 43 000 cartes, des prix Cardmarket et TCGplayer rafraîchis chaque jour, la synchro entre appareils et une visite guidée au premier lancement. Gratuit, en français et en anglais, sur nookdex.com.',
+      url: 'https://nookdex.com',
+      specs: [
+        { label: 'Année',   value: '2026' },
+        { label: 'Rôle',    value: 'Design produit & illustration' },
+        { label: 'Client',  value: 'Projet perso' },
+        { label: 'Secteur', value: 'Jeu · Collection' },
+      ],
+      images: [
+        { src: 'assets/nookdex/room.webp' },
+        { src: 'assets/nookdex/binder.webp' },
+        { src: 'assets/nookdex/sheet.webp', zoom: true },
+        [{ src: 'assets/nookdex/os-home.webp' }, { src: 'assets/nookdex/os-cards.webp' }],
+      ],
+      tags: ['Product Design', 'Illustration', 'Game UI', 'UX', 'Web'],
+    },
   ];
 
-  function buildProjectWin(project) {
-    const el = document.createElement('div');
-    el.className = 'project-win';
-    el.id = `pw-${project.id}`;
-
-    const imgs = project.images || [];
-
-    const imgsHtml = imgs.map((rowOrItem, i) => {
+  // Gabarits communs à la fenêtre (desktop) et à la bottom sheet (mobile)
+  function imagesHtml(project, reveal) {
+    return (project.images || []).map((rowOrItem, i) => {
       const row = Array.isArray(rowOrItem) ? rowOrItem : [rowOrItem];
       const colClass = row.length > 1 ? `pw-group-${row.length}col` : '';
       return `
-      <div class="pw-group ${colClass} pw-reveal">
+      <div class="pw-group ${colClass}${reveal ? ' pw-reveal' : ''}">
         ${row.map((item, j) => `
           <div class="pw-imgwrap">
             <img class="pw-float-img${item.zoom ? ' pw-float-img-zoom' : ''}" src="${item.src}" alt=""
@@ -329,20 +368,37 @@
           </div>`).join('')}
       </div>`;
     }).join('');
+  }
 
-    const specRows = (project.specs || []).map(s =>
-      `<div class="pw-spec-row"><dt>${s.label}</dt><dd>${s.value}</dd></div>`
-    ).join('');
+  const specsHtml = project => (project.specs || []).map(s =>
+    `<div class="pw-spec-row"><dt>${s.label}</dt><dd>${s.value}</dd></div>`
+  ).join('');
 
-    const liveHost = project.url
-      ? project.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')
-      : '';
+  const tagsHtml = project => project.tags.map(t => `<span class="pw-tag">${t}</span>`).join('');
+
+  function liveLinkHtml(project) {
+    if (!project.url) return '';
+    const host = project.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '');
+    return `<a class="pw-aside-link" href="${project.url}" target="_blank" rel="noopener"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>${host}</a>`;
+  }
+
+  const closingInnerHtml = project => `
+            <div class="pw-closing-rule"><div class="pw-author-avatar"></div></div>
+            <span class="pw-closing-name">Johan Trigeard</span>
+            <span class="pw-closing-role">Lead UI/UX Designer · B2B · Product</span>
+            ${project.collaborator ? `<p class="pw-closing-collab">Co-réalisé avec <a href="${project.collaborator.url}" target="_blank" rel="noopener">${project.collaborator.name}</a></p>` : ''}
+            <a href="mailto:johan.trigeard@gmail.com" class="pw-cta">Get in touch</a>`;
+
+  function buildProjectWin(project) {
+    const el = document.createElement('div');
+    el.className = 'project-win';
+    el.id = `pw-${project.id}`;
 
     el.innerHTML = `
       <div class="pw-titlebar">
         <div class="traffic-lights">
           <span class="tl tl-red" data-icon="&times;"></span>
-          <span class="tl tl-yellow" data-icon="âˆ'"></span>
+          <span class="tl tl-yellow" data-icon="−"></span>
           <span class="tl tl-green" data-icon="+"></span>
         </div>
         <span class="pw-title-label">${project.title}</span>
@@ -358,7 +414,7 @@
             <span class="pw-cat-tag">${project.category} · ${(project.specs || [])[0]?.value || ''}</span>
           </div>
 
-          ${imgsHtml}
+          ${imagesHtml(project, true)}
 
           <!-- Context text -->
           <div class="pw-context-block pw-reveal" style="--rv-delay:.06s">
@@ -377,14 +433,7 @@
           </div>` : ''}
 
           <!-- Closing Trexa-style -->
-          <div class="pw-closing pw-reveal" style="--rv-delay:.08s">
-            <div class="pw-closing-rule">
-              <div class="pw-author-avatar"></div>
-            </div>
-            <span class="pw-closing-name">Johan Trigeard</span>
-            <span class="pw-closing-role">Lead UI/UX Designer · B2B · Product</span>
-            ${project.collaborator ? `<p class="pw-closing-collab">Co-réalisé avec <a href="${project.collaborator.url}" target="_blank" rel="noopener">${project.collaborator.name}</a></p>` : ''}
-            <a href="mailto:johan.trigeard@gmail.com" class="pw-cta">Get in touch</a>
+          <div class="pw-closing pw-reveal" style="--rv-delay:.08s">${closingInnerHtml(project)}
           </div>
 
         </div>
@@ -395,14 +444,12 @@
             <span class="pw-aside-proj-lbl">Projet</span>
             <h3 class="pw-aside-title">${project.title.toUpperCase()}</h3>
             <p class="pw-aside-cat">${project.category}</p>
-            ${project.url ? `<a class="pw-aside-link" href="${project.url}" target="_blank" rel="noopener"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>${liveHost}</a>` : ''}
+            ${liveLinkHtml(project)}
             <p class="pw-aside-ctx">${project.context}</p>
           </div>
           <div class="pw-aside-bottom">
-            <dl class="pw-specs">${specRows}</dl>
-            <div class="pw-aside-tags">
-              ${project.tags.map(t => `<span class="pw-tag">${t}</span>`).join('')}
-            </div>
+            <dl class="pw-specs">${specsHtml(project)}</dl>
+            <div class="pw-aside-tags">${tagsHtml(project)}</div>
           </div>
         </aside>
 
@@ -487,8 +534,7 @@
     Object.assign(el.style, { position:'fixed', top:rect.top+'px', left:rect.left+'px', width:rect.width+'px', height:rect.height+'px', margin:'0' });
     el.dataset.origPW = JSON.stringify({ t:rect.top, l:rect.left, w:rect.width, h:rect.height });
     el.offsetHeight;
-    const tx = 'top .44s cubic-bezier(.4,0,.2,1),left .44s cubic-bezier(.4,0,.2,1),width .44s cubic-bezier(.4,0,.2,1),height .44s cubic-bezier(.4,0,.2,1),border-radius .44s ease';
-    el.style.transition = tx;
+    el.style.transition = WIN_TX;
     el.style.top          = `${window.innerHeight - pillH - 20}px`;
     el.style.left         = `${(window.innerWidth - pillW) / 2 + 140}px`;
     el.style.width        = `${pillW}px`;
@@ -500,8 +546,7 @@
   function restorePW(el) {
     if (!el.classList.contains('pw-minimized')) return;
     const { t, l, w, h } = JSON.parse(el.dataset.origPW);
-    const tx = 'top .44s cubic-bezier(.4,0,.2,1),left .44s cubic-bezier(.4,0,.2,1),width .44s cubic-bezier(.4,0,.2,1),height .44s cubic-bezier(.4,0,.2,1),border-radius .44s ease';
-    el.style.transition = tx;
+    el.style.transition = WIN_TX;
     el.style.top = t+'px'; el.style.left = l+'px'; el.style.width = w+'px'; el.style.height = h+'px'; el.style.borderRadius = '16px';
     el.classList.remove('pw-minimized');
   }
@@ -567,20 +612,8 @@
 
     document.body.appendChild(overlay);
 
-    // Logos (reuse svgColored)
-    overlay.querySelectorAll('.pw-mosaic-logo').forEach(img => {
-      const p = carouselProjects[+img.dataset.idx];
-      if (p.logoColor) {
-        img.style.opacity = '1';
-        svgColored(p.logo, p.logoColor)
-          .then(url => { img.src = url; })
-          .catch(() => { img.style.filter = 'brightness(0) invert(1)'; img.src = p.logo; });
-      } else {
-        img.style.filter = 'brightness(0) invert(1)';
-        img.style.opacity = '0.88';
-        img.src = p.logo;
-      }
-    });
+    // Logos
+    overlay.querySelectorAll('.pw-mosaic-logo').forEach(img => applyLogo(img, carouselProjects[+img.dataset.idx]));
 
     function closeMosaic() {
       overlay.classList.remove('pw-mosaic-open');
@@ -605,27 +638,6 @@
   function openProjectSheet(project) {
     document.querySelector('.pw-sheet-wrap')?.remove();
 
-    const imgs = project.images || [];
-    const imgsHtml = imgs.map((rowOrItem, i) => {
-      const row = Array.isArray(rowOrItem) ? rowOrItem : [rowOrItem];
-      const colClass = row.length > 1 ? `pw-group-${row.length}col` : '';
-      return `
-      <div class="pw-group ${colClass}">
-        ${row.map((item, j) => `
-          <div class="pw-imgwrap">
-            <img class="pw-float-img${item.zoom ? ' pw-float-img-zoom' : ''}" src="${item.src}" alt="" loading="${i === 0 && j === 0 ? 'eager' : 'lazy'}">
-          </div>`).join('')}
-      </div>`;
-    }).join('');
-
-    const specRows = (project.specs || []).map(s =>
-      `<div class="pw-spec-row"><dt>${s.label}</dt><dd>${s.value}</dd></div>`
-    ).join('');
-
-    const liveHost = project.url
-      ? project.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')
-      : '';
-
     const wrap = document.createElement('div');
     wrap.className = 'pw-sheet-wrap';
     wrap.innerHTML = `
@@ -639,13 +651,13 @@
             <div class="pw-sheet-title-wrap">
               <span class="pw-cat-tag">${project.category}</span>
               <h2 class="pw-sheet-title">${project.title}</h2>
-              ${project.url ? `<a class="pw-aside-link" href="${project.url}" target="_blank" rel="noopener"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>${liveHost}</a>` : ''}
+              ${liveLinkHtml(project)}
             </div>
           </div>
           <button class="pw-sheet-close" aria-label="Fermer">&times;</button>
         </div>
         <div class="pw-sheet-scroll">
-          ${imgsHtml}
+          ${imagesHtml(project, false)}
           <div class="pw-context-block">
             <p>${project.context}</p>
           </div>
@@ -657,17 +669,10 @@
             </a>
           </div>` : ''}
           <div class="pw-sheet-info">
-            <dl class="pw-specs">${specRows}</dl>
-            <div class="pw-aside-tags">
-              ${project.tags.map(t => `<span class="pw-tag">${t}</span>`).join('')}
-            </div>
+            <dl class="pw-specs">${specsHtml(project)}</dl>
+            <div class="pw-aside-tags">${tagsHtml(project)}</div>
           </div>
-          <div class="pw-closing">
-            <div class="pw-closing-rule"><div class="pw-author-avatar"></div></div>
-            <span class="pw-closing-name">Johan Trigeard</span>
-            <span class="pw-closing-role">Lead UI/UX Designer · B2B · Product</span>
-            ${project.collaborator ? `<p class="pw-closing-collab">Co-réalisé avec <a href="${project.collaborator.url}" target="_blank" rel="noopener">${project.collaborator.name}</a></p>` : ''}
-            <a href="mailto:johan.trigeard@gmail.com" class="pw-cta">Get in touch</a>
+          <div class="pw-closing">${closingInnerHtml(project)}
           </div>
         </div>
       </div>
@@ -761,7 +766,7 @@
     });
   });
 
-  // â”€â”€â”€ Card entrance animations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Card entrance animations ─────────────────────────────────
   const cards = document.querySelectorAll('.bento-grid .card');
 
   function revealCard(card, delay) {
@@ -809,12 +814,14 @@
     cards.forEach(card => observer.observe(card));
   }
 
-  // â”€â”€â”€ Portfolio carousel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Portfolio carousel ───────────────────────────────────────
   const carouselProjects = [
     { title: 'Maisons du Monde', cat: 'Product Design', color: '#2C3A28', img: 'assets/maisonsdumonde/chambre.jpg', logo: 'assets/maisonsdumonde/logo_mdm.svg',                        id: 'maisons-du-monde' },
     { title: 'Rhinov iA',        cat: 'Product Design', color: '#1b1614', img: 'assets/rhinov-ia/cover.jpg',         logo: 'assets/rhinov-ia/logo_rhinovia.svg',                        id: 'rhinov-ia' },
     { title: 'Rhinov Rebrand',   cat: 'Brand Design',   color: '#0f0f0f', img: 'assets/rhinov-rebrand/element.jpg', logo: 'assets/rhinov-rebrand/logo-rhinov.svg', logoColor: '#8C6848', id: 'rhinov-rebrand' },
     { title: 'MyFrenchTool',     cat: 'Product · Brand', color: '#0052CC', img: 'assets/myfrenchtool/cover-bg.svg', logo: 'assets/myfrenchtool/logo.svg', logoScale: 1.4,           id: 'myfrenchtool' },
+    { title: 'Vinyl Run',        cat: 'Web Design',     color: '#111110', img: 'assets/vinyl-run/cover.jpg',       logo: 'assets/vinyl-run/logo.svg',                                 id: 'vinyl-run' },
+    { title: 'NookDex',          cat: 'Product Design', color: '#3a2c24', img: 'assets/nookdex/cover.jpg',         logo: 'assets/nookdex/logo.webp', logoNative: true, logoScale: 1.3, id: 'nookdex' },
   ];
 
   let current = 0;
@@ -845,17 +852,51 @@
     return url;
   }
 
+  // Logo d'un projet : couleurs d'origine (logoNative), SVG recoloré (logoColor), sinon silhouette blanche
+  function applyLogo(img, p) {
+    const white = () => {
+      img.style.filter = 'brightness(0) invert(1)';
+      img.src = p.logo;
+      img.style.opacity = '0.88';
+    };
+    if (p.logoNative) {
+      img.style.filter = 'none';
+      img.src = p.logo;
+      img.style.opacity = '1';
+    } else if (p.logoColor) {
+      img.style.filter = 'none';
+      svgColored(p.logo, p.logoColor)
+        .then(url => { img.src = url; img.style.opacity = '1'; })
+        .catch(white);
+    } else {
+      white();
+    }
+  }
+
   // Build slide track
   const track = document.createElement('div');
   track.className = 'pw-carousel-track';
-  carouselProjects.forEach(p => {
+  const slides = carouselProjects.map(p => {
     const slide = document.createElement('div');
     slide.className = 'pw-carousel-slide';
     slide.style.backgroundColor = p.color;
-    if (p.img) slide.style.backgroundImage = `url('${p.img}')`;
     track.appendChild(slide);
+    return slide;
   });
   thumb.insertBefore(track, thumb.firstChild);
+
+  // Covers chargées à la demande : la slide affichée et ses deux voisines,
+  // plutôt que toutes les covers dès l'ouverture du site.
+  function loadCovers(idx) {
+    [idx - 1, idx, idx + 1].forEach(i => {
+      const n = carouselProjects.length;
+      const k = (i + n) % n;
+      const p = carouselProjects[k];
+      if (p.img && !slides[k].style.backgroundImage) slides[k].style.backgroundImage = `url('${p.img}')`;
+    });
+  }
+
+  dotsEl.innerHTML = carouselProjects.map((_, i) => `<span class="pdot${i === 0 ? ' active' : ''}"></span>`).join('');
 
   function renderLogo(p) {
     if (!logoEl) return;
@@ -865,20 +906,12 @@
     // Correction optique par projet (sinon valeurs par défaut du CSS)
     logoEl.style.width    = p.logoScale ? `${62 * p.logoScale}%` : '';
     logoEl.style.maxWidth = p.logoScale ? `${170 * p.logoScale}px` : '';
-    if (p.logoColor) {
-      logoEl.style.filter = 'none';
-      svgColored(p.logo, p.logoColor)
-        .then(url => { logoEl.src = url; logoEl.style.opacity = '1'; })
-        .catch(() => { logoEl.style.filter = 'brightness(0) invert(1)'; logoEl.src = p.logo; logoEl.style.opacity = '1'; });
-    } else {
-      logoEl.style.filter = 'brightness(0) invert(1)';
-      logoEl.src = p.logo;
-      logoEl.style.opacity = '0.88';
-    }
+    applyLogo(logoEl, p);
   }
 
   function render(idx) {
     const p = carouselProjects[idx];
+    loadCovers(idx);
     track.style.transform = `translateX(-${idx * 100}%)`;
     // Logo: fade out then fade in new one mid-slide
     if (logoEl) {
@@ -893,8 +926,8 @@
     render(current);
   }
 
+  loadCovers(0);
   renderLogo(carouselProjects[0]);
-  dotsEl.querySelectorAll('.pdot').forEach((d, i) => d.classList.toggle('active', i === 0));
 
   prevBtn?.addEventListener('click', () => goTo(current - 1));
   nextBtn?.addEventListener('click', () => goTo(current + 1));
@@ -913,7 +946,7 @@
   portfolioCard?.addEventListener('mouseenter', () => clearInterval(carouselTimer));
   portfolioCard?.addEventListener('mouseleave', () => startCarouselTimer());
 
-  // "Tous les projets" â†' open mosaic
+  // "Tous les projets" → open mosaic
   document.querySelector('.portfolio-all-link')?.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
@@ -927,7 +960,7 @@
     if (id) openProject(id);
   });
 
-  // â”€â”€â”€ Memoji seamless loop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Memoji seamless loop ─────────────────────────────────────
   const memojiVid = document.querySelector('.memoji-video');
   if (memojiVid) {
     const memojiRestart = () => {
@@ -948,7 +981,7 @@
     }, 2000);
   }
 
-  // â”€â”€â”€ Chat widget â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Chat widget ──────────────────────────────────────────────
   const chatToggle = document.getElementById('chatToggle');
   const chatPanel  = document.getElementById('chatPanel');
   const chatClose  = document.getElementById('chatClose');

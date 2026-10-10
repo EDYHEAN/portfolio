@@ -30,9 +30,15 @@ avec le **même `id`**.
   img:   'assets/mon-projet/cover.jpg',
   logo:  'assets/mon-projet/logo.svg',
   logoColor: '#8C6848',             // optionnel : recolore le SVG du logo (sinon blanc)
+  logoNative: true,                 // optionnel : garde les couleurs du logo (PNG/WebP détouré, ex. NookDex)
+  logoScale: 1.3,                   // optionnel : agrandit le logo sur la vignette
   id:    'mon-projet',              // ⚠️ doit être identique à l'id dans PROJECTS
 }
 ```
+
+Les points du carrousel sont générés automatiquement, rien à toucher dans
+`index.html`. Par défaut le logo est affiché en **silhouette blanche** : il
+doit donc avoir un fond transparent.
 
 ### 2. `PROJECTS` — la page projet complète (fenêtre desktop / bottom sheet mobile)
 

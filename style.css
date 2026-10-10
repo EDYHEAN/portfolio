@@ -1092,64 +1092,6 @@ body.win-dragging * { cursor: grabbing !important; }
 }
 .showreel-lightbox-close:hover { background: rgba(255, 255, 255, 0.24); }
 
-/* ─── HELLOBAR (en chantier) ────────────────────────────────── */
-
-.hellobar {
-  position: fixed;
-  top: 13px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 8px 7px 15px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, var(--blue-mid), var(--blue-deep));
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow:
-    0 8px 28px rgba(var(--blue-deep-rgb), 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 500;
-  white-space: nowrap;
-  animation: hellobarIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
-}
-
-@keyframes hellobarIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(-18px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-
-.hellobar.hidden {
-  opacity: 0;
-  transform: translateX(-50%) translateY(-18px);
-  pointer-events: none;
-  animation: none; /* sinon le fill-mode "both" de hellobarIn écrase opacity/transform */
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.hellobar-text { display: inline-flex; align-items: center; gap: 7px; }
-
-.hellobar-close {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.18);
-  color: #fff;
-  font-size: 11px;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: background 0.2s ease;
-}
-.hellobar-close:hover { background: rgba(255, 255, 255, 0.34); }
-
 /* ─── 8. PORTFOLIO CARD ─────────────────────────────────────── */
 
 .card-portfolio {
@@ -1418,6 +1360,9 @@ body.win-dragging * { cursor: grabbing !important; }
   align-items: flex-end;
   gap: 12px;
   transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Le conteneur garde la taille du panneau même fermé : il ne doit pas
+     capter la souris (sinon il bloque le scroll de ce qui est dessous). */
+  pointer-events: none;
 }
 
 .chat-displaced-msg {
@@ -1470,6 +1415,7 @@ body.win-dragging * { cursor: grabbing !important; }
 }
 
 .chat-toggle {
+  pointer-events: auto;
   width: 62px;
   height: 62px;
   border-radius: 50%;
@@ -1950,16 +1896,21 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   flex-direction: column;
   border-left: 1px solid rgba(0,0,0,0.06);
   background: #F7F7F9;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
 }
+
+.pw-aside::-webkit-scrollbar { width: 4px; }
+.pw-aside::-webkit-scrollbar-track { background: transparent; }
+.pw-aside::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 2px; }
 
 /* Top: project identity */
 .pw-aside-top {
-  flex: 1;
+  flex: 1 0 auto;
   padding: 34px 22px 20px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .pw-aside-logo {
@@ -2001,11 +1952,6 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
   font-size: 11.5px;
   line-height: 1.72;
   color: rgba(0,0,0,0.38);
-  flex: 1;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 9;
-  -webkit-box-orient: vertical;
 }
 
 /* Bottom: specs + tags */
@@ -2525,25 +2471,6 @@ body[data-resize-dir="nw"] *, body[data-resize-dir="se"] * { cursor: nwse-resize
 @media (max-width: 960px) {
   .chat-widget { display: none; }
   .hue-rail    { display: none; }
-
-  /* Barre chantier : pill flottante sticky en bas */
-  .hellobar {
-    font-size: 11px;
-    max-width: calc(100vw - 24px);
-    white-space: normal;
-    text-align: center;
-    padding: 8px 8px 8px 14px;
-    top: auto;
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-    animation: hellobarInBottom 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
-  }
-  .hellobar.hidden {
-    transform: translateX(-50%) translateY(24px);
-  }
-  @keyframes hellobarInBottom {
-    from { opacity: 0; transform: translateX(-50%) translateY(24px); }
-    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-  }
 
   .win-restore  { display: none; }
   .project-win  { display: none !important; }

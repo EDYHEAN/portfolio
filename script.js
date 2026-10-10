@@ -1167,10 +1167,6 @@
     }, 800);
   }
 
-  // ─── Hellobar (en chantier) ─────────────────────────────────
-  const hellobar = document.getElementById('hellobar');
-  document.getElementById('hellobarClose')?.addEventListener('click', () => hellobar?.classList.add('hidden'));
-
   // ─── Brand wall : carousel de logos ─────────────────────────
   // scale = correction optique par logo pour une présence visuelle homogène
   const BRANDS = [

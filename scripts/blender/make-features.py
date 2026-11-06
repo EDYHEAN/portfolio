@@ -1,11 +1,14 @@
 # Les illustrations 3D des « Features clés » (Johan, 06/11 : les captures n'apportaient rien) : de petites scènes en pâte
 # à modeler douce, aux couleurs du projet, rendues au format de leur tuile du bento.
-#   blender -b --factory-startup -P scripts/blender/make-features.py -- vinyl-run [nom…]
-# Écrit assets/<projet>/features3d/<nom>.webp. Modélisation 100 % procédurale (pas d'asset externe).
+#   blender -b --factory-startup -P scripts/blender/make-features.py -- vinyl-run [nom…] [--glb-only]
+# Écrit assets/<projet>/features3d/<nom>.glb (le modèle, animé en temps réel dans la tuile : src/feature3d.js) et
+# <nom>.webp (l'affiche transparente : avant le chargement, et sans WebGL). Modélisation 100 % procédurale.
 import bpy, bmesh, math, os, sys
 from mathutils import Vector
 
 ARGS = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
+GLB_ONLY = '--glb-only' in ARGS          # exporter les modèles sans refaire les rendus (affiches)
+ARGS = [a for a in ARGS if not a.startswith('--')]
 PROJECT = ARGS[0] if ARGS else 'vinyl-run'
 ONLY = set(ARGS[1:])
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -143,6 +146,7 @@ def scene(bg, size, cam_loc, target, lens=50, key=(-4, -5, 7), key_power=900):
     ground = rbox(80, 80, 0.2, (0, 0, -0.1), bg, bevel=0)
     ground.data.materials[0] = clay(bg, rough=0.9, coat=0)
     ground.is_shadow_catcher = True
+    ground.name = 'ground'
     for loc, power, size_l in ((key, key_power, 5), ((6, -3, 4), key_power * 0.28, 6), ((0, 6, 5), key_power * 0.35, 5)):
         ld = bpy.data.lights.new('l', 'AREA'); ld.energy = power; ld.size = size_l
         lo = link(bpy.data.objects.new('l', ld)); lo.location = loc
@@ -154,6 +158,17 @@ def scene(bg, size, cam_loc, target, lens=50, key=(-4, -5, 7), key_power=900):
 
 
 def render(name):
+    # Le modèle seul (sans sol ni lumières), centré, en GLB Draco : three.js l'éclaire et l'anime dans la tuile.
+    objs = [o for o in bpy.context.scene.objects if o.type == 'MESH' and o.name != 'ground']
+    bpy.ops.object.select_all(action='DESELECT')
+    for o in objs:
+        o.select_set(True)
+    glb = os.path.join(OUT, name + '.glb')
+    bpy.ops.export_scene.gltf(filepath=glb, export_format='GLB', use_selection=True, export_apply=True, export_yup=True,
+                              export_draco_mesh_compression_enable=True, export_draco_mesh_compression_level=7)
+    print('modèle', glb, round(os.path.getsize(glb) / 1024), 'Ko')
+    if GLB_ONLY:
+        return
     path = os.path.join(OUT, name + '.webp')
     bpy.context.scene.render.filepath = path
     bpy.ops.render.render(write_still=True)

@@ -1,6 +1,6 @@
 // Blocs des pages projet. Chaque bloc = render (HTML) + motion (dans un gsap.matchMedia).
 // Motion minimaliste : les visuels parlent, le mouvement guide la lecture.
-import { gsap, $, $$, t, tx, asset, spawn, revealTitle, countUp } from './core.js';
+import { gsap, $, $$, t, tx, asset, spawn, revealTitle, countUp, REDUCE, ROOT } from './core.js';
 
 const img = (src, { cls = '', alt = '', eager = false, style = '' } = {}) =>
   `<img src="${asset(src)}" alt="${alt}" class="${cls}" ${eager ? '' : 'loading="lazy"'} decoding="async" ${style ? `style="${style}"` : ''}>`;
@@ -133,8 +133,13 @@ export const BLOCKS = {
         Object.assign(mob.style, { width: '390px', height: `${pview.clientHeight / km}px`, transform: `scale(${km})` });
       };
       fit(); new ResizeObserver(fit).observe(view);
-      const load = () => [desk, mob].forEach((f) => { if (!f.src) f.src = f.dataset.src; });
-      new IntersectionObserver(([e], o) => { if (e.isIntersecting) { load(); o.disconnect(); } }, { rootMargin: '150% 0px' }).observe(el);
+      // Chargées à l'approche, déchargées (about:blank) quand on s'éloigne : deux sites complets (Lenis, GSAP, vidéos) ne
+      // tournent pas en fond pendant qu'on lit le reste de la page. Au téléphone, le cadre desktop est masqué : seul le mobile.
+      const wanted = () => (getComputedStyle($('.live-desk', el)).display === 'none' ? [mob] : [desk, mob]);
+      new IntersectionObserver(([e]) => {
+        if (e.isIntersecting) wanted().forEach((f) => { if (f.getAttribute('src') !== f.dataset.src) f.src = f.dataset.src; });
+        else [desk, mob].forEach((f) => { if (f.getAttribute('src') && f.getAttribute('src') !== 'about:blank') f.src = 'about:blank'; });
+      }, { rootMargin: '100% 0px' }).observe(el);
       $$('[data-live]', el).forEach((t) => t.addEventListener('click', () => {
         const it = b.items[+t.dataset.live];
         $$('[data-live]', el).forEach((x) => x.setAttribute('aria-selected', String(x === t)));
@@ -177,12 +182,22 @@ export const BLOCKS = {
       return `${head('b.features', n)}
         <div class="bento ft-bento">${b.items.map((f) => `
           <article class="b-tile ft ft-${f.size || 's'}">
-            <div class="ft-img">${img(f.img, { alt: '', style: `object-fit:${f.fit || 'cover'};object-position:${f.pos || 'top'}` })}</div>
+            <div class="ft-img"${f.model ? ` data-model="${asset(f.model)}"` : ''}>${img(f.img, { alt: '', style: `object-fit:${f.fit || 'cover'};object-position:${f.pos || 'top'}` })}</div>
             <div class="ft-txt"><h3>${tx(f.t)}</h3><p>${tx(f.d)}</p></div>
           </article>`).join('')}
         </div>`;
     },
-    motion(el) { spawn($$('.ft', el), $('.bento', el)); },
+    motion(el) {
+      spawn($$('.ft', el), $('.bento', el));
+      // Les tuiles à modèle 3D (item.model) : three.js n'est chargé qu'à l'approche du bloc ; l'affiche reste sinon.
+      const models = $$('.ft-img[data-model]', el);
+      if (!models.length || REDUCE) return;
+      new IntersectionObserver(([e], o) => {
+        if (!e.isIntersecting) return;
+        o.disconnect();
+        import('./feature3d.js').then(({ mountFeatures }) => mountFeatures(models, { root: ROOT })).catch(() => {});
+      }, { rootMargin: '100% 0px' }).observe(el);
+    },
   },
 
   /* Écosystème : le projet au centre, ses services autour, puis ce qui tourne tout seul. */

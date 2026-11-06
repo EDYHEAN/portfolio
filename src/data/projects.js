@@ -109,7 +109,6 @@ export const PROJECTS = [
         pages: [
           { src: 'vinyl-run/pages/home.webp', url: 'vinyl-run.com', label: T('Accueil', 'Home') },
           { src: 'vinyl-run/pages/blog.webp', url: 'vinyl-run.com/blog', label: T('Magazine', 'Magazine') },
-          { src: 'vinyl-run/pages/article.webp', url: 'vinyl-run.com/blog/articles', label: T('Article', 'Article') },
         ],
         mobile: 'vinyl-run/pages/m-home.webp',
       },
@@ -117,11 +116,11 @@ export const PROJECTS = [
         // Illustrations 3D (scripts/blender/make-features.py) à la place des captures (Johan, 06/11).
         type: 'features',
         items: [
-          { img: 'vinyl-run/features3d/map.webp', fit: 'contain', pos: 'center', size: 'l', t: T("La carte de l'île", 'The island map'), d: T('La boutique placée sur La Réunion, dessinée en courbes de niveau.', 'The shop pinned on Réunion, drawn in contour lines.') },
-          { img: 'vinyl-run/features3d/chat.webp', fit: 'contain', pos: 'center', size: 't', t: T('Chat avec le disquaire', 'Chat with the shop'), d: T('Une question sur un disque ? Réponse en direct, depuis une console admin.', 'A question about a record? Answered live, from an admin console.') },
-          { img: 'vinyl-run/features3d/inventory.webp', fit: 'contain', pos: 'center', size: 'w', t: T('Inventaire Discogs en direct', 'Live Discogs inventory'), d: T('Tout le stock, synchronisé depuis Discogs.', 'The whole stock, synced from Discogs.') },
-          { img: 'vinyl-run/features3d/player.webp', fit: 'contain', pos: 'center', size: 'w', t: T('Lecteur péi', 'Island player'), d: T('Des morceaux réunionnais pendant la visite.', 'Réunion tracks playing while you browse.') },
-          { img: 'vinyl-run/features3d/demande.webp', fit: 'contain', pos: 'center', size: 's', t: T('Demande spéciale', 'Special request'), d: T('Un formulaire pour chercher un vinyle précis.', 'A form to hunt down a specific record.') },
+          { img: 'vinyl-run/features3d/map.webp', model: 'vinyl-run/features3d/map.glb', fit: 'contain', pos: 'center', size: 'l', t: T("La carte de l'île", 'The island map'), d: T('La boutique placée sur La Réunion, dessinée en courbes de niveau.', 'The shop pinned on Réunion, drawn in contour lines.') },
+          { img: 'vinyl-run/features3d/chat.webp', model: 'vinyl-run/features3d/chat.glb', fit: 'contain', pos: 'center', size: 't', t: T('Chat avec le disquaire', 'Chat with the shop'), d: T('Une question sur un disque ? Réponse en direct, depuis une console admin.', 'A question about a record? Answered live, from an admin console.') },
+          { img: 'vinyl-run/features3d/inventory.webp', model: 'vinyl-run/features3d/inventory.glb', fit: 'contain', pos: 'center', size: 'w', t: T('Inventaire Discogs en direct', 'Live Discogs inventory'), d: T('Tout le stock, synchronisé depuis Discogs.', 'The whole stock, synced from Discogs.') },
+          { img: 'vinyl-run/features3d/player.webp', model: 'vinyl-run/features3d/player.glb', fit: 'contain', pos: 'center', size: 'w', t: T('Lecteur péi', 'Island player'), d: T('Des morceaux réunionnais pendant la visite.', 'Réunion tracks playing while you browse.') },
+          { img: 'vinyl-run/features3d/demande.webp', model: 'vinyl-run/features3d/demande.glb', fit: 'contain', pos: 'center', size: 's', t: T('Demande spéciale', 'Special request'), d: T('Un formulaire pour chercher un vinyle précis.', 'A form to hunt down a specific record.') },
         ],
       },
       {

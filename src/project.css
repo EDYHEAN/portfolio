@@ -157,8 +157,11 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .ft-img img { transition: opacity 0.5s ease; }
 .ft-img.is-3d img { opacity: 0; } /* le modèle 3D (feature3d.js) prend la place de son affiche */
 /* Une tuile à modèle 3D garde de la place pour lui, même petite ; la rangée grandit plutôt que de couper le texte. */
-.ft-img[data-model] { min-height: clamp(150px, 20vh, 220px); }
-.ft-bento:has(.ft-img[data-model]) { grid-auto-rows: minmax(clamp(200px, 27vh, 300px), auto); }
+/* Bento 3D compact (Johan, 06/11 : trop gros pour pas grand-chose) : trois rangées basses, tout tient dans l'écran. */
+.ft-bento:has(.ft-img[data-model]) { grid-auto-rows: clamp(150px, 21vh, 220px); }
+.ft-bento:has(.ft-img[data-model]) .ft-txt { padding: 14px 20px 18px; }
+.ft-bento:has(.ft-img[data-model]) .ft-txt p { font-size: 13px; }
+.ft-img[data-model] { min-height: 70px; }
 .ft-img img { width: 100%; height: 100%; transition: transform 0.8s var(--ease-out); }
 .ft:hover .ft-img img { transform: scale(1.03); }
 .ft-txt { padding: 20px 24px 28px; } /* de l'air sous le texte : il collait au bord bas de la tuile (Johan, 06/11) */

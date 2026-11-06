@@ -1,6 +1,6 @@
 // Blocs des pages projet. Chaque bloc = render (HTML) + motion (dans un gsap.matchMedia).
 // Motion minimaliste : les visuels parlent, le mouvement guide la lecture.
-import { gsap, $, $$, t, tx, asset, spawn, revealTitle, countUp, REDUCE, ROOT } from './core.js';
+import { gsap, ScrollTrigger, $, $$, t, tx, asset, spawn, revealTitle, countUp, REDUCE, ROOT } from './core.js';
 
 const img = (src, { cls = '', alt = '', eager = false, style = '' } = {}) =>
   `<img src="${asset(src)}" alt="${alt}" class="${cls}" ${eager ? '' : 'loading="lazy"'} decoding="async" ${style ? `style="${style}"` : ''}>`;
@@ -72,6 +72,17 @@ export const BLOCKS = {
       const phone = $('.pg-phone-shot', el);
       const phoneView = $('.phone-view', el);
       const n = shots.length;
+      // La course du bloc suit la longueur des captures : chaque page reçoit autant de scroll que ce qu'elle a à faire défiler
+      // (une hauteur fixe par page faisait filer les pages très longues, comme l'accueil de Vinyl Run).
+      const pg = $('.pg', el);
+      const size = () => {
+        if (!view.clientHeight) return;
+        const runs = shots.map((s) => Math.max(innerHeight * 0.9, (s.offsetHeight - view.clientHeight) * 1.1));
+        pg.style.height = `${runs.reduce((a, b) => a + b, 0) + innerHeight}px`;
+      };
+      size();
+      shots.forEach((s) => { if (!s.complete) s.addEventListener('load', () => { size(); ScrollTrigger.refresh(); }, { once: true }); });
+      addEventListener('resize', size);
       gsap.set(shots, { opacity: (i) => (i ? 0 : 1) });
       let current = 0;
       const setActive = (i) => {

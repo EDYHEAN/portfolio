@@ -182,17 +182,18 @@ export const BLOCKS = {
       return `
         <div class="sl-pin">
           ${head('b.slides', n)}
-          <div class="sl-track">${b.items.map((s) => `<figure class="slide">${img(s.src, { alt: tx(s.t) })}<figcaption class="mono">${tx(s.t)}</figcaption></figure>`).join('')}</div>
+          <div class="sl-track">${b.items.map((s) => `<figure class="slide">${img(s.src, { alt: tx(s.t), eager: true })}<figcaption class="mono">${tx(s.t)}</figcaption></figure>`).join('')}</div>
         </div>`;
     },
     motion(el, b, p, { desktop }) {
       const track = $('.sl-track', el);
       if (!desktop) { spawn($$('.slide', el), track, { stagger: 0.06, y: 50 }); return; }
+      // La piste arrive au bout à 85 % de la course : la dernière slide reste un temps entière à l'écran avant que la
+      // section se libère (sans cette marge, le lissage la laissait coupée à droite au moment de la sortie).
       const dist = () => Math.max(0, track.scrollWidth - innerWidth);
-      gsap.to(track, {
-        x: () => -dist(), ease: 'none',
-        scrollTrigger: { trigger: $('.sl-pin', el), start: 'top top', end: () => `+=${dist()}`, pin: true, scrub: 0.7, invalidateOnRefresh: true },
-      });
+      gsap.timeline({ scrollTrigger: { trigger: $('.sl-pin', el), start: 'top top', end: () => `+=${dist() / 0.85}`, pin: true, scrub: 0.4, invalidateOnRefresh: true } })
+        .to(track, { x: () => -dist(), ease: 'none', duration: 0.85 })
+        .to({}, { duration: 0.15 });
     },
   },
 

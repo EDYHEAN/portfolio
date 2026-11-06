@@ -344,7 +344,7 @@ export function renderOutro({ jaws = true } = {}) {
         <a class="btn" href="${asset('cv-johan-trigeard.pdf')}" download="Johan-Trigeard-CV.pdf" data-magnetic data-sound><span>${t('contact.cv')}</span><span aria-hidden="true">↓</span></a>
         <a class="btn" href="https://www.instagram.com/edyhean/" target="_blank" rel="noopener" data-magnetic data-sound><span>Instagram</span><span aria-hidden="true">↗</span></a>
       </div>
-      <footer class="foot mono"><span>© 2026 Johan Trigeard</span>${jaws ? `<a class="foot-credit" href="https://sketchfab.com/3d-models/brown-hyena-skull-db5a9af4646344c3b69fb6cad5a7a2b2" target="_blank" rel="noopener">${t('foot.skull')}</a>` : ''}<span>${t('foot.made')}</span></footer>
+      <footer class="foot mono"><span>© 2026 Johan Trigeard</span>${jaws ? `<a class="foot-credit" href="https://sketchfab.com/3d-models/brown-hyena-skull-db5a9af4646344c3b69fb6cad5a7a2b2" target="_blank" rel="noopener">${t('foot.skull')}</a>` : ''}</footer>
     </section>`;
   fillHyenas(el);
 }

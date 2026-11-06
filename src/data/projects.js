@@ -86,9 +86,10 @@ export const PROJECTS = [
       {
         type: 'outcome',
         stats: [
-          { v: 27, l: T('articles au magazine', 'magazine articles') },
-          { v: 5, l: T('automatisations', 'automations') },
-          { v: 2, l: T('langues, FR & EN', 'languages, FR & EN') },
+          // Chiffres relevés le 06/11/2026 : inventaire Discogs (vendeur Vinylrun974) et Search Console depuis la mise en ligne (mai 2026).
+          { v: 2763, l: T('références en ligne, synchronisées depuis Discogs', 'records online, synced from Discogs'), sep: true },
+          { v: 30855, l: T('impressions sur Google en 6 mois', 'Google impressions in 6 months'), sep: true },
+          { v: 1983, l: T('visites venues de Google', 'visits from Google'), sep: true },
         ],
       },
     ],

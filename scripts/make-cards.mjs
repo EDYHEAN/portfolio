@@ -43,7 +43,7 @@ const CARDS = {
       ${GRAIN}`;
   },
   // Vinyl Run : une vraie photo de la boutique (la fresque des platines Technics, sources/cards/vinyl-run), assombrie,
-  // le logo du disquaire en jaune par-dessus (Johan, 06/11 : mieux qu'un vinyle dessiné).
+  // le logo du disquaire en blanc par-dessus (Johan, 06/11).
   'vinyl-run'() {
     const photo = dataUri(path.join(ROOT, 'sources/cards/vinyl-run/boutique-technics.jpg'));
     const logo = svgInline(path.join(ROOT, 'assets/vinyl-run/logo.svg')).replace('<svg ', '<svg class="logo" ');
@@ -52,9 +52,9 @@ const CARDS = {
       .photo{position:absolute;inset:0;background:url(${photo}) 50% 40% / cover;filter:grayscale(1) contrast(1.1) brightness(.75)}
       .shade{position:absolute;inset:0;background:radial-gradient(70% 45% at 50% 50%, rgba(17,17,16,.55), rgba(17,17,16,.2) 70%),
         linear-gradient(rgba(17,17,16,.35), transparent 30% 65%, rgba(17,17,16,.7))}
-      .logo{position:absolute;left:50%;top:50%;width:470px;height:auto;transform:translate(-50%,-50%);fill:#EDF10C;
+      .logo{position:absolute;left:50%;top:50%;width:470px;height:auto;transform:translate(-50%,-50%);fill:#f0ede6;
         filter:drop-shadow(0 10px 30px rgba(0,0,0,.55))}
-      .logo *{fill:#EDF10C}
+      .logo *{fill:#f0ede6}
       </style>
       <div class="photo"></div><div class="shade"></div>${logo}
       ${GRAIN}`;

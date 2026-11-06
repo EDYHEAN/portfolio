@@ -60,18 +60,18 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 /* --- Identité ---------------------------------------------------- */
 .b-logo { grid-column: span 7; grid-row: span 2; --fit: clamp(28px, 6vw, 96px); }
 .b-logo-alt { grid-column: span 5; --fit: clamp(22px, 3vw, 44px) clamp(28px, 6vw, 96px); }
-.b-palette { grid-column: span 5; padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 14px; }
+.b-palette { grid-column: span 5; padding: 22px 24px 28px; display: flex; flex-direction: column; gap: 14px; }
 .sw-row { flex: 1; display: flex; gap: 10px; min-height: 0; }
 .sw { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
 .sw-chip { flex: 1; min-height: 40px; border-radius: 12px; background: var(--c); box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.25); }
 .sw b { font-weight: 650; line-height: 1.1; }
 .sw code { font-family: var(--f-mono); font-size: 11px; opacity: 0.55; }
-.b-font { grid-column: span 6; padding: 18px 22px; display: flex; flex-direction: column; justify-content: space-between; }
+.b-font { grid-column: span 6; padding: 22px 24px 28px; display: flex; flex-direction: column; justify-content: space-between; }
 .font-aa { font-size: calc(clamp(64px, 7vw, 120px) * var(--fs, 1)); line-height: 1; margin-top: 8px; }
 .b-font b { font-size: 22px; }
 .b-font span:last-child { font-size: 14px; opacity: 0.7; }
 
-.has-signs .b-sign { grid-column: span 4; grid-row: span 2; padding: 22px; display: flex; flex-direction: column; }
+.has-signs .b-sign { grid-column: span 4; grid-row: span 2; padding: 24px 24px 30px; display: flex; flex-direction: column; }
 .b-sign-img { position: relative; flex: 1; min-height: 0; margin-bottom: 14px; --fit: 4px 8%; }
 .b-sign b { font-family: 'Anton', sans-serif; font-weight: 400; font-size: 26px; text-transform: uppercase; }
 .b-sign-role { color: var(--p-accent); font-weight: 600; }
@@ -137,7 +137,7 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .ft-img { flex: 1; min-height: 0; overflow: hidden; }
 .ft-img img { width: 100%; height: 100%; transition: transform 0.8s var(--ease-out); }
 .ft:hover .ft-img img { transform: scale(1.03); }
-.ft-txt { padding: 14px 18px 16px; }
+.ft-txt { padding: 20px 24px 28px; } /* de l'air sous le texte : il collait au bord bas de la tuile (Johan, 06/11) */
 .ft-txt h3 { margin: 0; font-size: clamp(17px, 1.3vw, 21px); font-weight: 750; letter-spacing: -0.015em; }
 .ft-txt p { margin: 3px 0 0; font-size: 14px; line-height: 1.4; opacity: 0.72; }
 
@@ -178,7 +178,7 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 
 /* --- Chiffres ------------------------------------------------------ */
 .out-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 40px; }
-.out-stat { padding: 28px 26px; border-radius: 20px; background: var(--p-tile); display: flex; flex-direction: column; gap: 8px; }
+.out-stat { padding: 30px 28px 34px; border-radius: 20px; background: var(--p-tile); display: flex; flex-direction: column; gap: 8px; }
 .out-num { font-weight: 800; font-size: clamp(56px, 6.5vw, 116px); line-height: 0.95; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
 [data-project='myfrenchtool'] .out-num { color: #0052CC; }
 .out-lbl { font-size: 16px; opacity: 0.75; }

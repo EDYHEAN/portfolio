@@ -187,6 +187,8 @@ html.came .curtain { visibility: visible; }
 .btn-primary { background: var(--paper); color: var(--ink); border-color: var(--paper); }
 .btn-primary:hover { background: #fff; }
 .foot { grid-column: 1 / -1; align-self: end; display: flex; justify-content: space-between; gap: 16px; margin-top: 12vh; padding-top: 16px; border-top: 1px solid rgba(239, 233, 221, 0.2); opacity: 0.7; }
+.foot-credit { text-decoration: none; opacity: 0.75; } /* crédit du scan du crâne (licence CC BY) */
+.foot-credit:hover { opacity: 1; text-decoration: underline; }
 
 /* ------------------------------------------------------------------ */
 /* Mobile                                                              */
@@ -197,6 +199,7 @@ html.came .curtain { visibility: visible; }
   .contact { grid-template-columns: minmax(0, 1fr); }
   .contact-hyena { grid-column: 1; grid-row: auto; width: 52vw; margin-bottom: 24px; }
   .foot { flex-direction: column; }
+  .foot-credit { order: 3; }
 }
 
 @media (prefers-reduced-motion: reduce) {

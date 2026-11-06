@@ -315,7 +315,7 @@ export function countUp(root) {
 /* ------------------------------------------------------------------ */
 /* Outro : la morsure (crocs qui se referment) puis le contact         */
 /* ------------------------------------------------------------------ */
-// La mâchoire 3D (scenes3d.js, chargée en différé) : un seul montage par page, réattaché si l'outro est redessinée
+// Le crâne 3D (scenes3d.js, chargé en différé) : un seul montage par page, réattaché si l'outro est redessinée
 // (changement de langue). Le scroll écrit dans JAWS, la boucle 3D le lit.
 const JAWS = { a: 0, b: 0, c: 0, shake: 0 };
 let jaws = null;
@@ -324,8 +324,8 @@ function loadJaws() {
   if (!stage) return;
   if (jaws) { jaws.then((j) => j?.attach(stage)); return; }
   jaws = import('./scenes3d.js')
-    .then(({ mountJaws }) => mountJaws(stage, { root: ROOT, state: JAWS }))
-    .catch(() => { $('.bite-stage')?.remove(); return null; }); // pas de WebGL : la gueule reste ouverte, le contact s'affiche
+    .then(({ mountSkull }) => mountSkull(stage, { root: ROOT, state: JAWS }))
+    .catch((e) => { console.warn('Crâne 3D indisponible :', e); $('.bite-stage')?.remove(); return null; }); // pas de WebGL : le contact s'affiche
 }
 
 export function renderOutro({ jaws = true } = {}) {
@@ -345,7 +345,7 @@ export function renderOutro({ jaws = true } = {}) {
         <a class="btn" href="${asset('cv-johan-trigeard.pdf')}" download="Johan-Trigeard-CV.pdf" data-magnetic data-sound><span>${t('contact.cv')}</span><span aria-hidden="true">↓</span></a>
         <a class="btn" href="https://www.instagram.com/edyhean/" target="_blank" rel="noopener" data-magnetic data-sound><span>Instagram</span><span aria-hidden="true">↗</span></a>
       </div>
-      <footer class="foot mono"><span>© 2026 Johan Trigeard</span><span>${t('foot.made')}</span></footer>
+      <footer class="foot mono"><span>© 2026 Johan Trigeard</span>${jaws ? `<a class="foot-credit" href="https://sketchfab.com/3d-models/brown-hyena-skull-db5a9af4646344c3b69fb6cad5a7a2b2" target="_blank" rel="noopener">${t('foot.skull')}</a>` : ''}<span>${t('foot.made')}</span></footer>
     </section>`;
   fillHyenas(el);
 }
@@ -359,7 +359,7 @@ export function outroMotion() {
     ScrollTrigger.create({ trigger: '#outro', start: 'top 300%', once: true, onEnter: loadJaws });
     if (jaws) loadJaws(); // outro redessinée : on y remet le canvas
     const close = gsap.timeline({ scrollTrigger: { trigger: '#outro', start: 'top 70%', endTrigger: '.contact', end: 'top top', scrub: 0.3 } });
-    close.fromTo(JAWS, { a: 0 }, { a: 1, duration: 0.82, ease: 'power2.out' }) // elles surgissent vite, puis approchent
+    close.fromTo(JAWS, { a: 0 }, { a: 1, duration: 0.82, ease: 'none' }) // l'accélération est dans la scène (a²)
       .fromTo(JAWS, { b: 0 }, { b: 1, duration: 0.18, ease: 'power4.in' })
       .call(() => {
         if (close.scrollTrigger?.direction !== 1) return;

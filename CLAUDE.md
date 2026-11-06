@@ -50,12 +50,14 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
 - **Visuel de carte** (`card`, 3:5) : une image qui illustre le projet avec élégance et donne envie de cliquer sans tout
   dévoiler. Jamais une capture de page d'accueil ou un écran pris au hasard (défaut actuel de MyFrenchTool et Vinyl Run).
   Sur la carte, `logo.mark` (le symbole seul : coq MFT, Pokéball NookDex) et `markScale` pour équilibrer les poids.
-- **Outro** : une mâchoire 3D (`assets/3d/jaws.glb`, calque fixe au-dessus de tout) arrive par-dessus la fin de page en
-  l'assombrissant, claque quand le contact atteint le haut de l'écran (son `chomp` + secousse), puis s'ouvre pendant que le
-  contact reste épinglé : il se révèle dans la gueule. Le scroll écrit dans `JAWS` (a/b/c/shake, `outroMotion`), la boucle
-  3D le lit et ne dessine rien quand la mâchoire est hors champ. Pas de WebGL : le contact s'affiche normalement.
-  En cours : la remplacer par un vrai crâne de hyène (scan de musée, brut dans `sources/raw/brown_hyena_skull.glb` (147 Mo), University of
-  Dundee, CC BY 4.0 : crédit dans le footer), rendu gravure + grain, qui fonce vers l'écran et mord.
+- **Outro** : un crâne de hyène 3D (`assets/3d/skull.glb`, 378 Ko : scan University of Dundee, CC BY 4.0, crédité en bas du
+  contact ; brut dans `sources/raw/`, allégé et articulé dans `sources/hyena-skull.blend` : Skull + Jaw, origine = la
+  charnière, occlusion cuite en couleur de sommets). Rendu gravure maison (`mountSkull`, scenes3d.js) : os papier, hachures
+  d'encre calées sur la lumière et l'occlusion, grain qui frémit, contour encre. Au scroll (`outroMotion`, état `JAWS`) :
+  a = il surgit du fond et accélère vers l'écran en ouvrant la gueule (la page s'assombrit), b = il mord (son `chomp`,
+  secousse, noir total : on est dedans), c = le noir s'efface sur le contact épinglé. Calque fixe au-dessus de tout, rien
+  n'est dessiné hors champ. Pas de WebGL : le contact s'affiche normalement (l'erreur est dans la console).
+  L'ancienne mâchoire (`jaws.glb`, `scripts/blender/make-jaws.py`) est à supprimer une fois le crâne validé.
 - **Rideau** entre pages : piloté par GSAP en yPercent uniquement (un transform CSS s'y ajoutait) ; la page d'arrivée naît
   couverte (`html.came`, script et style inline du shell).
 - Faits vérifiés uniquement (repos, sites live, kit de marque). Chiffres MFT à revérifier.

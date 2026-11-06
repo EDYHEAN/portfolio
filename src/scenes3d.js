@@ -1,4 +1,4 @@
-// Scènes 3D (three.js, chargé en différé) : le booster d'ouverture et la hyène du hero.
+// Scènes 3D (three.js, chargé en différé) : le booster d'ouverture et le crâne de hyène du footer.
 // Modèles faits dans Blender (assets/3d/*.glb, Draco). Lumière claire de studio (RoomEnvironment).
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -139,43 +139,116 @@ export async function mountBooster(host, { root = './', onTear } = {}) {
 }
 
 /* ------------------------------------------------------------------ */
-/* La mâchoire du footer                                                */
+/* Le crâne du footer                                                   */
 /* ------------------------------------------------------------------ */
+// Rendu gravure : l'os couleur papier, ombré en hachures d'encre calées sur la lumière et l'occlusion cuite dans Blender
+// (couleur de sommets), un grain qui frémit comme la hyène du logo, un contour encre (coque retournée, gonflée).
+const ENGRAVE_VERT = /* glsl */ `
+varying vec3 vN;
+varying vec3 vV;
+varying float vAO;
+void main() {
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  vN = normalize(normalMatrix * normal);
+  vV = -mv.xyz;
+  #if defined(USE_COLOR) || defined(USE_COLOR_ALPHA)
+    vAO = color.r;
+  #else
+    vAO = 1.0;
+  #endif
+  gl_Position = projectionMatrix * mv;
+}`;
+const ENGRAVE_FRAG = /* glsl */ `
+uniform vec3 uInk;
+uniform vec3 uPaper;
+uniform vec3 uLight;
+uniform float uTime;
+uniform float uSpacing;
+uniform float uDpr;
+varying vec3 vN;
+varying vec3 vV;
+varying float vAO;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+// Un réseau de traits d'angle a, d'écartement s (px), d'épaisseur w (0..1 de l'interligne), antialiasé.
+float hatch(vec2 p, float a, float s, float w) {
+  float d = (p.x * cos(a) + p.y * sin(a)) / s;
+  float f = abs(fract(d) - 0.5) * 2.0;
+  float aa = fwidth(d) * 1.5;
+  return w <= 0.001 ? 0.0 : smoothstep(1.0 - w - aa, 1.0 - w + aa, f);
+}
+void main() {
+  vec3 n = normalize(vN);
+  if (!gl_FrontFacing) n = -n;
+  float lam = max(dot(n, normalize(uLight)), 0.0);
+  float rim = pow(1.0 - max(dot(n, normalize(vV)), 0.0), 3.0);
+  float ao = smoothstep(0.1, 0.95, vAO);
+  float tone = clamp((0.16 + 0.84 * lam) * mix(0.3, 1.0, ao) + rim * 0.12, 0.0, 1.0);
+  float dark = 1.0 - tone;
+  vec2 p = gl_FragCoord.xy / uDpr;
+  float ink = 0.0;
+  ink = max(ink, hatch(p, 0.785, uSpacing, smoothstep(0.2, 0.8, dark) * 0.55));         // une passe
+  ink = max(ink, hatch(p, -0.785, uSpacing, smoothstep(0.48, 0.92, dark) * 0.5));        // croisée
+  ink = max(ink, hatch(p, 0.0, uSpacing * 0.85, smoothstep(0.72, 1.0, dark) * 0.62));    // serrée
+  ink = max(ink, smoothstep(0.9, 0.98, dark));                                            // aplat dans les creux
+  float g = hash(floor(p * 0.8) + floor(uTime * 8.0));
+  ink = clamp(ink + (g - 0.5) * 0.22, 0.0, 1.0);
+  gl_FragColor = vec4(mix(uPaper, uInk, ink), 1.0);
+  #include <colorspace_fragment>
+}`;
+const OUTLINE_VERT = /* glsl */ `
+uniform float uWidth;
+void main() { gl_Position = projectionMatrix * modelViewMatrix * vec4(position + normal * uWidth, 1.0); }`;
+const OUTLINE_FRAG = /* glsl */ `
+uniform vec3 uInk;
+void main() { gl_FragColor = vec4(uInk, 1.0);
+  #include <colorspace_fragment>
+}`;
+
 /**
- * Deux rangées de crocs (assets/3d/jaws.glb, scripts/blender/make-jaws.py) rendues dans `host` (la scène collante de
- * la morsure). Le scroll pilote `state` (core.js, outroMotion) : a = elles arrivent (de hors champ à entrouvertes),
- * b = elles claquent, c = la gueule s'ouvre (le haut s'en va, le bas se pose au pied de l'écran, sa gencive se fond
- * dans le contact). shake = secousse du claquement.
+ * Le crâne de hyène (assets/3d/skull.glb : scan University of Dundee, CC BY 4.0, allégé dans sources/hyena-skull.blend ;
+ * Skull + Jaw, origine = la charnière) rendu dans `host` (le calque fixe de la morsure). Le scroll pilote `state`
+ * (core.js, outroMotion) : a = il surgit du fond et fonce vers l'écran en ouvrant la gueule, b = il mord (la gueule claque,
+ * l'écran passe au noir : on est dedans), c = le noir s'efface sur le contact. shake = secousse de la morsure.
  */
-export async function mountJaws(host, { root = './', state }) {
+export async function mountSkull(host, { root = './', state }) {
   const canvas = document.createElement('canvas');
   canvas.className = 'jaws-canvas';
-  const renderer = makeRenderer(canvas);
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  const dpr = Math.min(devicePixelRatio, innerWidth < 860 ? 1.5 : 2);
+  renderer.setPixelRatio(dpr);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
   const scene = new THREE.Scene();
-  scene.environment = studio(renderer);
-  const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 100);
-  // Lumière rasante d'en haut à gauche : elle sculpte les crocs (de face, l'éclairage studio seul les aplatit).
-  const key = new THREE.DirectionalLight(0xfff1dc, 2.8); key.position.set(-4, 5, 4); scene.add(key);
-  const fill = new THREE.DirectionalLight(0xdfe6ff, 0.35); fill.position.set(5, -3, 3); scene.add(fill);
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 200);
 
-  const gltf = await gltfLoader(root).loadAsync(`${root}3d/jaws.glb`);
-  const enamel = new THREE.MeshPhysicalMaterial({ color: 0xe9dfca, roughness: 0.3, clearcoat: 0.6, clearcoatRoughness: 0.2, envMapIntensity: 0.45 });
-  // Gencive : le noir du contact, mate (sinon le mur reflète le studio et vire au gris).
-  const gum = new THREE.MeshBasicMaterial({ color: 0x0b0b0b, toneMapped: false }); // le noir exact du contact : pas de raccord visible
-  gltf.scene.traverse((o) => { if (o.isMesh) o.material = /ivory/i.test(o.material.name) ? enamel : gum; });
-  const up = gltf.scene.getObjectByName('JawUp'), down = gltf.scene.getObjectByName('JawDown');
-  scene.add(up, down);
+  const uniforms = {
+    uInk: { value: new THREE.Color('#0B0B0B') },
+    uPaper: { value: new THREE.Color('#EFE9DD') },
+    uLight: { value: new THREE.Vector3(-0.55, 0.75, 0.6).normalize() },
+    uTime: { value: 0 },
+    uSpacing: { value: innerWidth < 860 ? 4.5 : 5.5 },
+    uDpr: { value: dpr },
+  };
+  const engrave = new THREE.ShaderMaterial({ uniforms, vertexShader: ENGRAVE_VERT, fragmentShader: ENGRAVE_FRAG, vertexColors: true, side: THREE.DoubleSide });
+  const outline = new THREE.ShaderMaterial({ uniforms: { uInk: uniforms.uInk, uWidth: { value: 0.022 } }, vertexShader: OUTLINE_VERT, fragmentShader: OUTLINE_FRAG, side: THREE.BackSide });
 
-  // Cadrage : la largeur visible suit l'écran (un téléphone ne montre que le devant de la gueule : incisives, canines).
-  let H = 10;
+  const gltf = await gltfLoader(root).loadAsync(`${root}3d/skull.glb`);
+  const skull = gltf.scene.getObjectByName('Skull'), jaw = gltf.scene.getObjectByName('Jaw');
+  // Les maillages d'abord, les coques ensuite (ajoutées pendant le parcours, elles seraient parcourues à leur tour).
+  const meshes = [];
+  [skull, jaw].forEach((part) => part.traverse((o) => { if (o.isMesh) meshes.push(o); }));
+  meshes.forEach((o) => { o.material = engrave; o.add(new THREE.Mesh(o.geometry, outline)); });
+  const head = new THREE.Group();
+  head.add(skull, jaw);
+  // La charnière est à l'origine ; on recentre le crâne (son milieu est devant et au-dessus d'elle).
+  const pivot = new THREE.Group();
+  head.position.set(0.08, -0.35, -1.0);
+  pivot.add(head);
+  scene.add(pivot);
+
   const resize = () => {
     const r = host.getBoundingClientRect();
-    const aspect = r.width / Math.max(1, r.height);
     renderer.setSize(r.width, r.height, false);
-    camera.aspect = aspect;
-    const W = Math.min(11, Math.max(6, 6.6 * aspect));
-    H = W / aspect;
-    camera.position.z = H / 2 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    camera.aspect = r.width / Math.max(1, r.height);
     camera.updateProjectionMatrix();
   };
   const ro = new ResizeObserver(resize);
@@ -183,30 +256,32 @@ export async function mountJaws(host, { root = './', state }) {
   attach(host);
 
   const lerp = (a, b, t) => a + (b - a) * t;
+  const smooth = (e0, e1, x) => { const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0))); return t * t * (3 - 2 * t); };
   let yaw = 0, idle = false;
   loop(canvas, (t) => {
     const { a = 0, b = 0, c = 0, shake = 0 } = state;
-    // Hors champ (pas encore arrivée, ou repartie) : un écran vide une fois, puis plus aucun rendu.
     if ((a <= 0.0001 || c >= 0.9999) && shake < 0.001) {
       if (!idle) { renderer.clear(); host.style.backgroundColor = ''; idle = true; }
       return;
     }
     idle = false;
-    const far = H / 2 + 2.8; // les canines (2,45) restent hors champ au départ
-    // hors champ -> entrouvertes (±2,9) -> fermées (±0,85, les crocs se croisent) -> rouvertes, reparties chacune de son côté.
-    up.position.y = lerp(lerp(lerp(far, 2.9, a), 0.85, b), far + 1, c);
-    down.position.y = lerp(lerp(lerp(-far, -2.9, a), -0.85, b), -far - 1, c);
-    const ajar = 0.22 * a * (1 - b); // entrouvertes, les mâchoires basculent : on voit les crocs par en dessous / dessus
-    up.rotation.x = -ajar - 0.3 * c;
-    down.rotation.x = ajar + 0.3 * c;
-    // La bouche s'assombrit en se refermant (l'ivoire ressort sur toutes les pages), puis s'éclaircit d'un coup à
-    // l'ouverture : le contact, épinglé derrière, apparaît entre les crocs.
-    const dark = Math.min(1, Math.max(0, (a - 0.15) / 0.55)) * (1 - Math.min(1, c * 3)); // suit l'arrivée des crocs
+    uniforms.uTime.value = t;
+    // Approche : du fond (z -60) jusque sous le nez de la caméra ; la gueule s'ouvre en route, puis claque à la morsure.
+    // Il accélère vers l'écran (a²) : petit au loin, énorme à la fin. De trois-quarts, il se tourne vers toi en approchant.
+    const near = a * a;
+    pivot.position.z = lerp(lerp(-70, -9.5, near), -4.4, b);
+    pivot.position.y = lerp(0.9, 0.45, a);
+    jaw.rotation.x = lerp(0.7 * smooth(0.4, 0.95, a), 0, smooth(0.0, 0.5, b));
+    yaw += ((pointer.x * 0.25) - yaw) * 0.05;
+    pivot.rotation.y = lerp(0.6, 0, smooth(0, 0.9, a)) + yaw * (1 - b) + Math.sin(t * 0.9) * 0.06 * (1 - a);
+    pivot.rotation.x = lerp(0.32, 0.04, a) + 0.12 * b; // il relève le museau en mordant
+    pivot.visible = b < 0.98; // à la morsure, on est dedans : plus que le noir
+    camera.position.x = Math.sin(t * 70) * 0.12 * shake;
+    camera.position.y = Math.cos(t * 55) * 0.09 * shake;
+    // Le noir de la gueule : il monte à la morsure, puis s'efface sur le contact (épinglé derrière).
+    // La page s'assombrit pendant l'approche (l'os papier se détache sur toutes les pages), le noir est total à la morsure.
+    const dark = Math.max(0.78 * near, smooth(0.55, 0.95, b)) * (1 - smooth(0.05, 0.6, c));
     host.style.backgroundColor = dark > 0.001 ? `rgba(11, 11, 11, ${dark.toFixed(3)})` : '';
-    yaw += (pointer.x * 0.12 - yaw) * 0.05;
-    up.rotation.y = down.rotation.y = yaw * (1 - c);
-    camera.position.x = Math.sin(t * 70) * 0.09 * shake;
-    camera.position.y = Math.cos(t * 55) * 0.07 * shake;
     renderer.render(scene, camera);
   });
   return { attach };

@@ -42,31 +42,21 @@ const CARDS = {
       ${tools.map(([f, x, y, r, s]) => `<div class="tool" style="left:${x}px;top:${y}px;width:${s}px;height:${s}px;transform:rotate(${r}deg)"><img src="${dataUri(path.join(dir, f))}"></div>`).join('')}
       ${GRAIN}`;
   },
-  // Vinyl Run : le disque qui sort de sa pochette, l'étiquette jaune du disquaire, sur le noir de la boutique.
+  // Vinyl Run : une vraie photo de la boutique (la fresque des platines Technics, sources/cards/vinyl-run), assombrie,
+  // le logo du disquaire en jaune par-dessus (Johan, 06/11 : mieux qu'un vinyle dessiné).
   'vinyl-run'() {
-    const logo = dataUri(path.join(ROOT, 'assets/vinyl-run/logo.svg'));
+    const photo = dataUri(path.join(ROOT, 'sources/cards/vinyl-run/boutique-technics.jpg'));
+    const logo = svgInline(path.join(ROOT, 'assets/vinyl-run/logo.svg')).replace('<svg ', '<svg class="logo" ');
     return `<style>${BASE}
-      body{background:radial-gradient(90% 60% at 50% 35%, #2a2a26 0%, #111110 70%)}
-      .disc{position:absolute;left:50%;top:150px;width:760px;height:760px;margin-left:-380px;border-radius:50%;
-        background:
-          radial-gradient(circle, transparent 0 25%, rgba(255,255,255,.035) 25.3% 25.6%, transparent 25.9%),
-          repeating-radial-gradient(circle, #0c0c0b 0 2px, #1d1d1b 2.6px 3.4px),
-          #121211;
-        box-shadow:0 40px 80px -20px rgba(0,0,0,.8), inset 0 0 0 6px #0a0a09}
-      .disc::before{content:'';position:absolute;inset:0;border-radius:50%;
-        background:conic-gradient(from 20deg, transparent 0 8%, rgba(255,255,255,.16) 12%, transparent 18% 50%, rgba(255,255,255,.1) 58%, transparent 64%)}
-      .label{position:absolute;left:50%;top:50%;width:250px;height:250px;margin:-125px 0 0 -125px;border-radius:50%;background:#EDF10C;
-        display:grid;place-items:center;box-shadow:inset 0 0 0 10px rgba(0,0,0,.06)}
-      .label img{width:72%;height:72%;object-fit:contain}
-      .hole{position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#111110}
-      .sleeve{position:absolute;left:50%;top:700px;width:720px;height:720px;margin-left:-360px;transform:rotate(-4deg);
-        background:#f0ede6;border-radius:6px;box-shadow:0 -20px 60px -10px rgba(0,0,0,.6);overflow:hidden}
-      .sleeve::after{content:'';position:absolute;left:0;right:0;top:0;height:46px;background:linear-gradient(rgba(0,0,0,.12),transparent)}
-      .sleeve img{position:absolute;left:50%;top:44%;width:300px;transform:translate(-50%,-50%)}
-      .sleeve span{position:absolute;left:0;right:0;bottom:120px;text-align:center;font:600 22px/1 'JetBrains Mono',monospace;letter-spacing:.35em;color:#111110;opacity:.75}
+      body{background:#111110}
+      .photo{position:absolute;inset:0;background:url(${photo}) 50% 40% / cover;filter:grayscale(1) contrast(1.1) brightness(.75)}
+      .shade{position:absolute;inset:0;background:radial-gradient(70% 45% at 50% 50%, rgba(17,17,16,.55), rgba(17,17,16,.2) 70%),
+        linear-gradient(rgba(17,17,16,.35), transparent 30% 65%, rgba(17,17,16,.7))}
+      .logo{position:absolute;left:50%;top:50%;width:470px;height:auto;transform:translate(-50%,-50%);fill:#EDF10C;
+        filter:drop-shadow(0 10px 30px rgba(0,0,0,.55))}
+      .logo *{fill:#EDF10C}
       </style>
-      <div class="disc"><div class="label"><img src="${logo}"></div><div class="hole"></div></div>
-      <div class="sleeve"><img src="${logo}"><span>SAINT-PIERRE · LA RÉUNION</span></div>
+      <div class="photo"></div><div class="shade"></div>${logo}
       ${GRAIN}`;
   },
 };

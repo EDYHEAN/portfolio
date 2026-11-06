@@ -50,7 +50,7 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
 - **Visuel de carte** (`card`, 3:5) : une image qui illustre le projet avec élégance et donne envie de cliquer sans tout
   dévoiler. Jamais une capture de page d'accueil ou un écran pris au hasard (défaut actuel de MyFrenchTool et Vinyl Run).
   Composés par `scripts/make-cards.mjs` (`npm run cards`, 900×1500) : MFT = le coq et des outils français en orbite,
-  Vinyl Run = le disque qui sort de sa pochette. Tout dans la bande centrale (y 300 à 1150) : les petites cases recadrent.
+  Vinyl Run = une photo de la boutique (sources/cards/) et le logo en jaune. Tout dans la bande centrale (y 300 à 1150) : les petites cases recadrent.
   Sur la carte, `logo.mark` (le symbole seul : coq MFT, Pokéball NookDex) et `markScale` pour équilibrer les poids.
 - **Outro** : un crâne de hyène 3D (`assets/3d/skull.glb`, 378 Ko : scan University of Dundee, CC BY 4.0, crédité en bas du
   contact ; brut dans `sources/raw/`, allégé et articulé dans `sources/hyena-skull.blend` : Skull + Jaw, origine = la

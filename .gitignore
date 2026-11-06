@@ -1,8 +1,14 @@
-# Masters vidéo (sources lourdes, non servies — on commit les versions optimisées)
-assets/memoji.mov
-assets/ShowReel_Motion.mp4
-
 .claude/
+
+# Dépendances et build (Vite)
+node_modules
+dist
+
+# Polices téléchargées par les scripts de génération
+.cache
 
 # Sauvegardes automatiques de Blender
 *.blend1
+
+# Sources brutes trop lourdes pour git (scans 3D, masters vidéo…) : on ne versionne que leur version allégée dans assets/
+sources/raw/

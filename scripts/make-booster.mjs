@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const A3D = path.join(ROOT, 'assets/3d');
 const HY = fs.readFileSync(path.join(ROOT, 'assets/brand/hyena.svg'), 'utf8').match(/ d="([^"]+)"/)[1];
 const INK = '#0A0A0A', PAPER = '#EFE9DD';

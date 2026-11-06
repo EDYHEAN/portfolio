@@ -7,7 +7,7 @@ const projets = fs.existsSync('projets') ? fs.readdirSync('projets').map((id) =>
 
 export default defineConfig({
   base: './',
-  // Les assets de la V1 (../assets) sont servis tels quels à la racine : assets/vinyl-run/x.webp -> ./vinyl-run/x.webp
-  publicDir: '../assets',
+  // assets/ est servi tel quel à la racine du site : assets/vinyl-run/x.webp -> ./vinyl-run/x.webp
+  publicDir: 'assets',
   build: { outDir: 'dist', emptyOutDir: true, rollupOptions: { input: [path.resolve('index.html'), ...projets] } },
 });

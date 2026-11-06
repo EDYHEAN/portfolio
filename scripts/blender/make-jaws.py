@@ -1,6 +1,6 @@
 # La mâchoire du footer : deux rangées de crocs de hyène (ivoire) sur une gencive d'encre, en arc pour la profondeur.
 # Blender en ligne de commande, sans interface :
-#   blender -b --factory-startup -P scripts/blender/make-jaws.py -- ../assets/3d/jaws.glb
+#   blender -b --factory-startup -P scripts/blender/make-jaws.py -- assets/3d/jaws.glb
 # Repère Blender : X = largeur, Y = profondeur (la caméra regarde vers +Y), Z = hauteur. La ligne de gencive est z = 0 ;
 # la gencive du haut monte en mur jusqu'à z = GUM_H (elle remplit la moitié d'écran), ses crocs pendent vers le bas.
 # Exporte JawUp et JawDown (origines sur leur ligne de gencive) en glTF Draco : three.js les anime (scenes3d.js).

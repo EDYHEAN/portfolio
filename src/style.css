@@ -157,7 +157,7 @@ html.came .curtain { visibility: visible; }
    mâchoire du bas arrivait hors champ). Transparent et non dessiné tant qu'elle est hors champ (scenes3d.js).
    .bite-run = la course de scroll pendant laquelle elle se referme. */
 .bite-stage { position: fixed; inset: 0; z-index: 60; overflow: hidden; pointer-events: none; } /* au-dessus du header (50) : son voile clair barrait la gueule */
-.bite-run { height: 20vh; }
+.bite-run { height: 160vh; } /* la course d'approche du crâne : longue, pour que ce soit fluide */
 .jaws-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 @media (prefers-reduced-motion: reduce) { .bite-stage, .bite-run { display: none; } }
 

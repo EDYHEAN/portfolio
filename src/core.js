@@ -352,24 +352,24 @@ export function renderOutro({ jaws = true } = {}) {
 
 /** À appeler dans un gsap.matchMedia (créé en dernier : il est en bas de page). */
 export function outroMotion() {
-  // La mâchoire arrive par-dessus la fin de page (la bouche s'assombrit), claque quand le contact arrive en haut de
-  // l'écran (son + secousse), puis s'ouvre pendant que le contact reste épinglé : il se révèle dans la gueule.
+  // Le crâne démarre quand la fin de page est lue, approche longuement jusqu'à remplir l'écran, mord quand le contact
+  // arrive en haut (son + secousse), puis se rouvre pendant que le contact reste épinglé : il se révèle dans la gueule.
   const jawed = !!$('.bite-stage');
   if (jawed) {
     ScrollTrigger.create({ trigger: '#outro', start: 'top 300%', once: true, onEnter: loadJaws });
     if (jaws) loadJaws(); // outro redessinée : on y remet le canvas
-    const close = gsap.timeline({ scrollTrigger: { trigger: '#outro', start: 'top 70%', endTrigger: '.contact', end: 'top top', scrub: 0.3 } });
-    close.fromTo(JAWS, { a: 0 }, { a: 1, duration: 0.82, ease: 'none' }) // l'accélération est dans la scène (a²)
-      .fromTo(JAWS, { b: 0 }, { b: 1, duration: 0.18, ease: 'power4.in' })
+    const close = gsap.timeline({ scrollTrigger: { trigger: '#outro', start: 'top 25%', endTrigger: '.contact', end: 'top top', scrub: 0.8 } });
+    close.fromTo(JAWS, { a: 0 }, { a: 1, duration: 0.8, ease: 'none' }) // l'accélération est dans la scène
+      .fromTo(JAWS, { b: 0 }, { b: 1, duration: 0.2, ease: 'power3.in' })
       .call(() => {
         if (close.scrollTrigger?.direction !== 1) return;
         play('chomp');
         gsap.fromTo(JAWS, { shake: 1 }, { shake: 0, duration: 0.45, ease: 'power2.out', overwrite: 'auto' }); // 'auto' : ne touche que shake
       });
     // Le contact reste invisible tant que la gueule est fermée (il monte sous elle), puis apparaît entre les crocs.
-    gsap.timeline({ scrollTrigger: { trigger: '.contact', start: 'top top', end: '+=55%', pin: true, scrub: 0.3 } })
-      .fromTo(JAWS, { c: 0 }, { c: 1, duration: 1, ease: 'power2.inOut' }, 0)
-      .fromTo('.contact', { opacity: 0 }, { opacity: 1, duration: 0.22, ease: 'none' }, 0.02);
+    gsap.timeline({ scrollTrigger: { trigger: '.contact', start: 'top top', end: '+=90%', pin: true, scrub: 0.8 } })
+      .fromTo(JAWS, { c: 0 }, { c: 1, duration: 1, ease: 'power1.inOut' }, 0)
+      .fromTo('.contact', { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'none' }, 0.08);
   }
 
   // Le contenu du contact entre quand la gueule s'ouvre (ou en arrivant, sans mâchoire).

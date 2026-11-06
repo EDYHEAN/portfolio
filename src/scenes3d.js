@@ -266,21 +266,29 @@ export async function mountSkull(host, { root = './', state }) {
     }
     idle = false;
     uniforms.uTime.value = t;
-    // Approche : du fond (z -60) jusque sous le nez de la caméra ; la gueule s'ouvre en route, puis claque à la morsure.
-    // Il accélère vers l'écran (a²) : petit au loin, énorme à la fin. De trois-quarts, il se tourne vers toi en approchant.
-    const near = a * a;
-    pivot.position.z = lerp(lerp(-70, -9.5, near), -4.4, b);
-    pivot.position.y = lerp(0.9, 0.45, a);
-    jaw.rotation.x = lerp(0.7 * smooth(0.4, 0.95, a), 0, smooth(0.0, 0.5, b));
+    // a : il surgit du fond et accélère jusqu'à remplir l'écran, de trois-quarts puis face à toi, la gueule s'ouvre en
+    //     route. b : il mord, plein écran. c : la gueule se rouvre en grand et on plonge entre les crocs : le contact,
+    //     épinglé derrière, apparaît dans l'ouverture.
+    const near = Math.pow(a, 1.6);
+    const zBite = innerWidth < 860 ? -6.2 : -4.8; // plein écran à la morsure (un téléphone est étroit : un peu plus loin)
+    let z = lerp(-70, zBite, near);
+    z = lerp(z, zBite + 0.5, smooth(0, 1, b));             // il se jette en avant en mordant
+    z = lerp(z, 2.2, Math.pow(c, 1.4));                    // puis on passe entre ses mâchoires
+    pivot.position.z = z;
+    // Cadrage : la ligne des crocs (≈ 0,95 sous le pivot) au centre de l'écran à la morsure ; à la réouverture, le pivot
+    // monte d'autant que la mâchoire descend, pour que la caméra file au milieu de l'ouverture (pas à travers l'os).
+    pivot.position.y = lerp(0.5, 0.6, smooth(0, 1, a)) + 1.2 * smooth(0, 0.8, c);
+    const gape = 0.62 * smooth(0.25, 0.85, a);
+    jaw.rotation.x = lerp(lerp(gape, 0, smooth(0, 0.6, b)), 1.15, smooth(0, 0.7, c));
     yaw += ((pointer.x * 0.25) - yaw) * 0.05;
-    pivot.rotation.y = lerp(0.6, 0, smooth(0, 0.9, a)) + yaw * (1 - b) + Math.sin(t * 0.9) * 0.06 * (1 - a);
-    pivot.rotation.x = lerp(0.32, 0.04, a) + 0.12 * b; // il relève le museau en mordant
-    pivot.visible = b < 0.98; // à la morsure, on est dedans : plus que le noir
+    pivot.rotation.y = lerp(0.6, 0, smooth(0, 0.8, a)) + yaw * (1 - b) * (1 - c) + Math.sin(t * 0.9) * 0.06 * (1 - a);
+    pivot.rotation.x = lerp(0.3, -0.1, smooth(0, 1, a)) - 0.06 * b * (1 - c) - 0.2 * smooth(0, 1, c); // museau un peu relevé : on voit les crocs
+    pivot.visible = c < 0.98;
     camera.position.x = Math.sin(t * 70) * 0.12 * shake;
     camera.position.y = Math.cos(t * 55) * 0.09 * shake;
-    // Le noir de la gueule : il monte à la morsure, puis s'efface sur le contact (épinglé derrière).
-    // La page s'assombrit pendant l'approche (l'os papier se détache sur toutes les pages), le noir est total à la morsure.
-    const dark = Math.max(0.78 * near, smooth(0.55, 0.95, b)) * (1 - smooth(0.05, 0.6, c));
+    // La page ne s'assombrit qu'en fin d'approche (tu as fini de lire), noire à la morsure ; à la réouverture le noir
+    // s'efface : derrière les crocs, c'est le contact.
+    const dark = Math.max(0.85 * smooth(0.55, 0.95, a), smooth(0.3, 0.9, b)) * (1 - smooth(0.1, 0.45, c));
     host.style.backgroundColor = dark > 0.001 ? `rgba(11, 11, 11, ${dark.toFixed(3)})` : '';
     renderer.render(scene, camera);
   });

@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rhinov Studio Immo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="La retouche photo pro et le home staging virtuel au service des professionnels de l'immobilier.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,600;1,6..96,700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="nav__bar">
+    <a class="nav__logo" href="#top" aria-label="Rhinov Studio, retour en haut"><img src="assets/img/logo-rhinov-studio.svg" width="85" height="41" alt="Rhinov Studio"></a>
+    <nav class="nav__liens" aria-label="Navigation principale">
+      <a href="#prestations">Nos prestations</a>
+      <a href="#tarifs">Nos tarifs</a>
+      <a href="#plateforme">Comment ça marche ?</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn btn--noir nav__cta" href="#essai">Tester gratuitement</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ============ HERO : la vidéo joue une fois et reste sur la pièce finie ============ -->
+<section class="hero" aria-label="Sublimez vos biens, boostez vos mandats">
+  <div class="hero__media" aria-hidden="true">
+    <video class="hero__video" id="hero-video" muted playsinline preload="auto" poster="assets/img/hero-immo-premiere.webp"></video>
+    <div class="hero__voile"></div>
+  </div>
+  <div class="wrap hero__contenu">
+    <h1 class="hero__titre">
+      <span class="line"><span>Sublimez vos biens,</span></span>
+      <span class="line hero__l2"><span class="bodoni">boostez vos mandats.</span></span>
+    </h1>
+    <p class="hero__sous" data-hero><span>La retouche photo pro et le home staging virtuel à portée de main.</span> <span>Au service des professionnels de l'immobilier.</span></p>
+    <a class="btn btn--blanc" href="#tarifs" data-hero>Voir les tarifs <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </div>
+  <a class="hero__scroll" href="#chiffres" aria-label="Faire défiler vers la suite"><span class="hero__souris" aria-hidden="true"><i></i></span></a>
+</section>
+
+<!-- ============ CHIFFRES ============ -->
+<section class="chiffres" id="chiffres" aria-label="Chiffres clés">
+  <div class="wrap">
+    <ul class="chiffres__liste">
+      <li data-reveal><b class="bodoni-chiffre" data-count="30000" data-format="milliers">30 000</b><span>biens sublimés depuis 12 ans</span></li>
+      <li data-reveal><b class="bodoni-chiffre" data-count="40" data-avant="+" data-apres=" %">+40 %</b><span>de consultations d’annonce</span></li>
+      <li data-reveal><b class="bodoni-chiffre" data-count="5" data-avant="×">×5</b><span>de temps passé sur l’annonce</span></li>
+      <li data-reveal><b class="bodoni-chiffre" data-count="50" data-avant="-" data-apres=" %">-50 %</b><span>de délai de vente avec home staging</span></li>
+    </ul>
+    <p class="chiffres__sources">Sources : Realtor.com, SeLoger, Logic-Immo, Bien'ici. Données Rhinov depuis 2014.</p>
+  </div>
+</section>
+
+<!-- ============ RÉFÉRENCES ============ -->
+<section class="refs" aria-label="Ils nous font confiance">
+  <div class="refs__piste">
+    <div class="refs__set"><span>Human Immobilier</span><span>Lamy</span><span>iad</span><span>Capifrance</span><span>Safti</span><span>Square Habitat</span><span>Century 21</span><span>Orpi</span><span>Action Logement</span></div>
+    <div class="refs__set" aria-hidden="true"><span>Human Immobilier</span><span>Lamy</span><span>iad</span><span>Capifrance</span><span>Safti</span><span>Square Habitat</span><span>Century 21</span><span>Orpi</span><span>Action Logement</span></div>
+  </div>
+</section>
+
+<!-- ============ PRESTATIONS ============ -->
+<section class="section prestations" id="prestations">
+  <div class="wrap">
+    <h2 class="titre" data-lines><span class="line"><span>Photo, home staging, vidéo.</span></span><span class="line titre__gris"><span>Tout ce qu'il faut pour une annonce qui sort du lot.</span></span></h2>
+    <div class="cartes">
+      <article class="carte">
+        <div class="ba ba--carte" data-ba data-balaye>
+          <img class="ba__apres" src="assets/img/photo-apres.webp" alt="Cuisine retouchée, lumineuse, ciel bleu à la fenêtre" loading="lazy">
+          <div class="ba__avant"><img src="assets/img/photo-avant.webp" alt="La même cuisine avant retouche, terne et sombre" loading="lazy"></div>
+          <span class="ba__pastille ba__pastille--g">Avant</span><span class="ba__pastille ba__pastille--d">Après</span>
+          <button class="ba__poignee" type="button" role="slider" aria-label="Comparer avant et après" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"></button>
+        </div>
+        <h3>Photos professionnelles</h3>
+        <p>Recadrage, luminosité, ciel bleu : vos photos prennent une dimension professionnelle.</p>
+      </article>
+      <article class="carte">
+        <div class="ba ba--carte" data-ba data-balaye>
+          <img class="ba__apres" src="assets/img/hs-apres.webp" alt="Séjour meublé par home staging virtuel" loading="lazy">
+          <div class="ba__avant"><img src="assets/img/hs-avant.webp" alt="Le même séjour vide" loading="lazy"></div>
+          <span class="ba__pastille ba__pastille--g">Avant</span><span class="ba__pastille ba__pastille--d">Après</span>
+          <button class="ba__poignee" type="button" role="slider" aria-label="Comparer avant et après" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"></button>
+        </div>
+        <h3>Home staging virtuel</h3>
+        <p>Révélez le potentiel du bien pour convaincre un maximum d’acheteurs.</p>
+      </article>
+      <article class="carte">
+        <div class="carte__visuel"><video class="carte__video" src="assets/video/carte-video.mp4" poster="assets/img/carte-video-poster.webp" muted loop playsinline preload="metadata" aria-label="Vidéo de visite : travelling lent dans un séjour lumineux"></video><span class="ba__pastille ba__pastille--g">Vidéo</span></div>
+        <h3>Vidéo</h3>
+        <p>Un travelling fluide généré depuis vos photos, prêt pour les portails.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AVANT / APRÈS : la scène se révèle au scroll ============ -->
+<section class="section galerie" id="realisations">
+  <div class="wrap galerie__pin">
+    <h2 class="titre titre--scene" data-lines><span class="line"><span>Avant, après.</span></span><span class="line titre__gris"><span>Glissez pour comparer.</span></span></h2>
+    <div class="ba ba--scene" data-ba id="scene">
+      <img class="ba__apres" src="assets/img/p1-apres.webp" alt="Séjour après home staging virtuel">
+      <div class="ba__avant"><img src="assets/img/p1-avant.webp" alt="Séjour avant, meubles datés"></div>
+      <span class="ba__pastille ba__pastille--g">Avant</span><span class="ba__pastille ba__pastille--d">Après</span>
+      <span class="scene__label" id="scene-label"><b>Home staging virtuel</b> Séjour</span>
+      <button class="ba__poignee" type="button" role="slider" aria-label="Comparer avant et après" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"></button>
+    </div>
+    <div class="vignettes" role="tablist" aria-label="Choisir une réalisation">
+      <button class="vignette is-on" role="tab" aria-selected="true" data-i="1" data-presta="Home staging virtuel" data-piece="Séjour"><img src="assets/img/p1-apres.webp" alt="" loading="lazy"><span>Séjour</span></button>
+      <button class="vignette" role="tab" aria-selected="false" data-i="2" data-presta="Home staging virtuel" data-piece="Chambre"><img src="assets/img/p2-apres.webp" alt="" loading="lazy"><span>Chambre</span></button>
+      <button class="vignette" role="tab" aria-selected="false" data-i="3" data-presta="Retouche photo" data-piece="Cuisine"><img src="assets/img/p3-apres.webp" alt="" loading="lazy"><span>Cuisine</span></button>
+      <button class="vignette" role="tab" aria-selected="false" data-i="4" data-presta="Retouche photo, ciel bleu" data-piece="Façade"><img src="assets/img/p4-apres.webp" alt="" loading="lazy"><span>Façade</span></button>
+      <button class="vignette" role="tab" aria-selected="false" data-i="5" data-presta="Home staging virtuel" data-piece="Terrasse"><img src="assets/img/p5-apres.webp" alt="" loading="lazy"><span>Terrasse</span></button>
+      <button class="vignette" role="tab" aria-selected="false" data-i="6" data-presta="Retouche photo" data-piece="Salle de bain"><img src="assets/img/p6-apres.webp" alt="" loading="lazy"><span>Salle de bain</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PLATEFORME ============ -->
+<section class="plateforme" id="plateforme">
+  <div class="wrap plateforme__grille">
+    <div class="plateforme__texte">
+      <h2 class="titre titre--m" data-lines><span class="line"><span>Une plateforme simple et rapide.</span></span><span class="line titre__gris"><span>Vos biens, vos photos, vos rendus au même endroit.</span></span></h2>
+      <div class="etapes-wrap">
+      <span class="etapes__fil" aria-hidden="true"><i></i></span>
+      <ol class="etapes">
+        <li><b>Déposez vos photos</b><span>Depuis votre téléphone ou votre appareil, en quelques secondes.</span></li>
+        <li><b>Choisissez le traitement</b><span>Retouche HDR, home staging virtuel ou vidéo. Une case à cocher.</span></li>
+        <li><b>Récupérez vos visuels</b><span>Prêts à publier sur vos portails, dans votre espace agence.</span></li>
+      </ol>
+      </div>
+    </div>
+    <div class="plateforme__app"><img src="assets/img/plateforme-app.webp" alt="L'espace agence Rhinov Studio : la liste des biens et un avant/après" loading="lazy"></div>
+  </div>
+</section>
+
+<!-- ============ ESSAI ============ -->
+<section class="section essai" id="essai">
+  <div class="wrap">
+    <div class="essai__bloc">
+      <div class="essai__texte">
+        <span class="pastille-blanche">Essai offert</span>
+        <h2 data-lines><span class="line"><span>Testez sur un de vos biens,</span></span><span class="line"><span class="bodoni">avant de vous abonner.</span></span></h2>
+        <p data-reveal>Envoyez-nous les photos d’un bien : nous vous retournons les photos retouchées et un home staging iA. Sans engagement.</p>
+      </div>
+      <a class="btn btn--blanc" href="#essai" data-reveal>Tester sur un bien <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TARIFS ============ -->
+<section class="section tarifs" id="tarifs">
+  <div class="wrap">
+    <div class="tarifs__intro">
+      <h2 class="titre titre--centre" data-lines><span class="line"><span>Quel abonnement pour votre agence ?</span></span></h2>
+      <p class="tarifs__chapo" data-reveal>Comparez les offres selon le nombre de biens que vous mettez en vente chaque mois.</p>
+      <div class="bascule" role="radiogroup" aria-label="Rythme de paiement" data-reveal>
+        <span class="bascule__pastille" aria-hidden="true"></span>
+        <button type="button" role="radio" aria-checked="true" data-mode="annuel" class="is-on">Annuel</button>
+        <button type="button" role="radio" aria-checked="false" data-mode="mensuel">Mensuel</button>
+      </div>
+    </div>
+    <div class="tableau-wrap">
+      <table class="tableau">
+        <caption class="sr-only">Comparatif des abonnements</caption>
+        <thead>
+          <tr>
+            <th scope="col" class="tableau__coin">Comparer<br>les offres</th>
+            <th scope="col"><div class="offre"><span class="offre__nom">Essentiel</span><span class="offre__pour">Négociateur indépendant</span><span class="offre__prix"><b data-annuel="39 €" data-mensuel="49 €">39 €</b> HT/mois</span><span class="offre__alt" data-annuel="ou 49 € en mensuel" data-mensuel="ou 39 € en annuel">ou 49 € en mensuel</span><a class="btn btn--contour" href="#essai">Choisir Essentiel</a></div></th>
+            <th scope="col" class="is-conseil"><div class="offre"><span class="offre__tag">Recommandé</span><span class="offre__nom">Boost</span><span class="offre__pour">Agent établi ou petite agence</span><span class="offre__prix"><b data-annuel="79 €" data-mensuel="99 €">79 €</b> HT/mois</span><span class="offre__alt" data-annuel="ou 99 € en mensuel" data-mensuel="ou 79 € en annuel">ou 99 € en mensuel</span><a class="btn btn--noir" href="#essai">Choisir Boost</a></div></th>
+            <th scope="col"><div class="offre"><span class="offre__nom">Team</span><span class="offre__pour">Agence d’environ 4 négociateurs</span><span class="offre__prix"><b data-annuel="149 €" data-mensuel="179 €">149 €</b> HT/mois</span><span class="offre__alt" data-annuel="ou 179 € en mensuel" data-mensuel="ou 149 € en annuel">ou 179 € en mensuel</span><a class="btn btn--contour" href="#essai">Choisir Team</a></div></th>
+            <th scope="col"><div class="offre"><span class="offre__nom">Réseau</span><span class="offre__pour">Réseaux et franchises</span><span class="offre__prix offre__prix--devis"><b>Sur devis</b></span><span class="offre__alt">Volume sur mesure</span><a class="btn btn--contour" href="#essai">Nous contacter</a></div></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Biens par mois</th><td>3</td><td class="is-conseil">8</td><td>15</td><td>Sur mesure</td></tr>
+          <tr><th scope="row">Photos pro incluses</th><td>45</td><td class="is-conseil">120</td><td>225 mutualisées</td><td>Sur mesure</td></tr>
+          <tr><th scope="row">Home stagings iA</th><td>3</td><td class="is-conseil">8</td><td>15</td><td>Illimités</td></tr>
+          <tr><th scope="row">Prix par bien</th><td data-annuel="13 €" data-mensuel="16,33 €">13 €</td><td class="is-conseil"><span data-annuel="9,87 €" data-mensuel="12,38 €">9,87 €</span> <span class="eco" data-annuel="-24 %" data-mensuel="-24 %">-24 %</span></td><td><span data-annuel="9,93 €" data-mensuel="11,93 €">9,93 €</span> <span class="eco" data-annuel="-23 %" data-mensuel="-27 %">-23 %</span></td><td>Sur devis</td></tr>
+          <tr><th scope="row">Connexion à vos portails</th><td class="non" aria-label="Non">—</td><td class="non is-conseil" aria-label="Non">—</td><td class="non" aria-label="Non">—</td><td class="oui" aria-label="Oui">✓</td></tr>
+          <tr><th scope="row">Accompagnement dédié</th><td class="non" aria-label="Non">—</td><td class="non is-conseil" aria-label="Non">—</td><td class="non" aria-label="Non">—</td><td class="oui" aria-label="Oui">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="forfaits">
+      <article class="forfait">
+        <div class="forfait__tete"><div><h3 class="forfait__nom">Essentiel</h3><p class="forfait__pour">Négociateur indépendant</p></div><p class="forfait__prix"><b data-annuel="39 €" data-mensuel="49 €">39 €</b><span>HT/mois</span></p></div>
+        <ul class="forfait__inclus"><li><b>3</b> biens/mois</li><li><b>45</b> photos pro</li><li><b>3</b> home stagings iA</li></ul>
+        <div class="forfait__pied"><span class="forfait__unite"><b data-annuel="13 €" data-mensuel="16,33 €">13 €</b> par bien</span><a class="btn btn--contour" href="#essai">Choisir</a></div>
+      </article>
+      <article class="forfait is-conseil">
+        <div class="forfait__tete"><div><h3 class="forfait__nom">Boost<span class="forfait__tag">Recommandé</span></h3><p class="forfait__pour">Agent établi ou petite agence</p></div><p class="forfait__prix"><b data-annuel="79 €" data-mensuel="99 €">79 €</b><span>HT/mois</span></p></div>
+        <ul class="forfait__inclus"><li><b>8</b> biens/mois</li><li><b>120</b> photos pro</li><li><b>8</b> home stagings iA</li></ul>
+        <div class="forfait__pied"><span class="forfait__unite"><b data-annuel="9,87 €" data-mensuel="12,38 €">9,87 €</b> par bien <span class="eco">-24 %</span></span><a class="btn btn--blanc" href="#essai">Choisir</a></div>
+      </article>
+      <article class="forfait">
+        <div class="forfait__tete"><div><h3 class="forfait__nom">Team</h3><p class="forfait__pour">Agence d’environ 4 négociateurs</p></div><p class="forfait__prix"><b data-annuel="149 €" data-mensuel="179 €">149 €</b><span>HT/mois</span></p></div>
+        <ul class="forfait__inclus"><li><b>15</b> biens/mois</li><li><b>225</b> photos pro mutualisées</li><li><b>15</b> home stagings iA</li></ul>
+        <div class="forfait__pied"><span class="forfait__unite"><b data-annuel="9,93 €" data-mensuel="11,93 €">9,93 €</b> par bien <span class="eco" data-annuel="-23 %" data-mensuel="-27 %">-23 %</span></span><a class="btn btn--contour" href="#essai">Choisir</a></div>
+      </article>
+      <article class="forfait">
+        <div class="forfait__tete"><div><h3 class="forfait__nom">Réseau</h3><p class="forfait__pour">Réseaux et franchises</p></div><p class="forfait__prix"><b>Sur devis</b><span>volume sur mesure</span></p></div>
+        <ul class="forfait__inclus"><li>Home stagings <b>illimités</b></li><li>Connexion à vos portails</li><li>Accompagnement dédié</li></ul>
+        <div class="forfait__pied"><span class="forfait__unite">Tarif selon volume</span><a class="btn btn--contour" href="#essai">Nous contacter</a></div>
+      </article>
+    </div>
+    <p class="tarifs__note">Prix HT par mois. Annuel : engagement de 12 mois. Mensuel : sans engagement.</p>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="section faq" id="faq">
+  <div class="wrap wrap--etroit">
+    <h2 class="titre titre--centre" data-lines><span class="line"><span>Les questions fréquentes</span></span></h2>
+    <div class="faq__liste" data-reveal>
+      <details><summary>Combien de temps pour recevoir mes photos retouchées ?</summary><p>Réponse à venir.</p></details>
+      <details><summary>Quelle qualité de photo dois-je fournir au départ ?</summary><p>Réponse à venir.</p></details>
+      <details><summary>Le home staging virtuel est-il autorisé sur les portails ?</summary><p>Réponse à venir.</p></details>
+      <details><summary>Puis-je faire retoucher un bien déjà en ligne ?</summary><p>Réponse à venir.</p></details>
+      <details><summary>Que se passe-t-il si un rendu ne me convient pas ?</summary><p>Réponse à venir.</p></details>
+      <details><summary>Mes visuels sont-ils utilisables sur tous mes supports ?</summary><p>Réponse à venir.</p></details>
+      <details><summary>Puis-je changer d'abonnement en cours d'année ?</summary><p>Réponse à venir.</p></details>
+      <details><summary>Mes photos restent-elles confidentielles ?</summary><p>Réponse à venir.</p></details>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__haut">
+      <div class="footer__marque"><img src="assets/img/logo-rhinov-studio-clair.svg" width="85" height="41" alt="Rhinov Studio"><p>Sublimez vos biens, boostez vos mandats.</p></div>
+      <div class="footer__cols">
+        <div><p class="footer__label">Navigation</p><a href="#prestations">Nos prestations</a><a href="#tarifs">Nos tarifs</a><a href="#plateforme">Comment ça marche ?</a><a href="#faq">FAQ</a></div>
+        <div><p class="footer__label">Contact</p><span>contact@rhinov.fr</span><a href="#essai">Prendre rendez-vous</a><a href="#essai">Demander un devis</a></div>
+      </div>
+    </div>
+    <div class="footer__bas"><p>© 2026 Rhinov Studio</p><p>Mentions légales · Politique de confidentialité · CGV</p></div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

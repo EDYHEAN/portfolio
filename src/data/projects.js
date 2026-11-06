@@ -24,7 +24,7 @@ export const PROJECTS = [
     year: '2026',
     theme: 'dark',
     colors: { bg: '#3B2A20', fg: '#F4EDE2', accent: '#C9672A', line: 'rgba(244,237,226,.14)', tile: '#4A3629' },
-    logo: { src: 'rhinov-studio/logo.svg', invert: true },
+    logo: { src: 'rhinov-studio/logo.svg', invert: true, introScale: 0.55 }, // le lockup est large : réduit dans l'intro
     shot: 'rhinov-studio/versions/v8.webp',
     fonts: ['Poppins:wght@400;600', 'Bodoni+Moda:ital,wght@1,500'],
     type: T('Product design · B2B', 'Product design · B2B'),
@@ -52,44 +52,21 @@ export const PROJECTS = [
         ],
       },
       {
-        // L'itération : le hero de chaque version, de la V1 à aujourd'hui (archives Figma).
-        type: 'slides',
-        title: T('8 versions avant la bonne', '8 versions to get it right'),
+        // Les vrais prototypes codés, à scroller dans le cadre (assets/rhinov-studio/live, copiés des sources de Johan).
+        type: 'live',
+        title: T('Les landings, en vrai', 'The landing pages, live'),
         items: [
-          { src: 'rhinov-studio/versions/v1.webp', t: T('V1 · la promesse seule', 'V1 · just the promise') },
-          { src: 'rhinov-studio/versions/v2.webp', t: T('V2 · la preuve par la galerie', 'V2 · proof by gallery') },
-          { src: 'rhinov-studio/versions/v3.webp', t: T("V3 · le produit dans son décor", 'V3 · the product in its setting') },
-          { src: 'rhinov-studio/versions/v4.webp', t: T('V4 · le gros plan matière', 'V4 · the material close-up') },
-          { src: 'rhinov-studio/versions/v5.webp', t: T('V5 · avant les retours du 30/09', 'V5 · before the 30/09 feedback') },
-          { src: 'rhinov-studio/versions/v6.webp', t: T('V6 · avant le hero vidéo', 'V6 · before the video hero') },
-          { src: 'rhinov-studio/versions/v7.webp', t: T("V7 · le produit seul, sur fond neutre", 'V7 · the product alone, neutral backdrop') },
-          { src: 'rhinov-studio/versions/v8.webp', t: T("V8 · aujourd'hui", 'V8 · today') },
+          { src: 'rhinov-studio/live/retail/index.html', url: T('Rhinov Studio · retail', 'Rhinov Studio · retail'), label: T('Retail', 'Retail') },
+          { src: 'rhinov-studio/live/immo/index.html', url: T('Rhinov Studio · immo', 'Rhinov Studio · real estate'), label: T('Immo', 'Real estate') },
         ],
-      },
-      {
-        // Les prototypes codés, en pleine page (la retail défile, l'immo à côté, le mobile en surimpression).
-        type: 'pages',
-        pages: [
-          { src: 'rhinov-studio/pages/retail.webp', url: 'Rhinov Studio · retail', label: T('Landing retail', 'Retail landing') },
-          { src: 'rhinov-studio/pages/immo.webp', url: 'Rhinov Studio · immo', label: T('Landing immo', 'Real estate landing') },
-        ],
-        mobile: 'rhinov-studio/pages/m-retail.webp',
       },
       {
         type: 'showcase',
         title: T("L'app des agents", "The agents' app"),
         items: [
-          { img: 'rhinov-studio/app/dashboard.webp', url: 'App agents · Mes biens', t: T('Mes biens', 'My listings'), d: T("Chaque bien, son statut et ses photos retouchées, en un coup d'œil.", 'Every listing, its status and its retouched photos, at a glance.') },
-          { img: 'rhinov-studio/app/ajout.webp', size: 'half', url: 'App agents · Ajouter un bien', t: T('Ajouter un bien', 'Add a listing'), d: T('Une adresse, des photos, la prestation : le studio prend le relais.', 'An address, some photos, the service: the studio takes it from there.') },
-          { img: 'rhinov-studio/app/suivi.webp', size: 'half', url: 'App agents · Connexion', t: T('La connexion', 'Sign in'), d: T("L'espace agent, aux couleurs de la marque.", "The agent's space, in the brand's colours.") },
-        ],
-      },
-      {
-        type: 'outcome',
-        stats: [
-          { v: 8, l: T('versions de la landing retail', 'retail landing versions') },
-          { v: 2, l: T('marchés : retail et immobilier', 'markets: retail and real estate') },
-          { v: 1, l: T('app pour les agents', 'app for the agents') },
+          { img: 'rhinov-studio/app/dashboard.webp', size: 'third', url: 'App agents · Mes biens', t: T('Mes biens', 'My listings'), d: T("Chaque bien, son statut et ses photos retouchées, en un coup d'œil.", 'Every listing, its status and its retouched photos, at a glance.') },
+          { img: 'rhinov-studio/app/ajout.webp', size: 'third', url: 'App agents · Ajouter un bien', t: T('Ajouter un bien', 'Add a listing'), d: T('Une adresse, des photos, la prestation : le studio prend le relais.', 'An address, some photos, the service: the studio takes it from there.') },
+          { img: 'rhinov-studio/app/suivi.webp', size: 'third', url: 'App agents · Connexion', t: T('La connexion', 'Sign in'), d: T("L'espace agent, aux couleurs de la marque.", "The agent's space, in the brand's colours.") },
         ],
       },
     ],
@@ -137,13 +114,14 @@ export const PROJECTS = [
         mobile: 'vinyl-run/pages/m-home.webp',
       },
       {
+        // Illustrations 3D (scripts/blender/make-features.py) à la place des captures (Johan, 06/11).
         type: 'features',
         items: [
-          { img: 'vinyl-run/features/map.webp', size: 'l', t: T("La carte de l'île", 'The island map'), d: T('La boutique placée sur La Réunion, dessinée en courbes de niveau.', 'The shop pinned on Réunion, drawn in contour lines.') },
-          { img: 'vinyl-run/features/chat.webp', size: 't', pos: 'top right', t: T('Chat avec le disquaire', 'Chat with the shop'), d: T('Une question sur un disque ? Réponse en direct, depuis une console admin.', 'A question about a record? Answered live, from an admin console.') },
-          { img: 'vinyl-run/features/inventory.webp', size: 'w', t: T('Inventaire Discogs en direct', 'Live Discogs inventory'), d: T('Tout le stock, synchronisé depuis Discogs.', 'The whole stock, synced from Discogs.') },
-          { img: 'vinyl-run/features/player.webp', size: 'w', fit: 'contain', t: T('Lecteur péi', 'Island player'), d: T('Des morceaux réunionnais pendant la visite.', 'Réunion tracks playing while you browse.') },
-          { img: 'vinyl-run/features/demande.webp', size: 's', t: T('Demande spéciale', 'Special request'), d: T('Un formulaire pour chercher un vinyle précis.', 'A form to hunt down a specific record.') },
+          { img: 'vinyl-run/features3d/map.webp', fit: 'contain', pos: 'center', size: 'l', t: T("La carte de l'île", 'The island map'), d: T('La boutique placée sur La Réunion, dessinée en courbes de niveau.', 'The shop pinned on Réunion, drawn in contour lines.') },
+          { img: 'vinyl-run/features3d/chat.webp', fit: 'contain', pos: 'center', size: 't', t: T('Chat avec le disquaire', 'Chat with the shop'), d: T('Une question sur un disque ? Réponse en direct, depuis une console admin.', 'A question about a record? Answered live, from an admin console.') },
+          { img: 'vinyl-run/features3d/inventory.webp', fit: 'contain', pos: 'center', size: 'w', t: T('Inventaire Discogs en direct', 'Live Discogs inventory'), d: T('Tout le stock, synchronisé depuis Discogs.', 'The whole stock, synced from Discogs.') },
+          { img: 'vinyl-run/features3d/player.webp', fit: 'contain', pos: 'center', size: 'w', t: T('Lecteur péi', 'Island player'), d: T('Des morceaux réunionnais pendant la visite.', 'Réunion tracks playing while you browse.') },
+          { img: 'vinyl-run/features3d/demande.webp', fit: 'contain', pos: 'center', size: 's', t: T('Demande spéciale', 'Special request'), d: T('Un formulaire pour chercher un vinyle précis.', 'A form to hunt down a specific record.') },
         ],
       },
       {

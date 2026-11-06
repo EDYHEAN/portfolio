@@ -31,7 +31,7 @@ function render() {
   $('#app').innerHTML = `
     <section class="intro" data-theme="${p.theme}">
       <a class="intro-back mono" href="${ROOT}#work" data-page><span aria-hidden="true">←</span> ${t('p.back')}</a>
-      <div class="intro-logo"><img src="${asset(p.logo.src)}" alt="${p.name}" class="${p.logo.invert ? 'inv' : ''}"></div>
+      <div class="intro-logo" style="--logo-k:${p.logo.introScale || 1}"><img src="${asset(p.logo.src)}" alt="${p.name}" class="${p.logo.invert ? 'inv' : ''}"></div>
       <h1 class="intro-name">${p.name}</h1>
       <p class="intro-tag">${tx(p.tagline)}</p>
       <dl class="intro-meta mono">

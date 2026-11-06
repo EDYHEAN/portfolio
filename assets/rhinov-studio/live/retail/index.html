@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rhinov Studio</title>
+<meta name="description" content="Le Studio dédié aux marques de la Maison qui remplace vos shootings photos et vidéos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,600;0,6..96,700;1,6..96,700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="nav__bar">
+    <a class="nav__logo" href="#top" aria-label="Rhinov Studio, retour en haut">
+      <img src="assets/img/logo-rhinov-studio.svg" width="85" height="41" alt="Rhinov Studio">
+    </a>
+    <nav class="nav__links" aria-label="Navigation principale">
+      <div class="nav__drop">
+        <button class="nav__link nav__link--drop" type="button" aria-expanded="false" aria-controls="nav-dropdown">
+          Nos prestations <img src="assets/img/ico-chevron.svg" width="10.5" height="6" alt="">
+        </button>
+        <div class="dropdown" id="nav-dropdown">
+          <a class="dropdown__item" href="#prestations" data-step="0"><span class="dropdown__picto" style="--c:#3b2b1f">1</span><span class="dropdown__txt"><b>Packshot fond studio</b></span></a>
+          <a class="dropdown__item" href="#prestations" data-step="1"><span class="dropdown__picto" style="--c:#a8664a">2</span><span class="dropdown__txt"><b>Mise en ambiance produits</b></span></a>
+          <a class="dropdown__item" href="#prestations" data-step="2"><span class="dropdown__picto" style="--c:#6b7f6e">3</span><span class="dropdown__txt"><b>Vidéos d'animation</b></span></a>
+          <a class="dropdown__item" href="#prestations" data-step="3"><span class="dropdown__picto" style="--c:#4a5a6b">4</span><span class="dropdown__txt"><b>Déclinaisons</b></span></a>
+          <a class="dropdown__item" href="#prestations" data-step="4"><span class="dropdown__picto" style="--c:#b08968">5</span><span class="dropdown__txt"><b>Jour/Nuit</b></span></a>
+          <a class="dropdown__item" href="#prestations" data-step="5"><span class="dropdown__picto" style="--c:#3b2b1f">6</span><span class="dropdown__txt"><b>Intégration</b></span></a>
+          <a class="dropdown__item" href="#prestations" data-step="6"><span class="dropdown__picto" style="--c:#a8664a">7</span><span class="dropdown__txt"><b>Mise en ambiance animée</b></span></a>
+          <a class="dropdown__item" href="#prestations" data-step="7"><span class="dropdown__picto" style="--c:#6b7f6e">8</span><span class="dropdown__txt"><b>Fichier 3D RA</b></span></a>
+        </div>
+      </div>
+      <a class="nav__link" href="#tarifs">Nos tarifs</a>
+      <a class="nav__link" href="#comment">Comment ça marche ?</a>
+      <a class="nav__link" href="#faq">FAQ</a>
+    </nav>
+    <a class="nav__cta" href="#demo">Prendre rendez-vous</a>
+    <button class="nav__burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="menu-mobile">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="menu-mobile" id="menu-mobile" hidden>
+    <nav class="menu-mobile__liens" aria-label="Menu mobile">
+      <a href="#prestations">Nos prestations<i aria-hidden="true"></i></a>
+      <a href="#tarifs">Nos tarifs<i aria-hidden="true"></i></a>
+      <a href="#comment">Comment ça marche ?<i aria-hidden="true"></i></a>
+      <a href="#faq">FAQ<i aria-hidden="true"></i></a>
+    </nav>
+    <div class="menu-mobile__ctas">
+      <a class="btn btn--primary" href="#demo"><span>Demander une démo</span><img src="assets/img/ico-fleche-blanche.svg" width="16.78" height="10.86" alt=""></a>
+      <a class="menu-mobile__second" href="#demo"><span>Tester sur un produit</span><span class="btn-essai__badge">Offert</span></a>
+    </div>
+  </div>
+</header>
+<div class="menu-voile" id="menu-voile" aria-hidden="true"></div>
+
+<main id="top">
+
+<!-- ============ HERO ============ -->
+<section class="hero hero--plein">
+  <!-- Desktop : visuel plein écran (en attendant la vidéo de Guillaume), flou progressif à gauche + voile uniforme -->
+  <div class="hero__bg" aria-hidden="true">
+    <img src="assets/img/hero-mea-2560.webp" srcset="assets/img/hero-mea-1600.webp 1600w, assets/img/hero-mea-2560.webp 2560w" sizes="100vw" alt="" fetchpriority="high">
+    <span class="hero__flou"></span>
+    <span class="hero__voile"></span>
+  </div>
+  <div class="wrap hero__grid">
+    <div class="hero__text">
+      <h1 class="hero__title">
+        <span class="line"><span>Vos produits,</span></span>
+        <span class="line bodoni"><span>mis en scène<span class="only-mob-i"> sans</span></span></span>
+        <span class="line bodoni"><span><span class="only-desk-i">sans </span>shooting.</span></span>
+      </h1>
+      <p class="hero__sub" data-hero>Le Studio dédié aux marques de la Maison qui remplace vos shootings photos et vidéos.</p>
+      <div class="hero__ctas" data-hero>
+        <a class="btn btn--primary hero__cta1" href="#demo"><span>Demander une démo</span><img class="ico-sur-fonce" src="assets/img/ico-fleche-blanche.svg" width="16.78" height="10.86" alt=""><img class="ico-sur-clair" src="assets/img/ico-fleche.svg" width="16.78" height="10.86" alt=""></a>
+        <a class="btn-essai" href="#demo"><span>Tester sur un produit</span><span class="btn-essai__badge">Offert</span></a>
+      </div>
+    </div>
+    <div class="hero__media">
+      <div class="hero__frame">
+        <video class="hero__video" src="assets/video/hero-4x5.mp4" poster="assets/img/hero-poster.webp" autoplay muted loop playsinline preload="auto" aria-label="Un produit passe de la 3D à une mise en scène iA"></video>
+      </div>
+    </div>
+  </div>
+  <a class="hero__scroll" href="#pourquoi" aria-label="Faire défiler vers la suite"><span class="hero__souris" aria-hidden="true"><i></i></span></a>
+</section>
+
+<!-- ============ LOGOS ============ -->
+<section class="logos" aria-label="Ils nous font confiance">
+  <div class="logos__viewport">
+    <div class="logos__track">
+      <div class="logos__set">
+        <img class="logo-mdm" src="assets/img/logo-mdm.svg" alt="Maisons du Monde">
+        <img class="logo-lapeyre" src="assets/img/logo-lapeyre.svg" alt="Lapeyre">
+        <img class="logo-ixina" src="assets/img/logo-ixina.svg" alt="Ixina">
+        <img class="logo-samsung" src="assets/img/logo-samsung.svg" alt="Samsung">
+        <img class="logo-hue" src="assets/img/logo-hue.svg" alt="Philips Hue">
+        <img class="logo-unikalo" src="assets/img/logo-unikalo.webp" alt="Unikalo">
+        <img class="logo-tosel" src="assets/img/logo-tosel.webp" alt="Tosel">
+      </div>
+      <div class="logos__set" aria-hidden="true">
+        <img class="logo-mdm" src="assets/img/logo-mdm.svg" alt="">
+        <img class="logo-lapeyre" src="assets/img/logo-lapeyre.svg" alt="">
+        <img class="logo-ixina" src="assets/img/logo-ixina.svg" alt="">
+        <img class="logo-samsung" src="assets/img/logo-samsung.svg" alt="">
+        <img class="logo-hue" src="assets/img/logo-hue.svg" alt="">
+        <img class="logo-unikalo" src="assets/img/logo-unikalo.webp" alt="">
+        <img class="logo-tosel" src="assets/img/logo-tosel.webp" alt="">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ POURQUOI ============ -->
+<section class="pourquoi" id="pourquoi">
+  <div class="wrap pourquoi__grid">
+    <div class="pourquoi__col">
+      <p class="surtitre" data-reveal>Pourquoi le Studio ?</p>
+      <h2 class="h2 h2--left" data-lines>
+        <span class="line"><span>Plus de contenu,</span></span>
+        <span class="line bodoni"><span>moins de contraintes.</span></span>
+      </h2>
+      <p class="pourquoi__intro" data-reveal>Tout ce qui rend un shooting lourd disparaît. Il reste vos produits, mis en scène autant de fois que vous le voulez.</p>
+      <div class="shooting" data-reveal>
+        <p class="shooting__label">Un shooting classique</p>
+        <ul class="shooting__list">
+          <li><img src="assets/img/ico-croix.svg" width="18" height="18" alt=""><span class="strike">Un lieu à réserver</span></li>
+          <li><img src="assets/img/ico-croix.svg" width="18" height="18" alt=""><span class="strike">Un produit à transporter</span></li>
+          <li><img src="assets/img/ico-croix.svg" width="18" height="18" alt=""><span class="strike">Une mise en scène par journée</span></li>
+          <li><img src="assets/img/ico-croix.svg" width="18" height="18" alt=""><span class="strike">Une DA à rebriefer à chaque fois</span></li>
+        </ul>
+        <p class="shooting__fin">Le Studio vous enlève tout ça.</p>
+      </div>
+    </div>
+    <div class="piliers">
+      <div class="piliers__col">
+        <article class="pilier">
+          <span class="pilier__bulle"><img src="assets/img/ico-zap.svg" width="24" height="24" alt=""></span>
+          <span class="pilier__num bodoni">01</span>
+          <h3 class="pilier__titre">Agilité</h3>
+          <p class="pilier__txt">Pas de lieu à réserver, pas de produit à transporter. Vos visuels sont prêts quand votre produit l’est.</p>
+        </article>
+        <article class="pilier">
+          <span class="pilier__bulle"><img src="assets/img/ico-ruler.svg" width="24" height="24" alt=""></span>
+          <span class="pilier__num bodoni">03</span>
+          <h3 class="pilier__titre">Fiabilité</h3>
+          <p class="pilier__txt">Dimensions justes, matières fidèles, finitions respectées.</p>
+        </article>
+      </div>
+      <div class="piliers__col piliers__col--decale">
+        <article class="pilier">
+          <span class="pilier__bulle"><img src="assets/img/ico-trending.svg" width="24" height="24" alt=""></span>
+          <span class="pilier__num bodoni">02</span>
+          <h3 class="pilier__titre">Performance</h3>
+          <p class="pilier__txt">Multipliez les formats, mises en scène et déclinaisons : plus votre produit se raconte, mieux il se vend !</p>
+        </article>
+        <article class="pilier">
+          <span class="pilier__bulle"><img src="assets/img/ico-swatch.svg" width="24" height="24" alt=""></span>
+          <span class="pilier__num bodoni">04</span>
+          <h3 class="pilier__titre">Expertise</h3>
+          <p class="pilier__txt">Votre direction artistique garantie par nos décorateurs.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CATALOGUE ============ -->
+<section class="catalogue" id="prestations">
+  <div class="wrap">
+    <h2 class="h2" data-lines>
+      <span class="line"><span>Chaque produit décliné,</span></span>
+      <span class="line bodoni"><span>pour tous vos supports.</span></span>
+    </h2>
+    <p class="chapo" data-reveal>Catalogues, fiches produits, réseaux sociaux, campagnes print et vidéo.</p>
+
+    <!-- Desktop : accordéon + visuel -->
+    <div class="cat only-desk" data-reveal>
+      <div class="cat__liste" role="tablist" aria-label="Nos prestations">
+        <button class="cat__ligne is-open" type="button" role="tab" aria-selected="true" data-i="0">
+          <span class="cat__entete"><span class="cat__num bodoni-plain">01</span><span class="cat__nom">Packshot fond studio</span><span class="cat__ico" aria-hidden="true"></span></span>
+          <span class="cat__desc"><span>Votre produit reproduit au pixel près : dimensions, textures, couleurs, sur le fond studio de votre choix.</span></span>
+          <span class="cat__progress" aria-hidden="true"></span>
+        </button>
+        <button class="cat__ligne" type="button" role="tab" aria-selected="false" data-i="1">
+          <span class="cat__entete"><span class="cat__num bodoni-plain">02</span><span class="cat__nom">Mise en ambiance produits</span><span class="cat__ico" aria-hidden="true"></span></span>
+          <span class="cat__desc"><span>Un produit, un décor qui raconte son histoire. Chaque mise en scène projette votre client dans l'usage, fidèle à votre direction artistique.</span></span>
+          <span class="cat__progress" aria-hidden="true"></span>
+        </button>
+        <button class="cat__ligne" type="button" role="tab" aria-selected="false" data-i="2">
+          <span class="cat__entete"><span class="cat__num bodoni-plain">03</span><span class="cat__nom">Vidéos d'animation</span><span class="cat__ico" aria-hidden="true"></span></span>
+          <span class="cat__desc"><span>Travelling dans la pièce, zoom sur la matière : votre produit en mouvement, prêt pour vos réseaux et vos campagnes.</span></span>
+          <span class="cat__progress" aria-hidden="true"></span>
+        </button>
+        <button class="cat__ligne" type="button" role="tab" aria-selected="false" data-i="3">
+          <span class="cat__entete"><span class="cat__num bodoni-plain">04</span><span class="cat__nom">Déclinaisons</span><span class="cat__ico" aria-hidden="true"></span></span>
+          <span class="cat__desc"><span>Optimisez votre budget shooting : une scène pensée une fois, déclinée sur tous vos produits (coloris, textures).</span></span>
+          <span class="cat__progress" aria-hidden="true"></span>
+        </button>
+        <button class="cat__ligne" type="button" role="tab" aria-selected="false" data-i="4">
+          <span class="cat__entete"><span class="cat__num bodoni-plain">05</span><span class="cat__nom">Jour/Nuit</span><span class="cat__ico" aria-hidden="true"></span></span>
+          <span class="cat__desc"><span>La lumière raconte une histoire : un même visuel décliné en version jour et nuit pour mettre en valeur ambiance et atmosphère.</span></span>
+          <span class="cat__progress" aria-hidden="true"></span>
+        </button>
+        <button class="cat__ligne" type="button" role="tab" aria-selected="false" data-i="5">
+          <span class="cat__entete"><span class="cat__num bodoni-plain">06</span><span class="cat__nom">Intégration</span><span class="cat__ico" aria-hidden="true"></span></span>
+          <span class="cat__desc"><span>Intégration de détails personnalisés : humains, animaux, objets, pour une scène qui semble réellement habitée.</span></span>
+          <span class="cat__progress" aria-hidden="true"></span>
+        </button>
+        <button class="cat__ligne" type="button" role="tab" aria-selected="false" data-i="6">
+          <span class="cat__entete"><span class="cat__num bodoni-plain">07</span><span class="cat__nom">Mise en ambiance animée</span><span class="cat__ico" aria-hidden="true"></span></span>
+          <span class="cat__desc"><span>Votre mise en ambiance prend vie : la lumière passe du jour à la nuit ou la saison change, sur une même scène.</span></span>
+          <span class="cat__progress" aria-hidden="true"></span>
+        </button>
+        <button class="cat__ligne" type="button" role="tab" aria-selected="false" data-i="7">
+          <span class="cat__entete"><span class="cat__num bodoni-plain">08</span><span class="cat__nom">Fichier 3D RA</span><span class="cat__ico" aria-hidden="true"></span></span>
+          <span class="cat__desc"><span>Vos clients manipulent le produit en 3D et le posent chez eux depuis leur smartphone. Un vrai levier de conversion pour le mobilier en ligne.</span></span>
+          <span class="cat__progress" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="cat__visuel">
+        <div class="cat__images">
+          <img class="is-active" src="assets/img/catalogue-01.webp" alt="Canapé en packshot sur fond studio rosé">
+          <img src="assets/img/catalogue-02.webp" alt="Canapé mis en ambiance dans un salon bohème" loading="lazy">
+          <img src="assets/img/catalogue-03.webp" alt="Canapé en vidéo d'animation" loading="lazy">
+          <img src="assets/img/catalogue-04.webp" alt="Déclinaison du canapé en velours terracotta" loading="lazy">
+          <img src="assets/img/catalogue-05.webp" alt="Le même salon en version soir" loading="lazy">
+          <img src="assets/img/catalogue-06.webp" alt="Salon habité, une femme traverse la pièce" loading="lazy">
+          <img src="assets/img/catalogue-07.webp" alt="Mise en ambiance animée du salon" loading="lazy">
+          <img src="assets/img/catalogue-03.webp" alt="Canapé en fichier 3D pour la réalité augmentée" loading="lazy">
+        </div>
+        <img class="cat__play" src="assets/img/ico-lecture.svg" width="72" height="72" alt="">
+        <div class="cat__orbite" aria-hidden="true">
+          <img src="assets/img/orbite-3d.svg" alt="">
+        </div>
+        <div class="cat__indice"><img src="assets/img/ico-rotate3d.svg" width="18" height="18" alt=""><span>Glissez pour faire tourner</span></div>
+        <div class="cat__compteur"><span class="cat__compteur-n">01</span> / 08</div>
+        <div class="cat__nav">
+          <button type="button" class="cat__fleche" data-dir="-1" aria-label="Prestation précédente"><img src="assets/img/ico-prev.svg" width="24" height="24" alt=""></button>
+          <button type="button" class="cat__fleche" data-dir="1" aria-label="Prestation suivante"><img src="assets/img/ico-next.svg" width="24" height="24" alt=""></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile : cartes swipeables -->
+  <div class="catm only-mob">
+    <div class="catm__rail" tabindex="0" aria-label="Nos prestations, faites glisser">
+      <article class="catm__carte"><div class="catm__visuel"><img src="assets/img/catalogue-01.webp" alt="" loading="lazy"></div><div class="catm__contenu"><h3><span class="bodoni-plain">01</span>Packshot fond studio</h3><p>Votre produit reproduit au pixel près : dimensions, textures, couleurs, sur le fond studio de votre choix.</p></div></article>
+      <article class="catm__carte"><div class="catm__visuel"><img src="assets/img/catalogue-02.webp" alt="" loading="lazy"></div><div class="catm__contenu"><h3><span class="bodoni-plain">02</span>Mise en ambiance produits</h3><p>Un produit, un décor qui raconte son histoire. Chaque mise en scène projette votre client dans l'usage, fidèle à votre direction artistique.</p></div></article>
+      <article class="catm__carte"><div class="catm__visuel"><img src="assets/img/catalogue-03.webp" alt="" loading="lazy"><img class="catm__play" src="assets/img/ico-lecture.svg" width="56" height="56" alt=""></div><div class="catm__contenu"><h3><span class="bodoni-plain">03</span>Vidéos d'animation</h3><p>Travelling dans la pièce, zoom sur la matière : votre produit en mouvement, prêt pour vos réseaux et vos campagnes.</p></div></article>
+      <article class="catm__carte"><div class="catm__visuel"><img src="assets/img/catalogue-04.webp" alt="" loading="lazy"></div><div class="catm__contenu"><h3><span class="bodoni-plain">04</span>Déclinaisons</h3><p>Optimisez votre budget shooting : une scène pensée une fois, déclinée sur tous vos produits (coloris, textures).</p></div></article>
+      <article class="catm__carte"><div class="catm__visuel"><img src="assets/img/catalogue-05.webp" alt="" loading="lazy"></div><div class="catm__contenu"><h3><span class="bodoni-plain">05</span>Jour/Nuit</h3><p>La lumière raconte une histoire : un même visuel décliné en version jour et nuit pour mettre en valeur ambiance et atmosphère.</p></div></article>
+      <article class="catm__carte"><div class="catm__visuel"><img src="assets/img/catalogue-06.webp" alt="" loading="lazy"></div><div class="catm__contenu"><h3><span class="bodoni-plain">06</span>Intégration</h3><p>Intégration de détails personnalisés : humains, animaux, objets, pour une scène qui semble réellement habitée.</p></div></article>
+      <article class="catm__carte"><div class="catm__visuel"><img src="assets/img/catalogue-07.webp" alt="" loading="lazy"></div><div class="catm__contenu"><h3><span class="bodoni-plain">07</span>Mise en ambiance animée</h3><p>Votre mise en ambiance prend vie : la lumière passe du jour à la nuit ou la saison change, sur une même scène.</p></div></article>
+      <article class="catm__carte"><div class="catm__visuel"><img src="assets/img/catalogue-03.webp" alt="" loading="lazy">
+        <div class="catm__orbite" aria-hidden="true"><img class="catm__arc" src="assets/img/orbite-arc.svg" alt=""><img class="catm__fleche" src="assets/img/orbite-fleche.svg" alt=""><img class="catm__poignee" src="assets/img/orbite-poignee.svg" alt=""></div>
+        <div class="catm__indice"><img src="assets/img/ico-rotate3d.svg" width="14" height="14" alt=""><span>Glissez pour faire tourner</span></div>
+      </div><div class="catm__contenu"><h3><span class="bodoni-plain">08</span>Fichier 3D RA</h3><p>Vos clients manipulent le produit en 3D et le posent chez eux depuis leur smartphone. Un vrai levier de conversion pour le mobilier en ligne.</p></div></article>
+    </div>
+    <div class="catm__points" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+
+  <div class="centre catalogue__cta" data-reveal>
+    <a class="btn btn--primary" href="#demo"><span>Demander une démo</span><img src="assets/img/ico-fleche-blanche.svg" width="16.78" height="10.86" alt=""></a>
+  </div>
+</section>
+
+<!-- ============ LA PREUVE PAR L'IMAGE ============ -->
+<section class="preuve" id="realisations">
+  <div class="wrap">
+    <div class="preuve__entete">
+      <h2 class="preuve__titre" data-lines>
+        <span class="line"><span>Pas une photo.</span></span>
+        <span class="line preuve__titre-it"><span>Aucune de ces pièces n’a existé.</span></span>
+      </h2>
+      <p class="preuve__chapo" data-reveal>Ces images n’ont pas été photographiées : elles sont générées dans notre Studio, prêtes pour vos fiches produits, vos réseaux et vos supports print.</p>
+    </div>
+  </div>
+  <div class="galerie">
+    <button class="galerie__ctrl" type="button" aria-label="Voir d’autres réalisations, série suivante">
+      <span class="galerie__points" aria-hidden="true"><i class="is-on"></i><i></i></span>
+      <span class="galerie__label">Voir d’autres réalisations</span>
+      <span class="galerie__rond"><img src="assets/img/ico-refresh.svg" width="18" height="18" alt=""></span>
+    </button>
+    <div class="galerie__scene">
+      <div class="galerie__grille is-active" data-serie="1">
+        <figure class="tuile t-a"><img src="assets/img/galerie-1-a.webp" alt="Chambre aux tomettes, lumière de fin de journée" loading="lazy"></figure>
+        <figure class="tuile t-b"><img src="assets/img/galerie-1-b.webp" alt="Terrasse face à la mer, table et chaises blanches" loading="lazy"></figure>
+        <figure class="tuile t-c"><img src="assets/img/galerie-1-c.webp" alt="Théière suspendue à une clé ancienne" loading="lazy"></figure>
+        <figure class="tuile t-d"><img src="assets/img/galerie-1-d.webp" alt="Patère en céramique et torchon vichy" loading="lazy"></figure>
+        <figure class="tuile t-e"><img src="assets/img/galerie-1-e.webp" alt="Salle à manger lumineuse, table ronde en bois" loading="lazy"></figure>
+        <figure class="tuile t-f"><img src="assets/img/galerie-1-f.webp" alt="Cuisine habitée, une mère et son enfant" loading="lazy"></figure>
+      </div>
+      <div class="galerie__grille" data-serie="2" aria-hidden="true">
+        <figure class="tuile t-a tuile--video"><video src="assets/video/galerie-zellige.mp4" poster="assets/img/galerie-zellige-poster.webp" muted loop playsinline preload="none" aria-label="Salle de bain en zellige, vidéo"></video><span class="pastille-video"><img src="assets/img/ico-play.svg" width="12" height="12" alt="">Vidéo</span></figure>
+        <figure class="tuile t-b tuile--video"><video src="assets/video/galerie-salon.mp4" poster="assets/img/galerie-salon-poster.webp" muted loop playsinline preload="none" aria-label="Salon du jour au soir, vidéo"></video><span class="pastille-video"><img src="assets/img/ico-play.svg" width="12" height="12" alt="">Vidéo</span></figure>
+        <figure class="tuile t-c"><img src="assets/img/galerie-2-c.webp" alt="Table ronde en bois et olivier en pot" loading="lazy"></figure>
+        <figure class="tuile t-d"><img src="assets/img/galerie-2-d.webp" alt="Banquette aux coussins terracotta" loading="lazy"></figure>
+        <figure class="tuile t-e"><img src="assets/img/galerie-2-e.webp" alt="Terrasse ombragée sous une voile" loading="lazy"></figure>
+        <figure class="tuile t-f"><img src="assets/img/galerie-2-f.webp" alt="Salon habité, canapé bouclette" loading="lazy"></figure>
+      </div>
+    </div>
+  </div>
+  <div class="centre preuve__cta" data-reveal>
+    <a class="btn btn--primary" href="#demo"><span>Pourquoi pas vous ?</span><img src="assets/img/ico-fleche-blanche.svg" width="16.78" height="10.86" alt=""></a>
+  </div>
+</section>
+
+<!-- ============ CLAIM ============ -->
+<section class="claim">
+  <div class="wrap centre">
+    <h2 class="claim__titre" data-words>
+      <span class="claim__l1">Le meilleur shooting <br class="only-mob">est celui</span>
+      <span class="claim__l2 bodoni">que vous ne ferez jamais.</span>
+    </h2>
+    <p class="claim__txt" data-reveal>Rhinov Studio produit vos visuels sans studio, sans mannequin, sans délai de production.</p>
+    <a class="btn btn--blanc" href="#demo" data-reveal><span>Demander une démo</span><img src="assets/img/ico-fleche.svg" width="16.78" height="10.86" alt=""></a>
+  </div>
+</section>
+
+<!-- ============ DEUX FAÇONS ============ -->
+<section class="facons" id="comment">
+  <div class="wrap">
+    <p class="surtitre centre" data-reveal>Comment ça marche ?</p>
+    <h2 class="h2" data-lines>
+      <span class="line"><span>Vous déléguez,</span></span>
+      <span class="line bodoni"><span>ou vous prenez la main.</span></span>
+    </h2>
+    <p class="chapo" data-reveal>Rhinov Studio est une plateforme sur laquelle vos équipes produisent en autonomie, ou nos décorateurs interviennent selon vos besoins.</p>
+
+    <div class="cartes">
+      <article class="carte carte--clair">
+        <div class="carte__visuel"><img src="assets/img/carte-autonomie.webp" alt="Une décoratrice compose une mise en ambiance sur l'interface du Studio" loading="lazy"></div>
+        <div class="carte__contenu">
+          <h3 class="carte__titre">En autonomie</h3>
+          <p class="carte__accroche">Nous vous équipons. Vous produisez.</p>
+          <p class="carte__txt">Vos équipes composent packshots et mises en ambiance sur des templates créés pour votre marque par nos décorateurs. Votre catalogue est déjà chargé, il ne reste qu'à composer. Depuis l'interface, ou par API dans vos outils.</p>
+          <p class="carte__ideal"><b>Idéal pour</b> : volume récurrent, réactivité au quotidien</p>
+        </div>
+      </article>
+      <span class="badge-ou" aria-hidden="true">ou</span>
+      <article class="carte carte--fonce">
+        <div class="carte__visuel">
+          <img src="assets/img/carte-equipes.webp" alt="Nos décorateurs produisent vos contenus" loading="lazy">
+          <div class="carte__formats">
+            <span>Vidéo</span><span>360°</span><span>Réalité augmentée</span><span>Scénographie sur-mesure</span>
+          </div>
+        </div>
+        <div class="carte__contenu">
+          <h3 class="carte__titre">Par nos équipes</h3>
+          <p class="carte__accroche">Vous briefez. Nous produisons.</p>
+          <p class="carte__txt">Nos équipes produisent à votre place ou absorbent les pics de volume, prennent en charge les formats complexes (vidéo, 360°, réalité augmentée, scénographies) et relèvent le niveau de qualité de vos livrables.</p>
+          <p class="carte__ideal"><b>Idéal pour</b> : lancements, campagnes, pièces à forte valeur</p>
+        </div>
+      </article>
+    </div>
+
+    <!-- Tarification -->
+    <div class="tarifs" id="tarifs">
+      <h2 class="h2" data-lines>
+        <span class="line"><span>Une tarification,</span></span>
+        <span class="line bodoni"><span>qui s'adapte à vos usages.</span></span>
+      </h2>
+      <p class="chapo" data-reveal>Trois étapes pour organiser votre production.</p>
+      <div class="panneau" data-reveal>
+        <span class="panneau__fil" aria-hidden="true"><i></i></span>
+        <div class="etape">
+          <div class="etape__entete"><span class="etape__num bodoni-semi">01</span><span class="etape__rythme">Une fois</span></div>
+          <h3 class="etape__titre">Intégration de votre univers de marque</h3>
+          <p class="etape__txt">Intégration de votre catalogue produits et création de storyboards par typologie de produit, construits à partir de votre direction artistique et de vos assets : scènes, cadrages et styles pensés pour votre marque.</p>
+          <div class="etape__pied">
+            <p class="etape__label">Sur devis, à partir de</p>
+            <p class="etape__prix"><span class="bodoni-semi">2 000 €</span></p>
+          </div>
+        </div>
+        <div class="etape">
+          <div class="etape__entete"><span class="etape__num bodoni-semi">02</span><span class="etape__rythme">Chaque mois</span></div>
+          <h3 class="etape__titre">Accès à votre studio</h3>
+          <p class="etape__txt">Hébergement et production de vos contenus, comptes utilisateurs et gestion des droits, support.</p>
+          <div class="etape__pied">
+            <p class="etape__label">Abonnement mensuel, à partir de</p>
+            <p class="etape__prix"><span class="bodoni-semi">149 €</span><small>/mois</small></p>
+          </div>
+        </div>
+        <div class="etape">
+          <div class="etape__entete"><span class="etape__num bodoni-semi">03</span><span class="etape__rythme etape__rythme--orange">À chaque contenu</span></div>
+          <h3 class="etape__titre">Production de vos contenus</h3>
+          <p class="etape__txt">Packshots, mises en ambiance, vidéos… produits par vos équipes ou par nos décorateurs.</p>
+          <div class="etape__pied">
+            <p class="etape__label">Prix par livrable, itérations incluses</p>
+            <p class="etape__prix etape__prix--mode"><span class="bodoni-semi">Selon le mode</span></p>
+          </div>
+        </div>
+      </div>
+      <p class="tarifs__note" data-reveal>Tarifs HT. Le montant de l'intégration dépend de la taille de votre catalogue et de vos spécificités produits.</p>
+      <div class="tarifs__ctas" data-reveal>
+        <a class="btn btn--primary" href="#demo"><span>Demander une démo</span><img src="assets/img/ico-fleche-blanche.svg" width="16.78" height="10.86" alt=""></a>
+        <a class="btn btn--secondaire" href="#demo"><span class="only-desk-i">Obtenir un chiffrage pour mon catalogue</span><span class="only-mob-i">Obtenir un chiffrage</span><img src="assets/img/ico-fleche.svg" width="16.78" height="10.86" alt=""></a>
+      </div>
+    </div>
+
+    <!-- Comparatif -->
+    <div class="compare">
+      <h2 class="compare__titre" data-reveal><span class="compare__t1">Ce qui nous sépare</span> <span class="bodoni compare__t2">d’un générateur d’images.</span></h2>
+
+      <div class="tableau only-desk" data-reveal>
+        <div class="tableau__surligne" aria-hidden="true"></div>
+        <div class="tableau__bandeau" aria-hidden="true">Rhinov Studio</div>
+        <div class="tableau__sep" aria-hidden="true"></div>
+        <div class="tableau__ligne tableau__ligne--tete">
+          <span></span><span class="th">En autonomie</span><span class="th">Par nos équipes</span><span class="th th--ia">iA générative seule</span>
+        </div>
+        <div class="tableau__ligne"><span class="tl">Qui produit</span><span class="tv">Vos équipes</span><span class="tv">Nos décorateurs</span><span class="tv tv--ia">Vous, seul</span></div>
+        <div class="tableau__ligne"><span class="tl">Conformité dimensionnelle</span><span class="ok">✓</span><span class="ok">✓</span><span class="ko">✕</span></div>
+        <div class="tableau__ligne"><span class="tl">Fidélité matières &amp; finitions</span><span class="ok">✓</span><span class="ok">✓</span><span class="ko">✕</span></div>
+        <div class="tableau__ligne"><span class="tl">Respect de votre direction artistique</span><span class="ok">✓</span><span class="ok">✓</span><span class="ko">✕</span></div>
+        <div class="tableau__ligne"><span class="tl">Mise en scène multi-produits maîtrisée</span><span class="ok">✓</span><span class="ok">✓</span><span class="ko">✕</span></div>
+        <div class="tableau__ligne"><span class="tl">Vidéo, 360°, réalité augmentée</span><span class="tv">En un clic, via nos équipes</span><span class="ok">✓</span><span class="ko">✕</span></div>
+        <div class="tableau__ligne"><span class="tl">Coût modéré</span><span class="ok">✓</span><span class="ok">✓</span><span class="ok ok--ia">✓</span></div>
+        <div class="tableau__ligne"><span class="tl">Réactivité</span><span class="ok">✓</span><span class="ok">✓</span><span class="ok ok--ia">✓</span></div>
+      </div>
+      <p class="compare__phrase only-desk" data-reveal><span>La 3D garantit. L’iA démultiplie. </span><span class="bodoni">Nos décorateurs signent.</span></p>
+
+      <div class="comparem only-mob">
+        <div class="switch" role="tablist" aria-label="Mode de production">
+          <span class="switch__pastille" aria-hidden="true"></span>
+          <button type="button" role="tab" aria-selected="true" class="is-on" data-mode="0">En autonomie</button>
+          <button type="button" role="tab" aria-selected="false" data-mode="1">Par nos équipes</button>
+          <button type="button" role="tab" aria-selected="false" data-mode="2">iA générative</button>
+        </div>
+        <div class="comparem__tableau">
+          <div class="comparem__ligne"><span>Qui produit</span><b data-v>Vos équipes</b></div>
+          <div class="comparem__ligne"><span>Conformité dimensionnelle</span><b class="mk" data-v>✓</b></div>
+          <div class="comparem__ligne"><span>Fidélité matières &amp; finitions</span><b class="mk" data-v>✓</b></div>
+          <div class="comparem__ligne"><span>Respect de votre direction artistique</span><b class="mk" data-v>✓</b></div>
+          <div class="comparem__ligne"><span>Mise en scène multi-produits maîtrisée</span><b class="mk" data-v>✓</b></div>
+          <div class="comparem__ligne"><span>Vidéo, 360°, réalité augmentée</span><b class="txt130" data-v>En un clic, via nos équipes</b></div>
+          <div class="comparem__ligne"><span>Coût modéré</span><b class="mk" data-v>✓</b></div>
+          <div class="comparem__ligne"><span>Réactivité</span><b class="mk" data-v>✓</b></div>
+        </div>
+        <div class="comparem__citation">
+          <p class="bodoni" data-cit-t>Autonome ne veut pas dire seul.</p>
+          <p data-cit-p>Chaque template a été composé par un décorateur, chaque produit modélisé conforme.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ÉQUIPE ============ -->
+<section class="equipe">
+  <div class="equipe__photos">
+    <div class="equipe__atelier"><img src="assets/img/equipe-atelier.webp" alt="L'équipe de décoratrices travaille sur des échantillons de matières" loading="lazy"></div>
+    <div class="equipe__sourire"><img src="assets/img/equipe-sourire.webp" alt="Deux décoratrices consultent un carnet de tendances" loading="lazy"></div>
+  </div>
+  <div class="wrap equipe__grid">
+    <div class="equipe__texte">
+      <h2 class="h2 h2--left" data-lines>
+        <span class="line"><span>L'équipe</span></span>
+        <span class="line bodoni"><span>derrière le Studio.</span></span>
+      </h2>
+      <p class="equipe__p" data-reveal>Nous sommes <b>30 personnes</b>, dont 10 décorateurs, épaulés par nos experts 3D, iA et nos graphistes. Derrière nous, <b>12 ans d'expertise</b> en décoration et aménagement d'intérieur. Et <b>15 000 projets clients</b> réalisés chaque année : la matière qui nourrit notre expertise et entraîne nos modèles.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FORMULAIRE ============ -->
+<section class="demo" id="demo">
+  <div class="demo__fond" aria-hidden="true"><img src="assets/img/formulaire-fond.webp" alt="" loading="lazy"></div>
+  <div class="wrap demo__inner">
+    <p class="demo__engagement" data-reveal><i></i><span>Sans engagement</span><i></i></p>
+    <h2 class="demo__titre" data-lines><span class="line"><span>Demandez une démonstration.</span></span></h2>
+    <p class="demo__sous" data-reveal>Contactez-nous pour obtenir un essai gratuit ou nous présenter votre besoin.</p>
+
+    <form class="form" id="form-demo" novalidate data-reveal>
+      <div class="form__etapes only-mob">
+        <div class="form__haut"><span class="form__etape-nom">Vous</span><span class="form__etape-n">1 / 2</span></div>
+        <div class="form__prog"><i class="is-on"></i><i></i></div>
+      </div>
+      <div class="form__groupe" data-step="1">
+        <label class="champ"><span>Prénom &amp; Nom*</span><input type="text" name="nom" placeholder="Marie Dupont" autocomplete="name" required></label>
+        <label class="champ"><span>Email professionnel*</span><input type="email" name="email" placeholder="marie@marque.com" autocomplete="email" required></label>
+        <label class="champ"><span>Téléphone</span><input type="tel" name="tel" placeholder="+33 6..." autocomplete="tel"></label>
+        <button type="button" class="btn btn--primary btn--plein only-mob form__continuer"><span>Continuer</span><img src="assets/img/ico-fleche-blanche.svg" width="16.78" height="10.86" alt=""></button>
+      </div>
+      <div class="form__groupe" data-step="2">
+        <label class="champ"><span>Marque / Société*</span><input type="text" name="marque" placeholder="Nom de la marque ou du groupe" autocomplete="organization" required></label>
+        <label class="champ champ--large"><span>Une précision ?</span><textarea name="precision" placeholder="Décrivez votre besoin" rows="3"></textarea></label>
+        <div class="form__actions">
+          <button type="button" class="btn btn--retour only-mob form__retour">Retour</button>
+          <button type="submit" class="btn btn--primary form__envoyer"><span>Envoyer ma demande</span><img src="assets/img/ico-fleche-blanche.svg" width="16.78" height="10.86" alt=""></button>
+        </div>
+      </div>
+      <div class="form__ok" hidden>
+        <img src="assets/img/ico-check.svg" width="48" height="48" alt="">
+        <p class="form__ok-t bodoni">Merci, c’est envoyé.</p>
+        <p class="form__ok-p">On revient vers vous rapidement pour caler votre test.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq" id="faq">
+  <div class="wrap">
+    <h2 class="faq__titre" data-reveal>Les questions fréquentes</h2>
+    <div class="faq__grille" data-reveal>
+      <div class="faq__col">
+        <div class="qa" style="--o:0"><button type="button" class="qa__q" aria-expanded="false"><span>Comment passer une commande ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa" style="--o:2"><button type="button" class="qa__q" aria-expanded="false"><span>Quel est le délai pour recevoir un devis ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa" style="--o:4"><button type="button" class="qa__q" aria-expanded="false"><span>Quel est le délai de réception moyen ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa" style="--o:6"><button type="button" class="qa__q" aria-expanded="false"><span>J'ai oublié de vous communiquer des informations, quel est le procédé ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:8"><button type="button" class="qa__q" aria-expanded="false"><span>Est-il possible d'ajouter l'option Mise en Ambiance (MEA) après modélisation de mes produits ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:10"><button type="button" class="qa__q" aria-expanded="false"><span>Comment fonctionne la tarification pour un produit décliné en plusieurs couleurs ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:12"><button type="button" class="qa__q" aria-expanded="false"><span>Y a-t-il un minimum de commande ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:14"><button type="button" class="qa__q" aria-expanded="false"><span>Dois-je envoyer un objet physique en complément des photos ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:16"><button type="button" class="qa__q" aria-expanded="false"><span>Est-ce qu'un produit type "Salon de Jardin" est comptabilisé comme 1 seul produit ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:18"><button type="button" class="qa__q" aria-expanded="false"><span>Puis-je fournir nos 3D plutôt que payer la prestation de modélisation (multi-produit) ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:20"><button type="button" class="qa__q" aria-expanded="false"><span>Puis-je combiner plusieurs produits dans une même Mise en Ambiance (MEA) ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:22"><button type="button" class="qa__q" aria-expanded="false"><span>Que contient une MEA Mono-produit ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:24"><button type="button" class="qa__q" aria-expanded="false"><span>Puis-je changer une typologie de meuble par une autre (prestation Déclinaison) ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:26"><button type="button" class="qa__q" aria-expanded="false"><span>J'ai un problème avec un livrable, que dois-je faire ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:28"><button type="button" class="qa__q" aria-expanded="false"><span>Mon produit paraît trop sombre ou trop clair dans la mise en ambiance, que dois-je faire ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:30"><button type="button" class="qa__q" aria-expanded="false"><span>Est-ce que Rhinov peut utiliser mes visuels pour sa communication ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+      </div>
+      <div class="faq__col">
+        <div class="qa" style="--o:1"><button type="button" class="qa__q" aria-expanded="false"><span>Quel est mon interlocuteur ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa" style="--o:3"><button type="button" class="qa__q" aria-expanded="false"><span>Comment puis-je suivre l'avancement de ma commande ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa" style="--o:5"><button type="button" class="qa__q" aria-expanded="false"><span>Puis-je annuler un produit d'une commande après avoir validé et signé le contrat ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa" style="--o:7"><button type="button" class="qa__q" aria-expanded="false"><span>Puis-je changer de style ou d'architecture après validation du devis ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:9"><button type="button" class="qa__q" aria-expanded="false"><span>Puis-je commander une nouvelle Mise en Ambiance (MEA) sur un modèle 3D déjà produit ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:11"><button type="button" class="qa__q" aria-expanded="false"><span>Quand s'effectue le paiement ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:13"><button type="button" class="qa__q" aria-expanded="false"><span>Quels formats de photos sont acceptés ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:15"><button type="button" class="qa__q" aria-expanded="false"><span>Quels types d'objets prenez-vous en charge ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:17"><button type="button" class="qa__q" aria-expanded="false"><span>Les coatings (ex : papiers peints) sont-ils intégrables dans une Mise en Ambiance ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:19"><button type="button" class="qa__q" aria-expanded="false"><span>Puis-je orienter le style et l'architecture de la mise en ambiance ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:21"><button type="button" class="qa__q" aria-expanded="false"><span>Quelles marques apparaîtront dans ma Mise en Ambiance (MEA) ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:23"><button type="button" class="qa__q" aria-expanded="false"><span>Que contient une MEA Multi-produit ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:25"><button type="button" class="qa__q" aria-expanded="false"><span>Puis-je récupérer les 3D réalisées pour les MEA multi-produits ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:27"><button type="button" class="qa__q" aria-expanded="false"><span>J'ai besoin d'une modification, que dois-je faire ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:29"><button type="button" class="qa__q" aria-expanded="false"><span>Puis-je utiliser les visuels sur tous mes canaux de communication ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+        <div class="qa qa--plus" style="--o:31"><button type="button" class="qa__q" aria-expanded="false"><span>Rhinov reste-t-il propriétaire des créations ?</span><i class="qa__plus" aria-hidden="true"></i></button><div class="qa__r"><p>Réponse à venir.</p></div></div>
+      </div>
+    </div>
+    <div class="centre only-mob faq__voir-wrap"><button type="button" class="btn btn--contour faq__voir">Voir les 32 questions</button></div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__haut">
+      <div class="footer__marque">
+        <img src="assets/img/logo-rhinov-studio-clair.svg" width="85" height="41" alt="Rhinov Studio">
+        <p>Vos produits, mis en scène sans shooting.</p>
+      </div>
+      <div class="footer__liens">
+        <div class="footer__col">
+          <p class="footer__label">NAVIGATION</p>
+          <a href="#prestations">Nos prestations</a>
+          <a href="#tarifs">Nos tarifs</a>
+          <a href="#comment">Comment ça marche ?</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div class="footer__col">
+          <p class="footer__label">CONTACT</p>
+          <span>contact@rhinov.fr</span>
+          <a href="#demo">Prendre rendez-vous</a>
+          <a href="#demo">Demander un devis</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__filet"></div>
+    <div class="footer__mentions">
+      <p>© 2026 Rhinov Studio</p>
+      <p>Mentions légales · Politique de confidentialité · CGV</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ CONTACT STICKY ============ -->
+<div class="sticky" id="sticky">
+  <div class="sticky__desk">
+    <span class="sticky__picto"><img src="assets/img/ico-phone-blanc.svg" width="18" height="18" alt=""></span>
+    <span class="sticky__tel"><small>Vous préférez nous parler ?</small><b>01 23 45 67 89</b></span>
+    <span class="sticky__sep" aria-hidden="true"></span>
+    <span class="sticky__dispo"><span class="sticky__statut"><span class="pastille" aria-hidden="true"></span>Conseillers disponibles</span><small>Du lundi au vendredi, de 9h à 18h</small></span>
+    <span class="sticky__espace" aria-hidden="true"></span>
+    <a class="btn btn--primary" href="#demo"><span>Demander une démo</span><img src="assets/img/ico-fleche-blanche.svg" width="16.78" height="10.86" alt=""></a>
+  </div>
+  <div class="sticky__mob">
+    <button type="button" class="sticky__appel" aria-expanded="false" aria-label="Afficher notre numéro"><img src="assets/img/ico-phone.svg" width="18" height="18" alt=""></button>
+    <span class="sticky__bulle" role="status"><small>Vous préférez nous parler ?</small><b>01 23 45 67 89</b></span>
+    <a class="btn btn--primary btn--plein" href="#demo"><span>Demander une démo</span><img src="assets/img/ico-fleche-blanche.svg" width="16.78" height="10.86" alt=""></a>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

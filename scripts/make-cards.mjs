@@ -42,16 +42,16 @@ const CARDS = {
       ${tools.map(([f, x, y, r, s]) => `<div class="tool" style="left:${x}px;top:${y}px;width:${s}px;height:${s}px;transform:rotate(${r}deg)"><img src="${dataUri(path.join(dir, f))}"></div>`).join('')}
       ${GRAIN}`;
   },
-  // Rhinov Studio : le fauteuil en rotin du hero actuel (un rendu Studio, sans shooting), recadré sur lui, le logo en ivoire.
+  // Rhinov Studio : le fauteuil en rotin du hero actuel (un rendu Studio, sans shooting), assombri, le logo blanc au centre.
   'rhinov-studio'() {
     const photo = dataUri(path.join(ROOT, 'sources/cards/rhinov-studio/hero.webp'));
     const logo = svgInline(path.join(ROOT, 'assets/rhinov-studio/logo.svg')).replace('<svg ', '<svg class="logo" ');
     return `<style>${BASE}
       body{background:#3B2A20}
       .photo{position:absolute;inset:0;background:url(${photo}) 72% 55% / auto 118%}
-      .shade{position:absolute;inset:0;background:linear-gradient(rgba(59,42,32,.55), transparent 26% 70%, rgba(59,42,32,.6))}
-      .logo{position:absolute;left:50%;top:300px;width:300px;height:auto;transform:translateX(-50%)}
-      .logo path{fill:#F4EDE2}
+      .shade{position:absolute;inset:0;background:rgba(30,20,14,.5)}
+      .logo{position:absolute;left:50%;top:50%;width:400px;height:auto;transform:translate(-50%,-50%);filter:drop-shadow(0 8px 24px rgba(0,0,0,.4))}
+      .logo path{fill:#fff}
       </style>
       <div class="photo"></div><div class="shade"></div>${logo}
       ${GRAIN}`;

@@ -104,6 +104,47 @@ export const BLOCKS = {
     motion(el) { spawn($$('.screen', el), $('.screens', el), { stagger: 0.12 }); },
   },
 
+  /* Live : les vrais prototypes, dans un cadre navigateur (rendus en 1440 px puis réduits) et un mobile à côté.
+     Onglets s'il y en a plusieurs. Les iframes ne se chargent qu'en approchant du bloc. Au téléphone : le mobile seul. */
+  live: {
+    render(b, p, n) {
+      const tabs = b.items.length > 1 ? `<div class="live-tabs" role="tablist">${b.items.map((it, i) => `<button type="button" role="tab" class="chip" aria-selected="${!i}" data-live="${i}" data-sound>${tx(it.label)}</button>`).join('')}</div>` : '';
+      const first = b.items[0];
+      return `${head(b.title || 'b.pages', n)}
+        <div class="live">
+          ${tabs}
+          <div class="live-stage">
+            <div class="browser live-desk">
+              <div class="browser-bar"><i></i><i></i><i></i><span class="browser-url mono">${tx(first.url)}</span></div>
+              <div class="browser-view"><iframe class="live-frame" data-src="${asset(first.src)}" title="${tx(first.label)}" loading="lazy"></iframe></div>
+            </div>
+            <div class="phone live-phone"><div class="phone-view"><iframe class="live-frame-m" data-src="${asset(first.src)}" title="${tx(first.label)} (mobile)" loading="lazy"></iframe></div></div>
+          </div>
+          <p class="mono live-hint">${tx(b.hint || { fr: 'Scrolle dans le cadre : c’est le vrai prototype.', en: 'Scroll inside the frame: it’s the real prototype.' })}</p>
+        </div>`;
+    },
+    motion(el, b) {
+      const desk = $('.live-frame', el), mob = $('.live-frame-m', el), view = $('.live-desk .browser-view', el), pview = $('.live-phone .phone-view', el);
+      // Le site est rendu à sa vraie largeur (1440 / 390 px), puis réduit au cadre : il se comporte comme sur un vrai écran.
+      const fit = () => {
+        const k = view.clientWidth / 1440;
+        Object.assign(desk.style, { width: '1440px', height: `${view.clientHeight / k}px`, transform: `scale(${k})` });
+        const km = pview.clientWidth / 390;
+        Object.assign(mob.style, { width: '390px', height: `${pview.clientHeight / km}px`, transform: `scale(${km})` });
+      };
+      fit(); new ResizeObserver(fit).observe(view);
+      const load = () => [desk, mob].forEach((f) => { if (!f.src) f.src = f.dataset.src; });
+      new IntersectionObserver(([e], o) => { if (e.isIntersecting) { load(); o.disconnect(); } }, { rootMargin: '150% 0px' }).observe(el);
+      $$('[data-live]', el).forEach((t) => t.addEventListener('click', () => {
+        const it = b.items[+t.dataset.live];
+        $$('[data-live]', el).forEach((x) => x.setAttribute('aria-selected', String(x === t)));
+        $('.browser-url', el).textContent = tx(it.url);
+        [desk, mob].forEach((f) => { f.dataset.src = asset(it.src); f.src = asset(it.src); });
+      }));
+      spawn([$('.live-stage', el)], el, { y: 60 });
+    },
+  },
+
   /* Vitrine : les écrans en grand, entiers (pas de recadrage), dans un navigateur, une légende chacun.
      size : full (toute la largeur) ou half (deux par ligne). Pour un outil dont l'image fait tout (NookDex). */
   showcase: {

@@ -153,11 +153,11 @@ html.came .curtain { visibility: visible; }
 /* ------------------------------------------------------------------ */
 /* Morsure : une mâchoire 3D (scenes3d.js) qui claque, puis s'ouvre sur le contact */
 /* ------------------------------------------------------------------ */
-/* Le calque de la mâchoire couvre l'écran (fixe : en sticky, il défilait avec la page pendant l'approche et la
-   mâchoire du bas arrivait hors champ). Transparent et non dessiné tant qu'elle est hors champ (scenes3d.js).
-   .bite-run = la course de scroll pendant laquelle elle se referme. */
+/* Le calque du crâne couvre l'écran (fixe ; scenes3d.js accroche l'image au dernier bloc tant qu'il est à l'écran).
+   Caché et non dessiné tant que le crâne est hors champ.
+   .bite-run = la course de scroll pendant laquelle le crâne approche. */
 .bite-stage { position: fixed; inset: 0; z-index: 60; overflow: hidden; pointer-events: none; } /* au-dessus du header (50) : son voile clair barrait la gueule */
-.bite-run { height: 160vh; } /* la course d'approche du crâne : longue, pour que ce soit fluide */
+.bite-run { height: 45vh; } /* la course d'approche du crâne : courte, pas de vide entre le dernier bloc et le contact */
 .jaws-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 @media (prefers-reduced-motion: reduce) { .bite-stage, .bite-run { display: none; } }
 

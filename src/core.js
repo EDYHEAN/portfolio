@@ -7,7 +7,7 @@ import Lenis from 'lenis';
 import { HYENA_BODY, HYENA_PUPILS } from './hyena.js';
 import { wordmarkSVG } from './wordmark.js';
 import { UI } from './i18n.js';
-import { bindSounds, isSoundOn, setSound, play } from './sound.js';
+import { bindSounds, isSoundOn, setSound } from './sound.js';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 export { gsap, ScrollTrigger, SplitText };
@@ -317,7 +317,7 @@ export function countUp(root) {
 /* ------------------------------------------------------------------ */
 // Le crâne 3D (scenes3d.js, chargé en différé) : un seul montage par page, réattaché si l'outro est redessinée
 // (changement de langue). Le scroll écrit dans JAWS, la boucle 3D le lit.
-const JAWS = { a: 0, b: 0, c: 0, shake: 0 };
+const JAWS = { a: 0, c: 0 };
 let jaws = null;
 function loadJaws() {
   const stage = $('.bite-stage');
@@ -352,24 +352,16 @@ export function renderOutro({ jaws = true } = {}) {
 
 /** À appeler dans un gsap.matchMedia (créé en dernier : il est en bas de page). */
 export function outroMotion() {
-  // Le crâne démarre quand la fin de page est lue, approche longuement jusqu'à remplir l'écran, mord quand le contact
-  // arrive en haut (son + secousse), puis se rouvre pendant que le contact reste épinglé : il se révèle dans la gueule.
+  // Le crâne naît juste sous le dernier bloc, fonce vers l'écran en ouvrant la gueule jusqu'à le recouvrir, puis on
+  // plonge dedans pendant que le contact reste épinglé : il apparaît derrière.
   const jawed = !!$('.bite-stage');
   if (jawed) {
     ScrollTrigger.create({ trigger: '#outro', start: 'top 300%', once: true, onEnter: loadJaws });
     if (jaws) loadJaws(); // outro redessinée : on y remet le canvas
-    const close = gsap.timeline({ scrollTrigger: { trigger: '#outro', start: 'top 25%', endTrigger: '.contact', end: 'top top', scrub: 0.8 } });
-    close.fromTo(JAWS, { a: 0 }, { a: 1, duration: 0.8, ease: 'none' }) // l'accélération est dans la scène
-      .fromTo(JAWS, { b: 0 }, { b: 1, duration: 0.2, ease: 'power3.in' })
-      .call(() => {
-        if (close.scrollTrigger?.direction !== 1) return;
-        play('chomp');
-        gsap.fromTo(JAWS, { shake: 1 }, { shake: 0, duration: 0.45, ease: 'power2.out', overwrite: 'auto' }); // 'auto' : ne touche que shake
-      });
-    // Le contact reste invisible tant que la gueule est fermée (il monte sous elle), puis apparaît entre les crocs.
-    gsap.timeline({ scrollTrigger: { trigger: '.contact', start: 'top top', end: '+=90%', pin: true, scrub: 0.8 } })
-      .fromTo(JAWS, { c: 0 }, { c: 1, duration: 1, ease: 'power1.inOut' }, 0)
-      .fromTo('.contact', { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'none' }, 0.08);
+    gsap.fromTo(JAWS, { a: 0 }, { a: 1, ease: 'none', scrollTrigger: { trigger: '#outro', start: 'top bottom-=10', endTrigger: '.contact', end: 'top top', scrub: 0.6 } });
+    gsap.timeline({ scrollTrigger: { trigger: '.contact', start: 'top top', end: '+=60%', pin: true, scrub: 0.6 } })
+      .fromTo(JAWS, { c: 0 }, { c: 1, duration: 1, ease: 'power1.in' }, 0)
+      .fromTo('.contact', { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'none' }, 0.25);
   }
 
   // Le contenu du contact entre quand la gueule s'ouvre (ou en arrivant, sans mâchoire).

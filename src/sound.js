@@ -83,13 +83,6 @@ const SOUNDS = {
     f.frequency.setValueAtTime(vary(3000), t); f.frequency.exponentialRampToValueAtTime(700, t + 0.07);
     env(g, t, 0.07, 0.003, 0.07); s.connect(f).connect(g).connect(master); s.start(t); s.stop(t + 0.1);
   },
-  // Claquement de mâchoire (footer) : coup sourd, puis les crocs qui s'entrechoquent (deux clics osseux).
-  chomp(t) {
-    osc('sine', 130, 45, 0.16, 0.2, t);
-    noise(0.05, 0.08, t, { type: 'lowpass', f: 700 });
-    noise(0.012, 0.09, t + 0.005, { type: 'bandpass', f: 2600, q: 2 });
-    noise(0.01, 0.06, t + 0.045, { type: 'bandpass', f: 3400, q: 2 });
-  },
   // Tournis (la hyène a trop tourné) : une vrille qui descend en tremblant, puis des petits oiseaux de dessin animé.
   dizzy(t) {
     const o = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), depth = ctx.createGain();

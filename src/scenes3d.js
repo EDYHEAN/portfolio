@@ -206,9 +206,9 @@ void main() { gl_FragColor = vec4(uInk, 1.0);
 
 /**
  * Le crâne de hyène (assets/3d/skull.glb : scan University of Dundee, CC BY 4.0, allégé dans sources/hyena-skull.blend ;
- * Skull + Jaw, origine = la charnière) rendu dans `host` (le calque fixe de la morsure). Le scroll pilote `state`
- * (core.js, outroMotion) : a = il surgit du fond et fonce vers l'écran en ouvrant la gueule, b = il mord (la gueule claque,
- * l'écran passe au noir : on est dedans), c = le noir s'efface sur le contact. shake = secousse de la morsure.
+ * Skull + Jaw, origine = la charnière) rendu dans `host` (le calque fixe de l'outro). Le scroll pilote `state`
+ * (core.js, outroMotion) : a = il naît sous le dernier bloc et fonce vers l'écran en ouvrant la gueule jusqu'à le
+ * recouvrir, c = on plonge dans la gueule ouverte et le contact apparaît.
  */
 export async function mountSkull(host, { root = './', state }) {
   const canvas = document.createElement('canvas');
@@ -258,39 +258,43 @@ export async function mountSkull(host, { root = './', state }) {
   const lerp = (a, b, t) => a + (b - a) * t;
   const smooth = (e0, e1, x) => { const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0))); return t * t * (3 - 2 * t); };
   let yaw = 0, idle = false;
+  // Le canvas reste caché tant qu'il n'y a rien à dessiner : un canvas WebGL encore vierge s'affiche en noir sur
+  // certains rendus (c'était le flash noir avant l'arrivée du crâne).
+  canvas.style.visibility = 'hidden';
+  const outro = document.getElementById('outro');
   loop(canvas, (t) => {
-    const { a = 0, b = 0, c = 0, shake = 0 } = state;
-    if ((a <= 0.0001 || c >= 0.9999) && shake < 0.001) {
-      if (!idle) { renderer.clear(); host.style.backgroundColor = ''; idle = true; }
+    const { a = 0, c = 0 } = state;
+    if (a <= 0.0001 || c >= 0.9999) {
+      if (!idle) { canvas.style.visibility = 'hidden'; host.style.backgroundColor = ''; idle = true; }
       return;
     }
     idle = false;
     uniforms.uTime.value = t;
-    // a : il surgit du fond et accélère jusqu'à remplir l'écran, de trois-quarts puis face à toi, la gueule s'ouvre en
-    //     route. b : il mord, plein écran. c : la gueule se rouvre en grand et on plonge entre les crocs : le contact,
-    //     épinglé derrière, apparaît dans l'ouverture.
+    // a : il naît juste sous le dernier bloc, accroché à lui, rejoint le centre en accélérant vers l'écran, de trois-quarts
+    //     puis face à toi, la gueule s'ouvrant jusqu'à recouvrir tout l'écran. c : on plonge dans la gueule ouverte, il
+    //     disparaît : derrière, le contact (épinglé) est là.
     const near = Math.pow(a, 1.6);
-    const zBite = innerWidth < 860 ? -6.2 : -4.8; // plein écran à la morsure (un téléphone est étroit : un peu plus loin)
-    let z = lerp(-70, zBite, near);
-    z = lerp(z, zBite + 0.5, smooth(0, 1, b));             // il se jette en avant en mordant
-    z = lerp(z, 2.2, Math.pow(c, 1.4));                    // puis on passe entre ses mâchoires
-    pivot.position.z = z;
-    // Cadrage : la ligne des crocs (≈ 0,95 sous le pivot) au centre de l'écran à la morsure ; à la réouverture, le pivot
-    // monte d'autant que la mâchoire descend, pour que la caméra file au milieu de l'ouverture (pas à travers l'os).
+    const zFull = innerWidth < 860 ? -6.2 : -4.8; // plein écran (un téléphone est étroit : un peu plus loin)
+    pivot.position.z = lerp(lerp(-70, zFull, near), 2.2, Math.pow(c, 1.3));
+    // Cadrage : la ligne des crocs au centre ; en plongeant, le pivot monte d'autant que la mâchoire descend, pour que
+    // la caméra file au milieu de l'ouverture (pas à travers l'os).
     pivot.position.y = lerp(0.5, 0.6, smooth(0, 1, a)) + 1.2 * smooth(0, 0.8, c);
-    const gape = 0.62 * smooth(0.25, 0.85, a);
-    jaw.rotation.x = lerp(lerp(gape, 0, smooth(0, 0.6, b)), 1.15, smooth(0, 0.7, c));
+    jaw.rotation.x = 0.75 * smooth(0.12, 0.8, a) + 0.35 * smooth(0, 0.6, c);
     yaw += ((pointer.x * 0.25) - yaw) * 0.05;
-    pivot.rotation.y = lerp(0.6, 0, smooth(0, 0.8, a)) + yaw * (1 - b) * (1 - c) + Math.sin(t * 0.9) * 0.06 * (1 - a);
-    pivot.rotation.x = lerp(0.3, -0.1, smooth(0, 1, a)) - 0.06 * b * (1 - c) - 0.2 * smooth(0, 1, c); // museau un peu relevé : on voit les crocs
+    pivot.rotation.y = lerp(0.6, 0, smooth(0, 0.8, a)) + yaw * (1 - c) + Math.sin(t * 0.9) * 0.06 * (1 - a);
+    pivot.rotation.x = lerp(0.3, -0.1, smooth(0, 1, a)) - 0.2 * smooth(0, 1, c); // museau un peu relevé : on voit les crocs
     pivot.visible = c < 0.98;
-    camera.position.x = Math.sin(t * 70) * 0.12 * shake;
-    camera.position.y = Math.cos(t * 55) * 0.09 * shake;
-    // La page ne s'assombrit qu'en fin d'approche (tu as fini de lire), noire à la morsure ; à la réouverture le noir
-    // s'efface : derrière les crocs, c'est le contact.
-    const dark = Math.max(0.85 * smooth(0.55, 0.95, a), smooth(0.3, 0.9, b)) * (1 - smooth(0.1, 0.45, c));
+    // Accroché au dernier bloc : tant que le haut de l'outro est sous le milieu de l'écran, l'image descend avec lui
+    // (le crâne naît 10 px sous le bloc), puis il se pose au centre.
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    const top = outro ? outro.getBoundingClientRect().top : 0;
+    const shift = Math.max(0, top + 10 + h * 0.06 - h / 2);
+    camera.setViewOffset(w, h, 0, -shift, w, h);
+    // La page ne s'assombrit qu'en fin d'approche ; le noir s'efface pendant qu'on traverse la gueule.
+    const dark = 0.9 * smooth(0.6, 1, a) * (1 - smooth(0.35, 0.75, c));
     host.style.backgroundColor = dark > 0.001 ? `rgba(11, 11, 11, ${dark.toFixed(3)})` : '';
     renderer.render(scene, camera);
+    canvas.style.visibility = 'visible';
   });
   return { attach };
 }

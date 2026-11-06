@@ -54,9 +54,11 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
   contact ; brut dans `sources/raw/`, allégé et articulé dans `sources/hyena-skull.blend` : Skull + Jaw, origine = la
   charnière, occlusion cuite en couleur de sommets). Rendu gravure maison (`mountSkull`, scenes3d.js) : os papier, hachures
   d'encre calées sur la lumière et l'occlusion, grain qui frémit, contour encre. Au scroll (`outroMotion`, état `JAWS`) :
-  a = il surgit du fond et accélère vers l'écran en ouvrant la gueule (la page s'assombrit), b = il mord (son `chomp`,
-  secousse, noir total : on est dedans), c = le noir s'efface sur le contact épinglé. Calque fixe au-dessus de tout, rien
-  n'est dessiné hors champ. Pas de WebGL : le contact s'affiche normalement (l'erreur est dans la console).
+  a = il naît 10 px sous le dernier bloc (image accrochée au haut de l'outro par `setViewOffset`), rejoint le centre et
+  fonce vers l'écran en ouvrant la gueule jusqu'à le recouvrir (la page s'assombrit en fin d'approche), c = on plonge dans
+  la gueule ouverte, il disparaît, le contact épinglé est derrière. Pas de morsure (Johan, 06/11). Course courte
+  (`.bite-run` 45vh) : pas de vide. Le canvas reste caché tant que rien n'est dessiné (un canvas WebGL vierge s'affichait
+  en noir : le flash noir avant le crâne). Pas de WebGL : le contact s'affiche normalement (l'erreur est dans la console).
   L'ancienne mâchoire (`jaws.glb`, `scripts/blender/make-jaws.py`) est à supprimer une fois le crâne validé.
 - **Rideau** entre pages : piloté par GSAP en yPercent uniquement (un transform CSS s'y ajoutait) ; la page d'arrivée naît
   couverte (`html.came`, script et style inline du shell).

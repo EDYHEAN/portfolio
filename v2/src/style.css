@@ -1,0 +1,204 @@
+/* ==================================================================
+   Johan Trigeard V2 · encre, papier, une hyène curieuse
+   Règle : le CSS décrit l'état FINAL. Les animations partent d'un état "avant".
+   ================================================================== */
+
+:root {
+  --ink: #0B0B0B;
+  --paper: #EFE9DD;
+  --paper-2: #E5DDCD;
+  --line: rgba(11, 11, 11, 0.14);
+  --f-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --gutter: clamp(16px, 4vw, 56px);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: clip; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-size: clamp(16px, 1.05vw, 18px);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+/* Grain photocopie par-dessus tout le site */
+body::after {
+  content: '';
+  position: fixed;
+  inset: -50%;
+  z-index: 95;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: 0.07;
+  animation: grain 0.9s steps(5) infinite;
+}
+@keyframes grain {
+  0% { transform: translate(0, 0); } 20% { transform: translate(-2%, 3%); } 40% { transform: translate(3%, -1%); }
+  60% { transform: translate(-3%, -2%); } 80% { transform: translate(2%, 2%); } 100% { transform: translate(0, 0); }
+}
+
+img { display: block; max-width: 100%; }
+img.inv { filter: brightness(0) invert(1); }
+a { color: inherit; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; border-radius: 4px; }
+.mono { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; }
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.hy { display: block; width: 100%; height: auto; overflow: visible; }
+.line { display: block; overflow: hidden; padding-bottom: 0.07em; }
+.line-in { display: block; }
+
+/* ------------------------------------------------------------------ */
+/* Loader, rideau, curseur                                             */
+/* ------------------------------------------------------------------ */
+.loader, .curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--ink);
+  color: var(--paper);
+}
+.loader-mark { width: min(40vh, 58vw); }
+.loader-word { position: absolute; left: var(--gutter); bottom: 26px; font-weight: 800; font-size: 22px; letter-spacing: -0.045em; }
+.loader-count { position: absolute; right: var(--gutter); bottom: 30px; font-size: 13px; }
+.loader-bar { position: absolute; left: 0; bottom: 0; width: 100%; height: 3px; background: var(--paper); transform-origin: left; }
+/* Pas de transform en CSS : GSAP le pilote en yPercent (un translateY ici s'ajoutait au sien et le gardait hors champ). */
+.curtain { visibility: hidden; }
+html.came .curtain { visibility: visible; }
+.curtain-mark { width: 84px; }
+
+.cursor {
+  position: fixed; top: 0; left: 0; z-index: 90;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #fff; mix-blend-mode: difference;
+  pointer-events: none; opacity: 0;
+  display: grid; place-items: center;
+  transition: width 0.35s var(--ease-out), height 0.35s var(--ease-out), opacity 0.3s, background 0.3s;
+}
+.cursor.is-on { opacity: 1; }
+.cursor.is-big { width: 92px; height: 92px; mix-blend-mode: normal; background: var(--ink); }
+.cursor-label { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--paper); }
+@media (pointer: coarse) { .cursor { display: none; } }
+
+/* ------------------------------------------------------------------ */
+/* Header                                                              */
+/* ------------------------------------------------------------------ */
+/* Lockup calé sur logo-johan-trigeard.svg (en multiples de la boîte hyène --logo) : le nom sur 2 lignes (src/wordmark.js,
+   corps 0,528), la capitale de « Johan » à 0,100 du haut, la base de « Trigeard » au pied de l'encre, gouttière d'encre 0,142. Grille 1fr / auto / 1fr : la nav reste au centre exact de la page. */
+.hdr {
+  --logo: clamp(36px, 1.1vw + 26px, 42px);
+  position: fixed; inset: 0 0 auto 0; z-index: 50;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 24px;
+  padding: clamp(14px, 1.4vw, 24px) var(--gutter);
+  color: var(--ink);
+  transition: color 0.4s ease, transform 0.45s var(--ease-out);
+}
+.hdr[data-theme='dark'] { color: var(--paper); --hb: #0B0B0B; }
+.hdr[data-theme='blue'] { color: #fff; --hb: #0052CC; }
+.hdr.is-hidden { transform: translateY(-110%); }
+/* Dès qu'on a scrollé : un voile flouté à la couleur de la section, pour que la nav reste lisible. */
+.hdr::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background: color-mix(in srgb, var(--hb, var(--s-bg, var(--paper))) 80%, transparent);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  opacity: 0; transition: opacity 0.35s ease, background 0.4s ease;
+}
+.hdr.is-scrolled::before { opacity: 1; }
+.hdr-logo {
+  justify-self: start; display: flex; align-items: flex-start; gap: calc(var(--logo) * 0.088); text-decoration: none;
+  margin-left: calc(var(--logo) * -0.053); /* l'encre de la hyène (pas sa boîte) s'aligne sur la gouttière */
+}
+.hdr-mark { width: var(--logo); height: var(--logo); display: block; flex: none; }
+.hdr-word { display: block; flex: none; height: calc(var(--logo) * 0.928); width: auto; margin-top: calc(var(--logo) * 0.1); overflow: visible; }
+.hdr-nav { display: flex; gap: clamp(24px, 2.2vw, 36px); }
+.hdr-nav a, .hdr-lang button {
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1px;
+  transition: background-size 0.4s var(--ease-out);
+  padding-block: 3px; /* symétrique : les capitales tombent sur l'axe de la hyène */
+}
+.hdr-nav a:hover { background-size: 100% 1px; }
+.hdr-end { grid-column: 3; justify-self: end; display: flex; align-items: center; gap: clamp(16px, 2vw, 28px); }
+.hdr-lang { display: flex; align-items: center; gap: 6px; font-family: var(--f-mono); font-size: 12px; }
+/* Son : pastille pleine = on, cerclée = off */
+.hdr-sound { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: 0.06em; padding-block: 3px; }
+.hdr-sound i { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid currentColor; transition: background 0.25s; }
+.hdr-sound[aria-pressed='true'] i { background: currentColor; }
+.hdr-sound[aria-pressed='false'] { opacity: 0.55; }
+.hdr-lang button[aria-pressed='false'] { opacity: 0.45; }
+.hdr-lang button[aria-pressed='true'] { background-size: 100% 1px; }
+
+/* ------------------------------------------------------------------ */
+/* Titres de section                                                   */
+/* ------------------------------------------------------------------ */
+.sec-head {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+  padding-bottom: 18px; margin-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+}
+.sec-title { margin: 0; font-weight: 800; font-size: clamp(44px, 7vw, 120px); line-height: 0.9; letter-spacing: -0.05em; }
+.kicker { margin: 0 0 26px; opacity: 0.6; }
+
+/* ------------------------------------------------------------------ */
+/* Morsure : une mâchoire 3D (scenes3d.js) qui claque, puis s'ouvre sur le contact */
+/* ------------------------------------------------------------------ */
+/* Le calque de la mâchoire couvre l'écran (fixe : en sticky, il défilait avec la page pendant l'approche et la
+   mâchoire du bas arrivait hors champ). Transparent et non dessiné tant qu'elle est hors champ (scenes3d.js).
+   .bite-run = la course de scroll pendant laquelle elle se referme. */
+.bite-stage { position: fixed; inset: 0; z-index: 60; overflow: hidden; pointer-events: none; } /* au-dessus du header (50) : son voile clair barrait la gueule */
+.bite-run { height: 20vh; }
+.jaws-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+@media (prefers-reduced-motion: reduce) { .bite-stage, .bite-run { display: none; } }
+
+/* ------------------------------------------------------------------ */
+/* Contact                                                             */
+/* ------------------------------------------------------------------ */
+.contact {
+  position: relative;
+  min-height: 100svh;
+  margin-top: -1px;
+  padding: 16vh var(--gutter) 28px;
+  background: var(--ink); color: var(--paper);
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto auto 1fr;
+  column-gap: 4vw;
+}
+.contact-hyena { grid-column: 2; grid-row: 2 / 4; width: min(28vw, 340px); align-self: start; }
+.contact-title { grid-column: 1; grid-row: 2; margin: 0; font-weight: 800; font-size: clamp(72px, 12vw, 220px); line-height: 0.84; letter-spacing: -0.06em; }
+.contact-sub { grid-column: 1; max-width: 38ch; margin: 36px 0 0; font-size: clamp(18px, 1.5vw, 24px); line-height: 1.35; }
+.contact-ctas { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 12px; margin-top: 40px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 17px 26px; border-radius: 999px; border: 1px solid currentColor;
+  text-decoration: none; font-weight: 600;
+  transition: background 0.3s, color 0.3s;
+}
+.btn:hover { background: var(--paper); color: var(--ink); }
+.btn-primary { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+.btn-primary:hover { background: #fff; }
+.foot { grid-column: 1 / -1; align-self: end; display: flex; justify-content: space-between; gap: 16px; margin-top: 12vh; padding-top: 16px; border-top: 1px solid rgba(239, 233, 221, 0.2); opacity: 0.7; }
+
+/* ------------------------------------------------------------------ */
+/* Mobile                                                              */
+/* ------------------------------------------------------------------ */
+@media (max-width: 860px) {
+  .hdr-nav { display: none; }
+  .sec-title { font-size: clamp(40px, 11vw, 80px); }
+  .contact { grid-template-columns: minmax(0, 1fr); }
+  .contact-hyena { grid-column: 1; grid-row: auto; width: 52vw; margin-bottom: 24px; }
+  .foot { flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after { animation: none; }
+}

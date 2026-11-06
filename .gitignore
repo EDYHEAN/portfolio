@@ -3,3 +3,6 @@ assets/memoji.mov
 assets/ShowReel_Motion.mp4
 
 .claude/
+
+# Sauvegardes automatiques de Blender
+*.blend1

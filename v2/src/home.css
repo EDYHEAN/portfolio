@@ -1,0 +1,220 @@
+/* ==================================================================
+   Home « Booster » : on ouvre un paquet, les projets sortent en bento.
+   Hero clair, pas de scroll (desktop), footer discret.
+   ================================================================== */
+
+/* Le header ne garde que son + langue : l'identité est dans le hero. */
+body[data-page='home'] .hdr-logo, body[data-page='home'] .hdr-nav { visibility: hidden; }
+
+/* ------------------------------------------------------------------ */
+/* Le booster (overlay)                                                */
+/* ------------------------------------------------------------------ */
+.booster {
+  position: fixed; inset: 0; z-index: 120;
+  background: radial-gradient(120% 90% at 50% 38%, #FCFAF6 0%, #F1ECE2 55%, #E3DBCB 100%);
+}
+.booster-stage { position: absolute; inset: 0; cursor: pointer; outline: none; }
+.booster-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* Image du paquet : affichée tout de suite, remplacée par la 3D dès qu'elle est prête (et repli sans WebGL). */
+.booster-img {
+  position: absolute; left: 50%; top: 50%; height: min(62vh, 150vw); width: auto;
+  translate: -50% -52%; border-radius: 8px;
+  box-shadow: 0 40px 70px rgba(60, 45, 20, 0.22);
+  animation: pack-float 3.2s ease-in-out infinite;
+  transition: opacity 0.5s;
+}
+.booster.has-3d .booster-img { opacity: 0; }
+@keyframes pack-float { 50% { transform: translateY(-10px) rotate(-1.5deg); } }
+.booster-hint {
+  position: absolute; left: 50%; bottom: 8vh; translate: -50% 0; margin: 0;
+  opacity: 0; transition: opacity 0.5s; pointer-events: none;
+}
+.booster.is-ready .booster-hint { opacity: 0.65; animation: hint 2.2s ease-in-out infinite; }
+@keyframes hint { 50% { opacity: 0.3; } }
+.booster-skip { position: absolute; right: var(--gutter); bottom: 22px; opacity: 0.45; font-size: 11px; letter-spacing: 0.08em; }
+.booster-skip:hover { opacity: 0.9; }
+.booster.is-opening .booster-hint, .booster.is-opening .booster-skip { opacity: 0; animation: none; }
+
+/* ------------------------------------------------------------------ */
+/* Hero : moi à gauche, le tirage à droite                             */
+/* ------------------------------------------------------------------ */
+.home {
+  height: 100svh; min-height: 620px;
+  max-width: 1680px; margin: 0 auto;
+  padding: clamp(76px, 10vh, 104px) var(--gutter) clamp(52px, 7vh, 70px);
+  display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(28px, 4vw, 72px); align-items: center;
+}
+/* Le bloc de gauche part du haut, à hauteur du « Ton tirage » : centré, il descendait trop bas. */
+.home > .who { align-self: start; margin-top: clamp(4px, 1.5vh, 16px); }
+.who { display: flex; flex-direction: column; align-items: flex-start; container-type: inline-size; }
+/* Le bloc logo en colonne : la hyène (--hy = sa boîte), puis « Johan / Trigeard » aussi large que son encre
+   (Trigeard = 3,545 em, l'encre = 0,893 boîte : corps 0,252 boîte). Tout le bloc s'aligne sur l'encre de la hyène. */
+.who-lock {
+  --hy: min(clamp(140px, 24vh, 260px), 70cqi);
+  display: flex; flex-direction: column; align-items: flex-start;
+  margin: 0 0 clamp(18px, 2.8vh, 30px) calc(var(--hy) * -0.053); /* l'encre (pas la boîte) sur la gouttière */
+}
+/* Logo : la hyène SVG, inclinée vers le curseur ; au clic, elle se retourne et change de rendu (logo.js). */
+.who-hy { position: relative; flex: none; width: var(--hy); aspect-ratio: 1; cursor: pointer; outline: none; }
+.who-hy:focus-visible { outline: 2px solid currentColor; outline-offset: 6px; border-radius: 12px; }
+.lg-float { position: absolute; inset: 0; animation: lg-float 4.5s ease-in-out infinite; }
+@keyframes lg-float { 50% { transform: translateY(-6px); } }
+.lg-tilt, .lg-flip { position: absolute; inset: 0; transform-style: preserve-3d; }
+.lg-layer { position: absolute; inset: 0; }
+.lg-layer .hy { width: 100%; height: 100%; }
+.lg-depth { transform: translateZ(calc(var(--d) * -3.5px)); }
+.lg-riso { mix-blend-mode: multiply; }
+.lg-riso-a { transform: translate(-1.6%, 1.1%); }
+.lg-riso-b { transform: translate(1.4%, -0.9%); }
+.lg-holo .hy { filter: drop-shadow(0 6px 14px rgba(120, 80, 200, 0.25)); }
+.lg-gl-r, .lg-gl-c { mix-blend-mode: multiply; opacity: 0.85; }
+.lg-gl-r { animation: gl-r 1.4s steps(1) infinite; }
+.lg-gl-c { animation: gl-c 1.4s steps(1) infinite; }
+.lg-gl-k { animation: gl-k 1.4s steps(1) infinite; }
+@keyframes gl-r { 0% { transform: translate(-2.4%, 0); } 22% { transform: translate(-1%, 0.6%); clip-path: inset(10% 0 55% 0); } 30% { clip-path: none; transform: translate(-3%, -0.4%); } 64% { transform: translate(-1.8%, 0); } 70% { clip-path: inset(62% 0 8% 0); transform: translate(2%, 0); } 76% { clip-path: none; } }
+@keyframes gl-c { 0% { transform: translate(2.2%, 0); } 22% { transform: translate(1%, -0.6%); clip-path: inset(40% 0 30% 0); } 30% { clip-path: none; transform: translate(2.8%, 0.4%); } 64% { transform: translate(1.6%, 0); } 70% { clip-path: inset(15% 0 70% 0); transform: translate(-2.4%, 0); } 76% { clip-path: none; } }
+@keyframes gl-k { 0%, 100% { transform: none; clip-path: none; } 22% { transform: translate(1.2%, 0); clip-path: inset(28% 0 48% 0); } 26% { transform: none; clip-path: none; } 70% { transform: translate(-1.6%, 0); clip-path: inset(70% 0 12% 0); } 74% { transform: none; clip-path: none; } }
+/* À droite du poitrail : la légende ne s'intercale pas entre la hyène et le nom. */
+.lg-label { position: absolute; left: calc(100% + 4px); bottom: 7%; font-size: 10px; letter-spacing: 0.08em; opacity: 0.45; white-space: nowrap; pointer-events: none; transition: opacity 0.3s; }
+.lg-label span { opacity: 0.6; margin-left: 4px; }
+.who-hy:hover .lg-label { opacity: 0.85; }
+/* Tournis (logo.js) : la tête tangue, 4 étoiles en orbite autour du crâne. L'orbite = deux mouvements sinusoïdaux
+   décalés d'un quart de tour (X sur <i>, Y + profondeur sur <b>) : une ellipse sans calcul. */
+.is-dizzy .lg-float { animation: lg-woozy 0.9s ease-in-out infinite; }
+@keyframes lg-woozy { 0%, 100% { transform: rotate(-5deg) translateY(-2px); } 50% { transform: rotate(5deg) translateY(2px); } }
+.lg-stars { position: absolute; left: 22%; top: 2%; width: 56%; height: 16%; pointer-events: none; z-index: 2; animation: lg-stars-in 0.35s var(--ease-out) both; }
+@keyframes lg-stars-in { from { opacity: 0; transform: scale(0.6); } }
+.lg-stars i { position: absolute; left: 50%; top: 50%; width: 0; height: 0; animation: lg-orb-x 0.55s ease-in-out infinite alternate; animation-delay: calc(var(--k) * -0.275s); }
+.lg-stars b { position: absolute; width: clamp(13px, calc(var(--hy) * 0.09), 26px); aspect-ratio: 1; translate: -50% -50%; animation: lg-orb-y 0.55s ease-in-out infinite alternate; animation-delay: calc(var(--k) * -0.275s - 0.275s); }
+.lg-stars svg { display: block; width: 100%; height: 100%; }
+@keyframes lg-orb-x { from { transform: translateX(calc(var(--orb-w, 140px) * -0.5)); } to { transform: translateX(calc(var(--orb-w, 140px) * 0.5)); } }
+@keyframes lg-orb-y { from { transform: translateY(-14px) scale(0.6) rotate(-30deg); opacity: 0.55; } to { transform: translateY(14px) scale(1.15) rotate(30deg); opacity: 1; } }
+.who-hy { --orb-w: calc(var(--hy) * 0.5); }
+@media (prefers-reduced-motion: reduce) { .lg-float, .lg-gl-r, .lg-gl-c, .lg-gl-k { animation: none; } }
+/* Écart encre -> capitale ≈ 0,09 boîte : le bas de la boîte (0,055) + l'interligne au-dessus de la capitale (0,14 em) suffisent. */
+.who-name { margin: 0 0 0 calc(var(--hy) * 0.053); font-weight: 800; font-size: calc(var(--hy) * 0.252); line-height: 0.94; letter-spacing: -0.03em; font-variation-settings: 'opsz' 96; }
+.who-name .line { padding: 0.08em 0 0.24em; margin: -0.08em 0 -0.24em; } /* le masque de l'apparition ne coupe ni le J ni le g */
+.who-role { margin: 16px 0 0; font-size: clamp(12px, 0.35vw + 8px, 14px); letter-spacing: 0.08em; }
+.who-line { margin: 18px 0 0; max-width: 28ch; font-size: clamp(18px, 1.45vw, 24px); line-height: 1.32; text-wrap: balance; }
+/* Les mots qui comptent : en gras, un trait de surligneur posé dessous (il se trace à l'arrivée, home.js). */
+.who-line em {
+  font-style: normal; font-weight: 700;
+  background: linear-gradient(color-mix(in srgb, var(--ink) 14%, transparent), color-mix(in srgb, var(--ink) 14%, transparent)) no-repeat 0 88% / var(--hl, 100%) 0.42em;
+  padding: 0 0.08em; margin: 0 -0.08em;
+}
+.who-actions { position: relative; display: flex; flex-wrap: wrap; gap: 8px; margin-top: clamp(20px, 3.4vh, 34px); }
+.chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line);
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.12s;
+}
+.chip:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.chip:active { transform: translateY(1px) scale(0.98); }
+.chip i { font-style: normal; transition: transform 0.3s var(--ease-out); }
+.chip[aria-expanded='true'] i { transform: rotate(45deg); }
+/* En surimpression sous les boutons : ouvrir la liste ne pousse plus rien (le bloc collait au bas, les cartes rétrécissaient). */
+.brands-panel { position: absolute; left: 0; top: calc(100% + 12px); z-index: 6; width: min(460px, 100%); }
+.brands-panel ul { list-style: none; margin: 0; padding: 8px 12px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 10px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); }
+.brands-panel li { height: 34px; display: grid; place-items: center; }
+.brands-panel img { height: calc(17px * var(--s, 1)); width: auto; max-width: 100%; object-fit: contain; filter: brightness(0); opacity: 0.75; }
+
+/* Touche (bouton reroll) */
+.key {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 11px 18px; border-radius: 12px; border: 1.5px solid currentColor;
+  font: inherit; font-weight: 650; font-size: 15px; cursor: pointer;
+  box-shadow: 0 3px 0 0 currentColor;
+  transition: transform 0.14s var(--ease-out), box-shadow 0.14s var(--ease-out);
+}
+.key:hover { transform: translateY(-1px); box-shadow: 0 4px 0 0 currentColor; }
+.key:active { transform: translateY(3px); box-shadow: 0 0 0 0 currentColor; transition-duration: 0.05s; }
+.key-ink { background: var(--ink); color: var(--paper); border-color: var(--ink); box-shadow: 0 3px 0 0 #000; }
+.key-ink:hover { box-shadow: 0 4px 0 0 #000; }
+.reroll-ico { display: inline-block; font-size: 18px; line-height: 1; }
+
+/* ------------------------------------------------------------------ */
+/* Le tirage (bento)                                                   */
+/* ------------------------------------------------------------------ */
+.pull { height: 100%; min-height: 0; display: flex; flex-direction: column; }
+.pull-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.pull-head b { font-weight: 500; }
+.pull-grid {
+  flex: 1; min-height: 0;
+  display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.slot { position: relative; min-height: 0; }
+.slot-0 { grid-row: 1 / 3; }
+
+.card {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; overflow: hidden; isolation: isolate;
+  border-radius: 18px; background: var(--bg); color: var(--fg); text-decoration: none;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.07), 0 10px 28px rgba(40, 30, 10, 0.08);
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
+}
+.card[href]:hover { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.07), 0 26px 56px rgba(40, 30, 10, 0.2); }
+.card[href]:active { transform: perspective(900px) scale(0.985); transition-duration: 0.08s; }
+.card-art { flex: 1; min-height: 0; margin: 8px 8px 0; border-radius: 12px; overflow: hidden; }
+.card-art img { width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.8s var(--ease-out); }
+.card[href]:hover .card-art img { transform: scale(1.04); }
+.card-info { display: flex; align-items: center; gap: 12px; padding: 12px 14px 13px; }
+.card-logo { position: relative; flex: none; width: 38px; height: 38px; }
+.card-logo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transform: scale(var(--ls, 1)); }
+.card-txt { display: flex; flex-direction: column; min-width: 0; }
+.card-txt b { font-weight: 800; font-size: 18px; letter-spacing: -0.02em; line-height: 1.1; }
+.card-txt span { font-size: 13px; opacity: 0.72; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-n { margin-left: auto; opacity: 0.55; }
+.slot-0 .card-logo { width: 52px; height: 52px; }
+.slot-0 .card-txt b { font-size: 26px; }
+/* Reflet qui suit la souris : discret, ne touche pas au visuel du projet */
+.card-shine {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 30%), rgba(255, 255, 255, 0.28), transparent 42%);
+  mix-blend-mode: soft-light; opacity: 0; transition: opacity 0.35s;
+}
+.card[href]:hover .card-shine { opacity: 1; }
+
+.card.is-soon {
+  background: transparent; color: var(--ink);
+  border: 1.5px dashed rgba(11, 11, 11, 0.25); box-shadow: none;
+  align-items: center; justify-content: center; text-align: center; gap: 4px; padding: 16px;
+}
+.card.is-soon b { font-size: 16px; }
+.card.is-soon span:last-child { font-size: 13px; opacity: 0.6; }
+.soon-hy { width: 54px; opacity: 0.3; margin-bottom: 8px; }
+
+/* ------------------------------------------------------------------ */
+/* Footer discret                                                      */
+/* ------------------------------------------------------------------ */
+.bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: 14px var(--gutter); font-size: 11px; letter-spacing: 0.08em;
+}
+.bar > span:first-child { opacity: 0.6; }
+.bar-links { display: flex; gap: 20px; }
+.bar-links a, .bar-links button { text-decoration: none; background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1px; transition: background-size 0.35s var(--ease-out); padding-bottom: 2px; text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; }
+.bar-links a:hover, .bar-links button:hover { background-size: 100% 1px; }
+
+.toast {
+  position: fixed; left: 50%; bottom: 56px; z-index: 96; translate: -50% 0;
+  padding: 12px 18px; border-radius: 12px; background: var(--ink); color: var(--paper);
+  opacity: 0; pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ */
+@media (max-width: 860px) {
+  .home { height: auto; min-height: 0; grid-template-columns: minmax(0, 1fr); padding-bottom: 90px; }
+  .who-lock { --hy: min(clamp(130px, 38vw, 200px), 70cqi); }
+  .pull-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: 300px; grid-auto-rows: 230px; }
+  .slot-0 { grid-row: auto; grid-column: span 2; }
+  .bar { background: color-mix(in srgb, var(--paper) 88%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+}
+@media (max-height: 700px) and (min-width: 861px) {
+  .who-lock { --hy: min(clamp(120px, 22vh, 200px), 70cqi); }
+  .who-line { margin-top: 12px; }
+}

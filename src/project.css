@@ -157,8 +157,11 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .ft-img img { transition: opacity 0.5s ease; }
 .ft-img.is-3d img { opacity: 0; } /* le modèle 3D (feature3d.js) prend la place de son affiche */
 /* Une tuile à modèle 3D garde de la place pour lui, même petite ; la rangée grandit plutôt que de couper le texte. */
-/* Bento 3D compact (Johan, 06/11 : trop gros pour pas grand-chose) : trois rangées basses, tout tient dans l'écran. */
-.ft-bento:has(.ft-img[data-model]) { grid-auto-rows: clamp(150px, 21vh, 220px); }
+/* Bento 3D équilibré (Johan, 06/11) : des tuiles égales, 3 puis 2, même hauteur (les tailles mélangées faisaient des
+   modèles énormes pour peu de chose, et un trou dans la grille). Tout tient dans l'écran. */
+.ft-bento:has(.ft-img[data-model]) { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: clamp(200px, 30vh, 270px); }
+.ft-bento:has(.ft-img[data-model]) .ft { grid-column: span 2; grid-row: span 1; }
+.ft-bento:has(.ft-img[data-model]) .ft:nth-child(n+4) { grid-column: span 3; }
 .ft-bento:has(.ft-img[data-model]) .ft-txt { padding: 14px 20px 18px; }
 .ft-bento:has(.ft-img[data-model]) .ft-txt p { font-size: 13px; }
 .ft-img[data-model] { min-height: 70px; }
@@ -252,6 +255,11 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
   .shw-cap { grid-template-columns: auto minmax(0, 1fr); }
   .shw-cap p { grid-column: 1 / -1; }
   .ft-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 190px; }
+  /* Au téléphone, la rangée suit le texte (deux colonnes étroites) ; le modèle garde une hauteur fixe. */
+  .ft-bento:has(.ft-img[data-model]) { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; }
+  .ft-bento:has(.ft-img[data-model]) .ft-img { flex: none; height: 120px; }
+  .ft-bento:has(.ft-img[data-model]) .ft, .ft-bento:has(.ft-img[data-model]) .ft:nth-child(n+4) { grid-column: span 1; }
+  .ft-bento:has(.ft-img[data-model]) .ft:last-child:nth-child(odd) { grid-column: span 2; }
   .ft-l { grid-column: span 2; grid-row: span 2; }
   .ft-w { grid-column: span 2; }
   .stk { grid-template-columns: minmax(0, 1fr); }

@@ -123,17 +123,20 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .shw-third .shw-cap { grid-template-columns: auto minmax(0, 1fr); }
 .shw-third .shw-cap p { grid-column: 1 / -1; }
 /* Live : le cadre bien aéré sur un fond teinté, le mobile qui déborde un peu à droite. */
-.live { padding: clamp(24px, 4vw, 64px); border-radius: 28px; background: var(--p-tile); }
+.live { padding: clamp(20px, 2.6vw, 40px); border-radius: 28px; background: var(--p-tile); }
 .live-tabs { display: flex; gap: 8px; margin-bottom: 22px; }
 .live-tabs button { padding: 9px 18px; border-radius: 999px; border: 1px solid var(--s-line); font-family: var(--f-mono); font-size: 12px;
   letter-spacing: 0.06em; text-transform: uppercase; transition: background 0.25s, color 0.25s, border-color 0.25s; }
 .live-tabs button:hover { border-color: var(--s-fg); }
 .live-tabs button[aria-selected='true'] { background: var(--s-fg); color: var(--s-bg); border-color: var(--s-fg); }
-.live-stage { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) clamp(180px, 17vw, 250px); gap: clamp(20px, 3vw, 44px); align-items: end; }
-.live-desk { height: min(64vh, 680px); }
+.live-stage { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) clamp(190px, 19vw, 290px); gap: clamp(20px, 2.6vw, 40px); align-items: end; }
+/* Le cadre tient entier sous le header : la hauteur de l'écran moins le header, les onglets et les marges (Johan : « qu'on voie plus »). */
+.live-desk { height: clamp(460px, calc(100svh - 200px), 980px); }
 .live-desk .browser-view, .live-phone .phone-view { overflow: hidden; }
 .live-frame, .live-frame-m { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; background: #fff; }
-.live-phone { aspect-ratio: 9 / 19.5; height: auto; }
+.live-phone { aspect-ratio: 9 / 19.5; height: auto; max-height: none; }
+/* Un onglet sans mobile (la Visite) : le navigateur prend toute la largeur. Au téléphone, le mobile reste le seul cadre. */
+@media (min-width: 861px) { .live-stage.is-solo { grid-template-columns: minmax(0, 1fr); } .live-stage.is-solo .live-phone { display: none; } }
 .live-hint { margin: 18px 0 0; opacity: 0.6; }
 .shw-item .browser-view img, .shw-video { display: block; width: 100%; height: auto; }
 .shw-item .pix { image-rendering: pixelated; } /* pixel art agrandi : des pixels nets, pas de flou */
@@ -251,7 +254,7 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
   .live { padding: 18px; }
   .live-stage { grid-template-columns: minmax(0, 1fr); justify-items: center; }
   .live-desk { display: none; }
-  .live-phone { width: min(300px, 80vw); }
+  .live-phone { display: block; width: min(300px, 80vw); } /* le seul cadre au téléphone (.phone est masqué plus haut) */
   .shw-cap { grid-template-columns: auto minmax(0, 1fr); }
   .shw-cap p { grid-column: 1 / -1; }
   .ft-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 190px; }

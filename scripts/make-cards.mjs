@@ -73,6 +73,25 @@ const CARDS = {
       <div class="photo"></div><div class="shade"></div>${logo}
       ${GRAIN}`;
   },
+  // Maisons du Monde · Labo : la pièce de nuit de « 24 h à la maison », assombrie, et une vraie carte de Pièce Rare
+  // (rendue par le code du prototype, sources/cards/mdm-labo) posée de biais au centre : deux des trois expériences.
+  'mdm-labo'() {
+    const dir = path.join(ROOT, 'sources/cards/mdm-labo');
+    const photo = dataUri(path.join(dir, 'nuit.webp'));
+    const card = dataUri(path.join(dir, 'mdm-254422.webp'));
+    return `<style>${BASE}
+      body{background:#14100c}
+      .photo{position:absolute;inset:0;background:url(${photo}) 43% 50% / auto 100%}
+      .shade{position:absolute;inset:0;background:radial-gradient(55% 38% at 50% 48%, rgba(20,16,12,.15), rgba(20,16,12,.62) 80%),
+        linear-gradient(rgba(20,16,12,.4), transparent 25% 70%, rgba(20,16,12,.75))}
+      .glow{position:absolute;left:50%;top:48%;width:760px;height:760px;transform:translate(-50%,-50%);
+        background:radial-gradient(closest-side, rgba(255,196,120,.32), transparent)}
+      .card{position:absolute;left:50%;top:48%;width:470px;height:auto;transform:translate(-50%,-50%) rotate(-6deg);
+        filter:drop-shadow(0 40px 50px rgba(0,0,0,.6)) drop-shadow(0 6px 12px rgba(0,0,0,.35))}
+      </style>
+      <div class="photo"></div><div class="shade"></div><div class="glow"></div><img class="card" src="${card}">
+      ${GRAIN}`;
+  },
 };
 
 const ids = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(CARDS);

@@ -72,6 +72,82 @@ export const PROJECTS = [
     ],
   },
   {
+    // Maisons du Monde · Labo (Johan, 06/11) : trois prototypes codés réunis en un projet (Pièce Rare, Catalogue Visite,
+    // 24 h à la maison). Sources : sources/raw/vibecoded ; copies allégées par scripts/make-mdm-labo.mjs.
+    // Décors générés avec Gemini (prompts dans les sources), heures et lumière de « 24 h » calculées dans le code.
+    id: 'mdm-labo',
+    card: 'mdm-labo/card.webp', // la pièce de nuit de « 24 h » et une vraie carte Pièce Rare (scripts/make-cards.mjs)
+    name: 'Maisons du Monde · Labo',
+    year: '2026',
+    theme: 'dark',
+    colors: { bg: '#1F1B16', fg: '#F7F2EA', accent: '#B4613B', line: 'rgba(247,242,234,.14)', tile: '#2B251E' },
+    logo: { src: 'mdm-labo/logo.svg', invert: true, introScale: 0.7 },
+    shot: 'mdm-labo/live/24h/img/jour.webp',
+    fonts: ['DM+Sans:wght@400;600', 'Bodoni+Moda:ital,wght@1,500'],
+    type: T('Prototypes · e-commerce', 'Prototypes · e-commerce'),
+    role: T('Concept, design & prototype codé', 'Concept, design & coded prototype'),
+    tagline: T("Trois façons de tomber amoureux d'un meuble, avant le panier.", 'Three ways to fall for a piece of furniture, before the basket.'),
+    context: T(
+      "Un labo pour sortir du catalogue en grille. Trois prototypes codés, une idée chacun : collectionner les meubles comme des cartes à jouer (Pièce Rare), visiter une maison pièce par pièce et acheter ce qu'on y voit (la Visite), vivre une journée dans une pièce où chaque heure met d'autres meubles en lumière (24 h à la maison). Les décors sont générés avec Gemini à partir des vrais produits, tout le reste est du code.",
+      "A lab to break out of the grid catalogue. Three coded prototypes, one idea each: collect furniture like trading cards (Pièce Rare), walk through a house room by room and buy what you see (the Tour), spend a day in one room where every hour puts other pieces in the light (24 hours at home). The sets are generated with Gemini from the real products; everything else is code.",
+    ),
+    blocks: [
+      {
+        // Les trois prototypes en vrai (assets/mdm-labo/live), un onglet chacun.
+        type: 'live',
+        title: T('Trois prototypes, en vrai', 'Three prototypes, live'),
+        items: [
+          {
+            src: 'mdm-labo/live/piece-rare/index.html', url: T('Pièce Rare', 'Pièce Rare'), label: T('Pièce Rare', 'Pièce Rare'),
+            hint: T('Ouvre un booster, garde tes cartes, pose tes meubles dans ta pièce en 3D.', 'Open a pack, keep your cards, place your furniture in your 3D room.'),
+          },
+          {
+            src: 'mdm-labo/live/visite/index.html', url: T('Catalogue · la visite', 'Catalogue · the tour'), label: T('La visite', 'The tour'), mobile: false,
+            hint: T('Entre par la porte ou par une fenêtre, puis passe de pièce en pièce.', 'Come in through the door or a window, then go from room to room.'),
+          },
+          {
+            src: 'mdm-labo/live/24h/index.html', url: T('Catalogue · 24 h à la maison', 'Catalogue · 24 hours at home'), label: T('24 h à la maison', '24 hours at home'),
+            hint: T("Scrolle dans le cadre : l'heure tourne, la lumière suit.", 'Scroll inside the frame: the hours turn, the light follows.'),
+          },
+        ],
+      },
+      {
+        // Les meubles 3D de Pièce Rare (ceux qu'on pose dans « Ma pièce »), un par rareté, animés par feature3d.js ;
+        // l'affiche le temps du chargement = le détourage de la carte.
+        type: 'features',
+        title: T('La collection, en 3D', 'The collection, in 3D'),
+        items: [
+          { img: 'mdm-labo/live/piece-rare/cut/mdm-223563.webp', model: 'mdm-labo/live/piece-rare/models/mdm-223563.glb', fit: 'contain', pos: 'center', t: T('Lin lavé', 'Lin lavé'), d: T('Commune · Maisons du Monde. Le coussin en lin.', 'Common · Maisons du Monde. The linen cushion.') },
+          { img: 'mdm-labo/live/piece-rare/cut/mdm-214553.webp', model: 'mdm-labo/live/piece-rare/models/mdm-214553.glb', fit: 'contain', pos: 'center', t: T('Kalinda', 'Kalinda'), d: T('Rare · Maisons du Monde. Le tapis rond motif jungle.', 'Rare · Maisons du Monde. The round jungle print rug.') },
+          { img: 'mdm-labo/live/piece-rare/cut/fermliving-podo.webp', model: 'mdm-labo/live/piece-rare/models/fermliving-podo.glb', fit: 'contain', pos: 'center', t: T('Podo', 'Podo'), d: T('Rare · Ferm Living. Le tabouret sculptural.', 'Rare · Ferm Living. The sculptural stool.') },
+          { img: 'mdm-labo/live/piece-rare/cut/sklum-canape-coco.webp', model: 'mdm-labo/live/piece-rare/models/sklum-canape-coco.glb', fit: 'contain', pos: 'center', t: T('Coco', 'Coco'), d: T('Épique · Sklum. Le canapé en chenille épaisse.', 'Epic · Sklum. The thick chenille sofa.') },
+          { img: 'mdm-labo/live/piece-rare/cut/design-tulip.webp', model: 'mdm-labo/live/piece-rare/models/design-tulip.glb', fit: 'contain', pos: 'center', t: T('Table Saarinen', 'Saarinen table'), d: T('Légendaire · Knoll. Une icône du design, la rareté la plus haute.', 'Legendary · Knoll. A design icon, the highest rarity.') },
+        ],
+      },
+      {
+        type: 'slides',
+        title: T('La maison, pièce par pièce', 'The house, room by room'),
+        items: [
+          { src: 'mdm-labo/rooms/facade.webp', t: T('La façade', 'The front') },
+          { src: 'mdm-labo/rooms/entree.webp', t: T("L'entrée", 'The hall') },
+          { src: 'mdm-labo/rooms/sejour.webp', t: T('Le séjour', 'The living room') },
+          { src: 'mdm-labo/rooms/cuisine.webp', t: T('La cuisine', 'The kitchen') },
+          { src: 'mdm-labo/rooms/palier.webp', t: T('Le palier', 'The landing') },
+          { src: 'mdm-labo/rooms/chambre.webp', t: T('La chambre', 'The bedroom') },
+          { src: 'mdm-labo/rooms/enfant.webp', t: T("La chambre d'enfant", "The kid's room") },
+        ],
+      },
+      {
+        type: 'showcase',
+        title: T('Deux images, une journée', 'Two images, one day'),
+        items: [
+          { img: 'mdm-labo/live/24h/img/jour.webp', size: 'half', url: '24 h à la maison · 7 h', t: T('Le jour', 'Day'), d: T('Une seule pièce, quatre coins de vie, les vrais meubles du catalogue.', 'One room, four living corners, the real pieces from the catalogue.') },
+          { img: 'mdm-labo/live/24h/img/nuit.webp', size: 'half', url: '24 h à la maison · 23 h', t: T('La nuit', 'Night'), d: T('Entre les deux, les heures, le soleil et les faisceaux sont calculés dans le code.', 'In between, the hours, the sun and the light beams are computed in code.') },
+        ],
+      },
+    ],
+  },
+  {
     id: 'vinyl-run',
     card: 'vinyl-run/card.webp', // visuel de carte du booster (3:5, sujet centré)
     name: 'Vinyl Run',

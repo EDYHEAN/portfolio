@@ -1,6 +1,6 @@
 // Blocs des pages projet. Chaque bloc = render (HTML) + motion (dans un gsap.matchMedia).
 // Motion minimaliste : les visuels parlent, le mouvement guide la lecture.
-import { gsap, ScrollTrigger, $, $$, t, tx, asset, spawn, revealTitle, countUp, REDUCE, ROOT } from './core.js';
+import { gsap, ScrollTrigger, $, $$, t, tx, asset, spawn, revealTitle, countUp, REDUCE, ROOT, lenis } from './core.js';
 
 const img = (src, { cls = '', alt = '', eager = false, style = '' } = {}) =>
   `<img src="${asset(src)}" alt="${alt}" class="${cls}" ${eager ? '' : 'loading="lazy"'} decoding="async" ${style ? `style="${style}"` : ''}>`;
@@ -18,6 +18,34 @@ const browser = (inner, url) => `
     <div class="browser-bar"><i></i><i></i><i></i><span class="browser-url mono">${url || ''}</span></div>
     <div class="browser-view">${inner}</div>
   </div>`;
+
+// Un prototype live, une fois chargé (même origine seulement : sinon on n'y touche pas) :
+// - sans barre de défilement : dans un cadre réduit, elle mangeait la largeur et faisait « fenêtre Windows » ;
+// - la molette : la page ne l'entend pas (Lenis écoute sa fenêtre, pas celle de l'iframe). Quand le prototype ne peut plus
+//   défiler dans ce sens (un jeu plein écran, ou le bas de sa page), on la passe à la page, comme le ferait un navigateur.
+//   Seulement si le prototype ne l'a pas prise pour lui (zoom 3D, défilement maison : preventDefault).
+function tameFrame(frame) {
+  frame.addEventListener('load', () => {
+    let w;
+    try { w = frame.contentWindow; if (!w.document.body) return; } catch { return; }
+    const st = w.document.createElement('style');
+    st.textContent = 'html,body{scrollbar-width:none}::-webkit-scrollbar{display:none}';
+    w.document.head.append(st);
+    const canScroll = (n, dy) => (dy > 0 ? n.scrollTop + n.clientHeight < n.scrollHeight - 1 : n.scrollTop > 0);
+    w.addEventListener('wheel', (e) => {
+      if (e.defaultPrevented || e.ctrlKey || !e.deltaY) return;
+      for (let n = e.target; n && n.nodeType === 1 && n !== w.document.documentElement; n = n.parentElement) {
+        if (/(auto|scroll)/.test(w.getComputedStyle(n).overflowY) && n.scrollHeight > n.clientHeight + 1 && canScroll(n, e.deltaY)) return;
+      }
+      if (canScroll(w.document.scrollingElement, e.deltaY)) return;
+      const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+      if (lenis) lenis.scrollTo(lenis.targetScroll + dy); else scrollBy(0, dy);
+    }, { passive: true });
+  });
+}
+
+// L'indice sous un prototype live : celui de l'onglet (on ne scrolle pas un jeu, on le clique), sinon celui du bloc.
+const liveHint = (it, b) => tx(it.hint || b.hint || { fr: 'Scrolle dans le cadre : c’est le vrai prototype.', en: 'Scroll inside the frame: it’s the real prototype.' });
 
 /* ------------------------------------------------------------------ */
 export const BLOCKS = {
@@ -116,7 +144,8 @@ export const BLOCKS = {
   },
 
   /* Live : les vrais prototypes, dans un cadre navigateur (rendus en 1440 px puis réduits) et un mobile à côté.
-     Onglets s'il y en a plusieurs. Les iframes ne se chargent qu'en approchant du bloc. Au téléphone : le mobile seul. */
+     Onglets s'il y en a plusieurs. Les iframes ne se chargent qu'en approchant du bloc. Au téléphone : le mobile seul.
+     item.mobile = false : pas de mobile au bureau, le navigateur prend toute la largeur (la Visite). */
   live: {
     render(b, p, n) {
       const tabs = b.items.length > 1 ? `<div class="live-tabs" role="tablist">${b.items.map((it, i) => `<button type="button" role="tab" class="chip" aria-selected="${!i}" data-live="${i}" data-sound>${tx(it.label)}</button>`).join('')}</div>` : '';
@@ -124,38 +153,46 @@ export const BLOCKS = {
       return `${head(b.title || 'b.pages', n)}
         <div class="live">
           ${tabs}
-          <div class="live-stage">
+          <div class="live-stage${first.mobile === false ? ' is-solo' : ''}">
             <div class="browser live-desk">
               <div class="browser-bar"><i></i><i></i><i></i><span class="browser-url mono">${tx(first.url)}</span></div>
               <div class="browser-view"><iframe class="live-frame" data-src="${asset(first.src)}" title="${tx(first.label)}" loading="lazy"></iframe></div>
             </div>
             <div class="phone live-phone"><div class="phone-view"><iframe class="live-frame-m" data-src="${asset(first.src)}" title="${tx(first.label)} (mobile)" loading="lazy"></iframe></div></div>
           </div>
-          <p class="mono live-hint">${tx(b.hint || { fr: 'Scrolle dans le cadre : c’est le vrai prototype.', en: 'Scroll inside the frame: it’s the real prototype.' })}</p>
+          <p class="mono live-hint">${liveHint(first, b)}</p>
         </div>`;
     },
     motion(el, b) {
       const desk = $('.live-frame', el), mob = $('.live-frame-m', el), view = $('.live-desk .browser-view', el), pview = $('.live-phone .phone-view', el);
       // Le site est rendu à sa vraie largeur (1440 / 390 px), puis réduit au cadre : il se comporte comme sur un vrai écran.
-      const fit = () => {
+      const fit = () => { // un cadre masqué (largeur 0) garde sa dernière échelle
         const k = view.clientWidth / 1440;
-        Object.assign(desk.style, { width: '1440px', height: `${view.clientHeight / k}px`, transform: `scale(${k})` });
+        if (k) Object.assign(desk.style, { width: '1440px', height: `${view.clientHeight / k}px`, transform: `scale(${k})` });
         const km = pview.clientWidth / 390;
-        Object.assign(mob.style, { width: '390px', height: `${pview.clientHeight / km}px`, transform: `scale(${km})` });
+        if (km) Object.assign(mob.style, { width: '390px', height: `${pview.clientHeight / km}px`, transform: `scale(${km})` });
       };
-      fit(); new ResizeObserver(fit).observe(view);
+      [desk, mob].forEach(tameFrame);
       // Chargées à l'approche, déchargées (about:blank) quand on s'éloigne : deux sites complets (Lenis, GSAP, vidéos) ne
-      // tournent pas en fond pendant qu'on lit le reste de la page. Au téléphone, le cadre desktop est masqué : seul le mobile.
-      const wanted = () => (getComputedStyle($('.live-desk', el)).display === 'none' ? [mob] : [desk, mob]);
-      new IntersectionObserver(([e]) => {
-        if (e.isIntersecting) wanted().forEach((f) => { if (f.getAttribute('src') !== f.dataset.src) f.src = f.dataset.src; });
-        else [desk, mob].forEach((f) => { if (f.getAttribute('src') && f.getAttribute('src') !== 'about:blank') f.src = 'about:blank'; });
-      }, { rootMargin: '100% 0px' }).observe(el);
+      // tournent pas en fond pendant qu'on lit le reste de la page. Seuls les cadres affichés se chargent (au téléphone :
+      // le mobile ; au bureau, sans le mobile pour un onglet `mobile: false`).
+      const shown = (f) => f.offsetParent !== null;
+      const blank = (f) => { if (f.getAttribute('src') && f.getAttribute('src') !== 'about:blank') f.src = 'about:blank'; };
+      let near = false;
+      const sync = () => [desk, mob].forEach((f) => {
+        if (near && shown(f)) { if (f.getAttribute('src') !== f.dataset.src) f.src = f.dataset.src; } else blank(f);
+      });
+      new IntersectionObserver(([e]) => { near = e.isIntersecting; sync(); }, { rootMargin: '100% 0px' }).observe(el);
+      fit();
+      const ro = new ResizeObserver(() => { fit(); sync(); }); ro.observe(view); ro.observe(pview);
       $$('[data-live]', el).forEach((t) => t.addEventListener('click', () => {
         const it = b.items[+t.dataset.live];
         $$('[data-live]', el).forEach((x) => x.setAttribute('aria-selected', String(x === t)));
         $('.browser-url', el).textContent = tx(it.url);
-        [desk, mob].forEach((f) => { f.dataset.src = asset(it.src); f.src = asset(it.src); });
+        $('.live-hint', el).textContent = liveHint(it, b);
+        $('.live-stage', el).classList.toggle('is-solo', it.mobile === false);
+        [desk, mob].forEach((f) => { f.dataset.src = asset(it.src); });
+        sync();
       }));
       spawn([$('.live-stage', el)], el, { y: 60 });
     },
@@ -190,7 +227,7 @@ export const BLOCKS = {
 
   features: {
     render(b, p, n) {
-      return `${head('b.features', n)}
+      return `${head(b.title || 'b.features', n)}
         <div class="bento ft-bento">${b.items.map((f) => `
           <article class="b-tile ft ft-${f.size || 's'}">
             <div class="ft-img"${f.model ? ` data-model="${asset(f.model)}"` : ''}>${img(f.img, { alt: '', style: `object-fit:${f.fit || 'cover'};object-position:${f.pos || 'top'}` })}</div>

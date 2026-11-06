@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Catalogue Maisons du Monde</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=DM+Sans:opsz,wght@9..40,400..600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1f1b16; --ink-2:#6b6157; --cream:#f7f2ea; --paper:#fffdf9; --line:#e6ddd0;
+  --accent:#b4613b; --night:#1b1713;
+  --serif:'Bodoni Moda', Georgia, serif; --sans:'DM Sans', system-ui, sans-serif;
+  --ease:cubic-bezier(.65,.02,.25,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--night);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit}
+.bodoni{font-family:var(--serif);-webkit-text-stroke:.5px currentColor}
+
+/* ---------- Vue (façade ou pièce) ---------- */
+#viewport{position:fixed;inset:0;overflow:hidden}
+#viewport.pan{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#viewport.pan::-webkit-scrollbar{display:none}
+#stage{position:absolute;left:0;top:0;transform-origin:50% 50%;will-change:transform}
+#stage>img.bg{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none}
+#stage.out{transition:transform .75s var(--ease),opacity .6s ease .15s,filter .6s ease;transform:scale(1.9);opacity:0;filter:blur(6px)}
+#stage.back-out{transition:transform .6s var(--ease),opacity .5s ease;transform:scale(.9);opacity:0}
+#stage.in{transform:scale(1.12);opacity:0}
+#stage.settle{transition:transform .9s var(--ease),opacity .6s ease}
+
+/* Ouvertures de la façade : la pièce derrière la vitre */
+.opening{position:absolute;overflow:hidden;cursor:pointer}
+.opening .room{position:absolute;inset:-12%;background-size:cover;background-position:center;transition:transform .8s var(--ease),filter .8s ease;filter:brightness(.82) saturate(.9)}
+.opening:hover .room,.opening:focus-visible .room{transform:scale(1.08);filter:brightness(1.05)}
+.opening .glow{position:absolute;inset:0;box-shadow:inset 0 0 40px rgba(255,214,150,.0);transition:box-shadow .6s}
+.opening:hover .glow{box-shadow:inset 0 0 40px rgba(255,214,150,.45)}
+/* Battants : sous la façade PNG, le mur masque l'arrondi et les bords. Ils s'ouvrent vers l'intérieur. */
+.opening{perspective:var(--persp,1400px)}
+.leaf{position:absolute;top:-3%;height:106%;width:52%;background-size:100% 100%;backface-visibility:hidden;transition:transform 1.1s var(--ease),filter 1.1s ease;pointer-events:none}
+.leaf-l{left:-2%;width:50.1%;transform-origin:0 50%;background-image:var(--leaf-g)}
+.leaf-r{right:-2%;width:53.9%;transform-origin:100% 50%;background-image:var(--leaf-d)}
+.leaf-door{left:-3%;width:106%;transform-origin:0 50%;background-image:var(--door);transform:rotateY(10deg);filter:brightness(.97)}
+.opening:hover .leaf-l,.opening.open .leaf-l{transform:rotateY(80deg);filter:brightness(.62)}
+.opening:hover .leaf-r,.opening.open .leaf-r{transform:rotateY(-80deg);filter:brightness(.62)}
+.opening:hover .leaf-door,.opening.open .leaf-door{transform:rotateY(84deg);filter:brightness(.5)}
+.logo-mdm{position:absolute;left:50%;top:30.5%;width:16%;transform:translate(-50%,-50%);mix-blend-mode:multiply;opacity:.8;pointer-events:none;user-select:none}
+canvas.fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.op-label{position:absolute;transform:translate(-50%,0);white-space:nowrap;pointer-events:none;color:#fff;font-size:13px;letter-spacing:.02em;text-shadow:0 1px 8px rgba(0,0,0,.6);opacity:0;transition:opacity .3s, transform .3s}
+.op-label.on{opacity:1;transform:translate(-50%,-4px)}
+
+/* ---------- Pastilles ---------- */
+.dot{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;display:grid;place-items:center;z-index:2}
+.dot i{width:16px;height:16px;border-radius:50%;background:rgba(255,253,249,.95);box-shadow:0 0 0 1px rgba(31,27,22,.12),0 2px 10px rgba(0,0,0,.25);transition:transform .25s var(--ease),background .25s}
+.dot::before{content:"";position:absolute;width:16px;height:16px;border-radius:50%;border:1.5px solid rgba(255,253,249,.9);animation:pulse 2.4s ease-out infinite;animation-delay:var(--d,0s)}
+.dot:hover i,.dot:focus-visible i{transform:scale(1.35)}
+.dot.in-cart i{background:var(--accent);box-shadow:0 0 0 2px rgba(255,253,249,.95),0 2px 10px rgba(0,0,0,.25)}
+.dot.in-cart::before{border-color:rgba(180,97,59,.7)}
+@keyframes pulse{0%{transform:scale(1);opacity:.9}80%,100%{transform:scale(2.6);opacity:0}}
+body.no-dots .dot{opacity:0;pointer-events:none}
+.dot{transition:opacity .3s}
+
+/* Bulle au survol */
+#tip{position:fixed;z-index:20;pointer-events:none;display:flex;gap:10px;align-items:center;background:var(--paper);border-radius:10px;padding:6px 12px 6px 6px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;max-width:280px}
+#tip.on{opacity:1;transform:none}
+#tip img{width:44px;height:44px;border-radius:6px;object-fit:cover;background:var(--cream)}
+#tip b{display:block;font-weight:600;font-size:13px}
+#tip span{font-size:12px;color:var(--ink-2)}
+
+/* ---------- Flèches de déplacement ---------- */
+.nav{position:absolute;z-index:3;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px}
+.nav .ring{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:rgba(255,253,249,.18);border:1px solid rgba(255,253,249,.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:background .3s,transform .3s var(--ease)}
+.nav svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.6;filter:drop-shadow(0 1px 3px rgba(0,0,0,.35))}
+.nav:hover .ring{background:rgba(255,253,249,.4);transform:scale(1.08)}
+.nav span{color:#fff;font-size:13px;letter-spacing:.02em;text-shadow:0 1px 8px rgba(0,0,0,.7);white-space:nowrap}
+.nav .ring{animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-4px)}}
+.nav:hover .ring{animation:none}
+
+/* ---------- Interface fixe ---------- */
+header{position:fixed;z-index:10;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:18px 22px;pointer-events:none;color:#fff}
+header>*{pointer-events:auto}
+.brand{display:flex;align-items:baseline;gap:12px;text-shadow:0 1px 12px rgba(0,0,0,.45)}
+.brand .bodoni{font-size:26px;font-style:italic;font-weight:500;letter-spacing:-.01em}
+.brand .where{font-size:16px;font-weight:500}
+.tools{display:flex;gap:10px}
+.chip{height:42px;min-width:42px;padding:0 14px;border-radius:21px;display:flex;align-items:center;gap:8px;background:rgba(255,253,249,.92);color:var(--ink);box-shadow:0 4px 18px rgba(0,0,0,.18);font-size:14px;font-weight:500;transition:transform .2s}
+.chip:hover{transform:translateY(-1px)}
+.chip svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.6}
+.chip.icon{padding:0;justify-content:center}
+.count{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center}
+.count.bump{animation:bump .5s var(--ease)}
+@keyframes bump{40%{transform:scale(1.4)}}
+
+#back{position:fixed;z-index:10;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);height:42px;padding:0 18px 0 12px;border-radius:21px;display:flex;align-items:center;gap:8px;color:#fff;font-size:14px;background:rgba(27,23,19,.42);border:1px solid rgba(255,253,249,.35);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:opacity .4s,background .3s}
+#back:hover{background:rgba(27,23,19,.6)}
+#back svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:1.6}
+#back[hidden]{display:flex;opacity:0;pointer-events:none}
+
+#hint{position:fixed;z-index:9;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translateX(-50%);color:#fff;font-size:14px;text-shadow:0 1px 10px rgba(0,0,0,.6);transition:opacity .6s;pointer-events:none;white-space:nowrap}
+#hint.off{opacity:0}
+
+/* ---------- Panneaux (fiche produit, panier) ---------- */
+#scrim{position:fixed;inset:0;z-index:30;background:rgba(20,16,12,.35);opacity:0;pointer-events:none;transition:opacity .4s}
+#scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;z-index:31;top:0;right:0;bottom:0;width:min(440px,100vw);background:var(--paper);transform:translateX(102%);transition:transform .55s var(--ease);display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,.2)}
+.sheet.on{transform:none}
+.sheet .close{position:absolute;top:14px;right:14px;z-index:2;width:40px;height:40px;border-radius:50%;background:rgba(255,253,249,.9);display:grid;place-items:center}
+.sheet .close svg{width:18px;height:18px;stroke:var(--ink);stroke-width:1.6;fill:none}
+.sheet .scroll{overflow-y:auto;flex:1;overscroll-behavior:contain}
+
+#fiche .visuel{aspect-ratio:1/1;background:#f3eee6;display:grid;place-items:center;overflow:hidden}
+#fiche .visuel img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+#fiche .corps{padding:24px 28px 28px}
+#fiche .nom{font-size:34px;line-height:1.05;font-weight:500}
+#fiche .type{margin-top:8px;color:var(--ink-2);font-size:15px;line-height:1.45}
+#fiche .prix{margin-top:18px;font-size:22px;font-weight:600}
+.btn{width:100%;height:52px;border-radius:26px;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:600;font-size:15px;transition:background .25s,transform .15s}
+.btn:active{transform:scale(.98)}
+.btn-dark{background:var(--ink);color:var(--paper)}
+.btn-dark:hover{background:#3a332b}
+.btn-dark.done{background:var(--accent)}
+.btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
+#fiche .add{margin-top:22px}
+.ext{display:inline-flex;align-items:center;gap:6px;margin-top:16px;font-size:14px;color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px}
+.ext:hover{color:var(--ink)}
+.ext svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8}
+#fiche .piece{padding:22px 0 30px 28px;border-top:1px solid var(--line)}
+#fiche .piece h3{font-size:14px;font-weight:600;margin-bottom:12px}
+.rail{display:flex;gap:10px;overflow-x:auto;padding-right:28px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.rail button{flex:0 0 88px;text-align:left}
+.rail img{width:88px;height:88px;border-radius:8px;object-fit:cover;background:#f3eee6;display:block;border:2px solid transparent;transition:border-color .2s}
+.rail button.cur img{border-color:var(--ink)}
+.rail small{display:block;font-size:12px;margin-top:6px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+#panier .tete{padding:26px 28px 18px;border-bottom:1px solid var(--line)}
+#panier .tete h2{font-size:30px;font-weight:500}
+#panier .tete p{color:var(--ink-2);font-size:14px;margin-top:4px}
+.ligne{display:grid;grid-template-columns:72px 1fr auto;gap:14px;padding:16px 28px;border-bottom:1px solid var(--line);align-items:center}
+.ligne img{width:72px;height:72px;border-radius:8px;object-fit:cover;background:#f3eee6}
+.ligne b{font-weight:600;font-size:15px}
+.ligne .t{font-size:13px;color:var(--ink-2);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ligne .p{font-weight:600;font-size:15px;text-align:right}
+.qty{display:flex;align-items:center;gap:4px;margin-top:8px}
+.qty button{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:15px}
+.qty button:hover{border-color:var(--ink)}
+.qty span{min-width:22px;text-align:center;font-size:14px}
+.vide{padding:40px 28px;color:var(--ink-2);font-size:15px;line-height:1.5}
+#panier .pied{padding:20px 28px calc(24px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--paper)}
+.total{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px}
+.total span{font-size:15px}
+.total b{font-size:24px;font-weight:600}
+#envoi{margin-top:14px;font-size:13px;color:var(--ink-2);line-height:1.5}
+#envoi a{display:block;padding:6px 0;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line)}
+#envoi a:hover{color:var(--accent)}
+
+/* ---------- Mode édition (?edit) ---------- */
+body.edit .dot{cursor:grab}
+body.edit .dot i{background:#ffde59}
+#editbar{position:fixed;z-index:40;left:16px;bottom:16px;background:#fff;color:#111;border-radius:10px;padding:10px 12px;font:12px/1.4 ui-monospace,monospace;box-shadow:0 6px 24px rgba(0,0,0,.3);display:none;gap:8px;align-items:center}
+body.edit #editbar{display:flex}
+#editbar button{background:#111;color:#fff;border-radius:6px;padding:6px 10px}
+
+/* ---------- Mobile ---------- */
+@media (max-width:700px){
+  header{padding:14px 16px}
+  .brand{flex-direction:column;gap:0}
+  .brand .bodoni{font-size:22px}
+  .brand .where{font-size:15px}
+  .chip .lbl{display:none}
+  .sheet{top:auto;left:0;width:100%;height:auto;max-height:88svh;border-radius:18px 18px 0 0;transform:translateY(102%);box-shadow:0 -20px 60px rgba(0,0,0,.25)}
+  #fiche .visuel{aspect-ratio:4/3}
+  #fiche .corps{padding:20px 20px 22px}
+  #fiche .nom{font-size:30px}
+  #fiche .piece{padding-left:20px}
+  .ligne{padding:14px 20px}
+  #panier .tete{padding:22px 20px 14px}
+  #panier .pied{padding:16px 20px calc(18px + env(safe-area-inset-bottom))}
+  .nav .ring{width:48px;height:48px}
+}
+body.test *{transition:none!important}
+@media (prefers-reduced-motion:reduce){
+  .dot::before,.nav .ring{animation:none}
+}
+@media (min-width:700px){#fiche .visuel{aspect-ratio:auto;height:min(42vh,420px)}}</style>
+</head>
+<body>
+
+<div id="viewport"><div id="stage"></div></div>
+
+<header>
+  <div class="brand"><span class="where" id="where"></span></div>
+  <div class="tools">
+    <button class="chip icon" id="toggleDots" aria-label="Masquer les pastilles" title="Masquer les pastilles">
+      <svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+    </button>
+    <button class="chip" id="openCart" aria-label="Panier">
+      <svg viewBox="0 0 24 24"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+      <span class="lbl">Panier</span><span class="count" id="count">0</span>
+    </button>
+  </div>
+</header>
+
+<button id="back" hidden>
+  <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><span></span>
+</button>
+<div id="hint"></div>
+<div id="tip"><img alt=""><div><b></b><span></span></div></div>
+
+<div id="scrim"></div>
+
+<aside class="sheet" id="fiche" aria-label="Fiche produit">
+  <button class="close" data-close aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <div class="scroll">
+    <div class="visuel"><img alt=""></div>
+    <div class="corps">
+      <h2 class="nom bodoni"></h2>
+      <p class="type"></p>
+      <p class="prix"></p>
+      <button class="btn btn-dark add"></button>
+      <a class="ext" target="_blank" rel="noopener">Voir la fiche sur maisonsdumonde.fr <svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+    </div>
+    <div class="piece"><h3></h3><div class="rail"></div></div>
+  </div>
+</aside>
+
+<aside class="sheet" id="panier" aria-label="Panier">
+  <button class="close" data-close aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <div class="tete"><h2 class="bodoni">Panier</h2><p id="resume"></p></div>
+  <div class="scroll" id="lignes"></div>
+  <div class="pied" id="pied">
+    <div class="total"><span>Total</span><b id="total"></b></div>
+    <button class="btn btn-dark" id="commander">Commander chez Maisons du Monde</button>
+    <div id="envoi"></div>
+  </div>
+</aside>
+
+<div id="editbar"><span id="editinfo">Mode édition · glisse les pastilles</span><button id="copySpots">Copier</button></div>
+
+<script src="produits.js"></script>
+<script>
+/* =========================================================
+   CONFIG
+   ========================================================= */
+// Lien d'import panier côté MDM. Leur site garde le panier dans son propre stockage (MDM_CART_TOKEN)
+// et leur API refuse les appels venant d'un autre domaine : on ne peut pas remplir leur panier d'ici.
+// Dès que MDM expose une URL qui prend une liste de références, on la met ici et le bouton l'ouvre.
+// {items} est remplacé par "sku:quantité,sku:quantité"
+const MDM_IMPORT_URL = null; // ex. 'https://www.maisonsdumonde.com/FR/fr/cart/import?items={items}'
+
+/* =========================================================
+   SCÈNES · coordonnées en % de l'image
+   spots : [sku, x, y]   navs : [vers, x, y, libellé, sens]
+   ========================================================= */
+const SCENES = {
+  facade: {
+    titre: '', img: 'scenes/facade.webp', w: 1920, h: 1072, parent: null,
+    openings: [
+      ['entree',  47.09, 60.16, 6.10, 21.09, 'Entrer'],
+      ['sejour',  29.22, 56.64, 5.45, 16.80, 'Séjour'],
+      ['cuisine', 67.15, 57.03, 5.01, 16.80, 'Cuisine'],
+      ['chambre', 29.43, 26.17, 5.23, 16.80, 'Chambre'],
+      ['enfant',  67.15, 26.56, 5.01, 16.41, "Chambre d'enfant"],
+    ],
+  },
+  entree: {
+    titre: 'Entrée', dans: "l'entrée", img: 'scenes/entree.webp', w: 2752, h: 1536, parent: 'facade',
+    spots: [
+      ['240068', 49.9, 21.5], ['243562', 16.0, 37.5], ['234125', 21.4, 35.8], ['230201', 21.0, 72.0],
+      ['248249', 53.5, 52.0], ['250338', 50.0, 86.0], ['237900', 75.2, 66.2], ['236210', 78.7, 60.5],
+      ['254422', 79.0, 40.0],
+    ],
+    navs: [['sejour', 42.0, 53.0, 'Séjour'], ['cuisine', 71.3, 47.0, 'Cuisine'], ['palier', 62.0, 40.0, 'Étage', 'up']],
+  },
+  sejour: {
+    titre: 'Séjour', dans: 'le séjour', img: 'scenes/sejour.webp', w: 2752, h: 1536, parent: 'entree',
+    spots: [
+      ['242295', 28.0, 66.0], ['239172', 35.0, 84.0], ['229973', 76.0, 80.0], ['249384', 53.0, 74.0],
+      ['250338', 60.0, 89.0], ['240085', 66.5, 74.0], ['219737', 64.5, 63.0], ['232421', 68.0, 53.0],
+      ['165316', 33.6, 47.0], ['250369', 63.7, 43.0], ['231223', 24.5, 38.0],
+    ],
+    navs: [],
+  },
+  cuisine: {
+    titre: 'Cuisine', dans: 'la cuisine', img: 'scenes/cuisine.webp', w: 2752, h: 1536, parent: 'entree',
+    spots: [
+      ['229998', 30.7, 50.0], ['229948', 30.7, 70.0], ['199051', 49.0, 71.0], ['222455', 43.5, 82.0],
+      ['230985', 72.0, 74.0], ['253646', 64.5, 62.0], ['213853', 57.0, 33.0], ['231342', 58.0, 77.0],
+      ['253523', 54.5, 61.5], ['223214', 37.7, 88.5], ['238784', 11.5, 45.5],
+    ],
+    navs: [],
+  },
+  palier: {
+    titre: 'Palier', dans: 'le palier', img: 'scenes/palier.webp', w: 2752, h: 1536, parent: 'entree',
+    spots: [
+      ['147412', 72.0, 50.0], ['230201', 50.5, 62.0], ['237900', 34.5, 62.0], ['236210', 35.6, 53.0],
+      ['254322', 30.0, 76.0], ['254356', 70.0, 86.0], ['239915', 60.8, 44.0], ['240068', 50.0, 22.5],
+    ],
+    navs: [['chambre', 13.0, 55.0, 'Chambre'], ['enfant', 88.0, 55.0, "Chambre d'enfant"], ['entree', 54.0, 84.0, 'Entrée', 'down']],
+  },
+  chambre: {
+    titre: 'Chambre', dans: 'la chambre', img: 'scenes/chambre.webp', w: 2752, h: 1536, parent: 'palier',
+    spots: [
+      ['219736', 50.5, 55.0], ['235662', 44.0, 75.0], ['230980', 57.0, 78.0], ['253320', 38.3, 65.0],
+      ['236210', 62.3, 58.0], ['249987', 50.5, 41.0], ['229812', 72.2, 52.0], ['253258', 79.0, 70.0],
+      ['199529', 19.0, 91.0], ['240068', 55.0, 20.0], ['231223', 10.0, 40.0],
+    ],
+    navs: [['palier', 89.0, 55.0, 'Palier']],
+  },
+  enfant: {
+    titre: "Chambre d'enfant", dans: "la chambre d'enfant", img: 'scenes/enfant.webp', w: 2752, h: 1536, parent: 'palier',
+    spots: [
+      ['241726', 55.5, 47.0], ['235659', 59.0, 67.0], ['226183', 16.0, 52.0], ['241741', 38.5, 63.0],
+      ['182115', 74.5, 45.0], ['242671', 73.5, 70.0], ['162094', 72.5, 80.0], ['250338', 33.0, 84.0],
+      ['240068', 41.3, 22.0],
+    ],
+    navs: [['palier', 9.0, 50.0, 'Palier']],
+  },
+};
+
+/* =========================================================
+   OUTILS
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const euro = n => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+const img = sku => `produits/${sku}.webp`;
+const params = new URLSearchParams(location.search);
+const EDIT = params.has('edit');
+const TEST = params.has('test');
+const ARROWS = {
+  fwd:  '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  up:   '<path d="M12 19V5M6 11l6-6 6 6"/>',
+  down: '<path d="M12 5v14M6 13l6 6 6-6"/>',
+};
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+};
+
+/* =========================================================
+   PANIER
+   ========================================================= */
+let cart = store.get('catalogue-mdm-panier', {}); // { sku: quantité }
+Object.keys(cart).forEach(s => { if (!PRODUITS[s]) delete cart[s]; });
+
+function cartCount() { return Object.values(cart).reduce((a, b) => a + b, 0); }
+function cartTotal() { return Object.entries(cart).reduce((a, [s, q]) => a + PRODUITS[s].prix * q, 0); }
+function saveCart() {
+  store.set('catalogue-mdm-panier', cart);
+  $('#count').textContent = cartCount();
+  document.querySelectorAll('.dot').forEach(d => d.classList.toggle('in-cart', !!cart[d.dataset.sku]));
+  renderCart();
+}
+function addToCart(sku) {
+  cart[sku] = (cart[sku] || 0) + 1;
+  saveCart();
+  const c = $('#count'); c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump');
+}
+function setQty(sku, q) { if (q <= 0) delete cart[sku]; else cart[sku] = q; saveCart(); }
+
+function renderCart() {
+  const n = cartCount();
+  $('#resume').textContent = n ? `${n} article${n > 1 ? 's' : ''}` : '';
+  $('#total').textContent = euro(cartTotal());
+  $('#pied').style.display = n ? '' : 'none';
+  $('#envoi').innerHTML = '';
+  const box = $('#lignes');
+  if (!n) { box.innerHTML = '<p class="vide">Ton panier est vide. Clique sur les pastilles dans les pièces pour voir les meubles.</p>'; return; }
+  box.innerHTML = Object.entries(cart).map(([s, q]) => {
+    const p = PRODUITS[s];
+    return `<div class="ligne">
+      <img src="${img(s)}" alt="">
+      <div><b>${p.nom}</b><div class="t">${p.type}</div>
+        <div class="qty"><button data-q="${s}" data-d="-1" aria-label="Retirer un">−</button><span>${q}</span><button data-q="${s}" data-d="1" aria-label="Ajouter un">+</button></div></div>
+      <div class="p">${euro(p.prix * q)}</div></div>`;
+  }).join('');
+}
+$('#lignes').addEventListener('click', e => {
+  const b = e.target.closest('[data-q]'); if (!b) return;
+  setQty(b.dataset.q, (cart[b.dataset.q] || 0) + +b.dataset.d);
+});
+$('#commander').addEventListener('click', () => {
+  const items = Object.entries(cart).map(([s, q]) => `${s}:${q}`).join(',');
+  if (MDM_IMPORT_URL) { window.open(MDM_IMPORT_URL.replace('{items}', encodeURIComponent(items)), '_blank'); return; }
+  // Proto : pas encore de lien d'import MDM, on donne les fiches
+  $('#envoi').innerHTML = '<p>Le lien qui remplit directement le panier MDM n\'est pas encore branché. Tes fiches :</p>' +
+    Object.keys(cart).map(s => `<a href="${PRODUITS[s].url}" target="_blank" rel="noopener">${PRODUITS[s].nom} · ${PRODUITS[s].type} ↗</a>`).join('');
+});
+
+/* =========================================================
+   FICHE PRODUIT
+   ========================================================= */
+let ficheSku = null;
+function openFiche(sku) {
+  const p = PRODUITS[sku]; if (!p) return;
+  ficheSku = sku;
+  const f = $('#fiche');
+  f.querySelector('.visuel img').src = img(sku);
+  f.querySelector('.visuel img').alt = `${p.nom}, ${p.type}`;
+  f.querySelector('.nom').textContent = p.nom;
+  f.querySelector('.type').textContent = p.type;
+  f.querySelector('.prix').textContent = euro(p.prix);
+  f.querySelector('.ext').href = p.url;
+  updateAddBtn();
+  const sc = SCENES[current];
+  const autres = [...new Set((sc.spots || []).map(s => s[0]))];
+  f.querySelector('.piece h3').textContent = 'Dans ' + sc.dans;
+  f.querySelector('.rail').innerHTML = autres.map(s =>
+    `<button data-sku="${s}" class="${s === sku ? 'cur' : ''}"><img src="${img(s)}" alt=""><small>${PRODUITS[s].nom}</small></button>`).join('');
+  f.querySelector('.scroll').scrollTop = 0;
+  openSheet('fiche');
+}
+function updateAddBtn() {
+  const b = $('#fiche .add'); const q = cart[ficheSku] || 0;
+  b.classList.toggle('done', q > 0);
+  b.innerHTML = q
+    ? `<svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg> Dans ton panier${q > 1 ? ' (' + q + ')' : ''} · ajouter encore`
+    : 'Ajouter au panier';
+}
+$('#fiche .add').addEventListener('click', () => { addToCart(ficheSku); updateAddBtn(); });
+$('#fiche .rail').addEventListener('click', e => { const b = e.target.closest('[data-sku]'); if (b) openFiche(b.dataset.sku); });
+
+/* Panneaux */
+function openSheet(id) {
+  document.querySelectorAll('.sheet').forEach(s => s.classList.toggle('on', s.id === id));
+  $('#scrim').classList.add('on'); hideTip();
+}
+function closeSheets() { document.querySelectorAll('.sheet').forEach(s => s.classList.remove('on')); $('#scrim').classList.remove('on'); }
+$('#scrim').addEventListener('click', closeSheets);
+document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeSheets));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheets(); });
+$('#openCart').addEventListener('click', () => { renderCart(); openSheet('panier'); });
+$('#toggleDots').addEventListener('click', () => {
+  const off = document.body.classList.toggle('no-dots');
+  $('#toggleDots').setAttribute('aria-label', off ? 'Afficher les pastilles' : 'Masquer les pastilles');
+  $('#toggleDots').title = off ? 'Afficher les pastilles' : 'Masquer les pastilles';
+});
+
+/* Bulle au survol */
+const tip = $('#tip');
+function showTip(sku, el) {
+  if (matchMedia('(hover:none)').matches) return;
+  const p = PRODUITS[sku]; const r = el.getBoundingClientRect();
+  tip.querySelector('img').src = img(sku);
+  tip.querySelector('b').textContent = p.nom;
+  tip.querySelector('span').textContent = euro(p.prix);
+  tip.classList.add('on');
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  let x = r.left + r.width / 2 + 18, y = r.top + r.height / 2 - th / 2;
+  if (x + tw > innerWidth - 12) x = r.left + r.width / 2 - 18 - tw;
+  tip.style.left = x + 'px'; tip.style.top = Math.max(70, Math.min(innerHeight - th - 12, y)) + 'px';
+}
+function hideTip() { tip.classList.remove('on'); }
+
+/* =========================================================
+   RENDU D'UNE SCÈNE
+   ========================================================= */
+const viewport = $('#viewport'), stage = $('#stage');
+let current = null;
+let pan = false;                     // mobile : on glisse l'image au doigt
+let mouse = { x: 0, y: 0 }, cam = { x: 0, y: 0 };
+
+function render(id) {
+  const sc = SCENES[id]; current = id;
+  stage.innerHTML = '';
+  if (sc.openings) {
+    sc.openings.forEach(([to, l, t, w, h, label]) => {
+      const o = document.createElement('button');
+      o.className = 'opening'; o.setAttribute('aria-label', label);
+      Object.assign(o.style, { left: l + '%', top: t + '%', width: w + '%', height: h + '%' });
+      const target = SCENES[to];
+      const leaves = to === 'entree' ? '<div class="leaf leaf-door"></div>' : '<div class="leaf leaf-l"></div><div class="leaf leaf-r"></div>';
+      o.innerHTML = `<div class="room" style="background-image:url('${target.img}')"></div><div class="glow"></div>${leaves}`;
+      const lab = document.createElement('div');
+      lab.className = 'op-label'; lab.textContent = label;
+      Object.assign(lab.style, { left: (l + w / 2) + '%', top: (t + h + 1.2) + '%' });
+      o.addEventListener('mouseenter', () => lab.classList.add('on'));
+      o.addEventListener('mouseleave', () => lab.classList.remove('on'));
+      o.addEventListener('click', () => {
+        // tactile : pas de survol, on ouvre d'abord puis on plonge
+        if (!o.classList.contains('open') && matchMedia('(hover:none)').matches) {
+          o.classList.add('open'); lab.classList.add('on');
+          setTimeout(() => go(to, l + w / 2, t + h / 2), 650); return;
+        }
+        go(to, l + w / 2, t + h / 2);
+      });
+      stage.append(o, lab);
+    });
+  }
+  const bg = new Image(); bg.className = 'bg'; bg.src = sc.img; bg.alt = sc.titre || 'Façade de la maison';
+  stage.append(bg);
+  if (id === 'facade') { const lg = new Image(); lg.className = 'logo-mdm'; lg.src = 'scenes/logo-mdm.svg'; lg.alt = 'Maisons du Monde'; stage.append(lg); }
+  FX.mount(id);
+  if (sc.openings) stage.append(...stage.querySelectorAll('.op-label')); // libellés au-dessus de la façade
+
+  (sc.spots || []).forEach(([sku, x, y], i) => {
+    if (!PRODUITS[sku]) return;
+    const d = document.createElement('button');
+    d.className = 'dot' + (cart[sku] ? ' in-cart' : ''); d.dataset.sku = sku;
+    d.style.left = x + '%'; d.style.top = y + '%'; d.style.setProperty('--d', (i * 0.27 % 2.4) + 's');
+    d.setAttribute('aria-label', `${PRODUITS[sku].nom}, ${euro(PRODUITS[sku].prix)}`);
+    d.innerHTML = '<i></i>';
+    d.addEventListener('mouseenter', () => showTip(sku, d));
+    d.addEventListener('mouseleave', hideTip);
+    d.addEventListener('click', e => { if (EDIT && d._moved) return; openFiche(sku); });
+    stage.append(d);
+  });
+  (sc.navs || []).forEach(([to, x, y, label, sens]) => {
+    const n = document.createElement('button');
+    n.className = 'nav'; n.style.left = x + '%'; n.style.top = y + '%';
+    n.innerHTML = `<div class="ring"><svg viewBox="0 0 24 24">${ARROWS[sens || 'fwd']}</svg></div><span>${label}</span>`;
+    n.addEventListener('click', () => { if (EDIT && n._moved) return; go(to, x, y); });
+    stage.append(n);
+  });
+
+  $('#where').textContent = sc.titre || '';
+  const back = $('#back');
+  if (sc.parent) {
+    back.hidden = false;
+    back.querySelector('span').textContent = sc.parent === 'facade' ? 'Sortir' : SCENES[sc.parent].titre;
+  } else back.hidden = true;
+
+  const hint = $('#hint');
+  if (id === 'facade') { hint.textContent = 'Entre par la porte ou par une fenêtre'; hint.classList.remove('off'); }
+  else if (!store.get('catalogue-mdm-vu', false)) {
+    hint.textContent = 'Clique sur les pastilles pour voir les meubles'; hint.classList.remove('off');
+    store.set('catalogue-mdm-vu', true);
+    setTimeout(() => hint.classList.add('off'), 4500);
+  } else hint.classList.add('off');
+
+  history.replaceState(null, '', location.pathname + location.search + (id === 'facade' ? '' : '#' + id));
+  if (EDIT) $('#editinfo').textContent = `Mode édition · ${id} · glisse les pastilles`;
+  layout(true);
+}
+
+/* Cadrage : l'image couvre l'écran, un peu plus grande pour le parallax.
+   Sur mobile (écran plus étroit que l'image) : hauteur plein écran + glisser au doigt. */
+const OVERSCAN = 1.06;
+function layout(recentre) {
+  const sc = SCENES[current]; if (!sc) return;
+  const vw = innerWidth, vh = innerHeight, R = sc.w / sc.h;
+  pan = (params.has('mobile') || matchMedia('(pointer:coarse)').matches) && vw / vh < R * 0.9;
+  viewport.classList.toggle('pan', pan);
+  let w, h;
+  if (pan) {
+    h = vh; w = h * R;
+    stage.style.width = w + 'px'; stage.style.height = h + 'px';
+    stage.style.left = '0px'; stage.style.top = '0px';
+    if (recentre) {
+      // façade : on centre sur la porte ; pièce : on centre l'image
+      const cx = current === 'facade' ? 0.5 : 0.5;
+      viewport.scrollLeft = w * cx - vw / 2;
+    }
+  } else {
+    w = Math.max(vw, vh * R) * OVERSCAN; h = w / R;
+    stage.style.width = w + 'px'; stage.style.height = h + 'px';
+    placeStage();
+  }
+  stage.style.setProperty('--persp', (w * 0.7) + 'px');
+  FX.resize();
+}
+function placeStage() {
+  if (pan) return;
+  const w = stage.offsetWidth, h = stage.offsetHeight;
+  const ex = (w - innerWidth) / 2, ey = (h - innerHeight) / 2;
+  stage.style.left = (-ex - cam.x * ex) + 'px';
+  stage.style.top = (-ey - cam.y * ey) + 'px';
+}
+addEventListener('resize', () => layout(true));
+addEventListener('mousemove', e => {
+  mouse.x = (e.clientX / innerWidth) * 2 - 1;
+  mouse.y = (e.clientY / innerHeight) * 2 - 1;
+});
+(function loop() {
+  if (!pan && !EDIT) {
+    cam.x += (mouse.x - cam.x) * 0.06; cam.y += (mouse.y - cam.y) * 0.06;
+    placeStage();
+  }
+  requestAnimationFrame(loop);
+})();
+
+/* =========================================================
+   NAVIGATION · zoom vers la porte puis fondu dans la pièce
+   ========================================================= */
+let busy = false;
+function go(to, x, y, backward) {
+  if (busy || to === current) return;
+  closeSheets(); hideTip();
+  if (TEST) { render(to); return; }
+  busy = true;
+  stage.style.transformOrigin = backward ? '50% 50%' : `${x}% ${y}%`;
+  stage.classList.add(backward ? 'back-out' : 'out');
+  const pre = new Image(); pre.src = SCENES[to].img;
+  setTimeout(() => {
+    stage.classList.remove('out', 'back-out');
+    stage.style.transformOrigin = '50% 50%';
+    stage.classList.add('in');
+    const show = () => {
+      render(to);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        stage.classList.add('settle'); stage.classList.remove('in');
+        setTimeout(() => { stage.classList.remove('settle'); busy = false; }, 950);
+      }));
+    };
+    pre.complete ? show() : (pre.onload = pre.onerror = show);
+  }, backward ? 520 : 700);
+}
+$('#back').addEventListener('click', () => { const p = SCENES[current].parent; if (p) go(p, 50, 50, true); });
+
+/* =========================================================
+   MODE ÉDITION (?edit) · glisser les pastilles, copier les coords
+   ========================================================= */
+if (EDIT) {
+  document.body.classList.add('edit');
+  let drag = null;
+  stage.addEventListener('pointerdown', e => {
+    const el = e.target.closest('.dot,.nav'); if (!el) return;
+    drag = el; el._moved = false; el.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  stage.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const r = stage.getBoundingClientRect();
+    drag.style.left = ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%';
+    drag.style.top = ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%';
+    drag._moved = true;
+  });
+  stage.addEventListener('pointerup', () => {
+    if (!drag) return;
+    const sc = SCENES[current];
+    const x = +parseFloat(drag.style.left).toFixed(1), y = +parseFloat(drag.style.top).toFixed(1);
+    if (drag.classList.contains('dot')) {
+      const i = [...stage.querySelectorAll('.dot')].indexOf(drag);
+      sc.spots[i][1] = x; sc.spots[i][2] = y;
+    } else {
+      const i = [...stage.querySelectorAll('.nav')].indexOf(drag);
+      sc.navs[i][1] = x; sc.navs[i][2] = y;
+    }
+    setTimeout(() => { if (drag) drag._moved = false; drag = null; }, 0);
+  });
+  $('#copySpots').addEventListener('click', () => {
+    const sc = SCENES[current];
+    const txt = `spots: ${JSON.stringify(sc.spots || [])},\nnavs: ${JSON.stringify(sc.navs || [])},`;
+    navigator.clipboard?.writeText(txt); console.log(txt);
+    $('#editinfo').textContent = 'Copié · colle-le dans SCENES.' + current;
+  });
+}
+
+/* =========================================================
+   BATTANTS · découpes Gemini si présentes, sinon dessin provisoire
+   ========================================================= */
+const svgUrl = s => `url("data:image/svg+xml,${encodeURIComponent(s)}")`;
+function leafSvg(mirror) {
+  // un battant : cadre blanc cassé, 3 carreaux, poignée côté battement
+  const panes = [[10, 66], [71, 127], [132, 188]].map(([a, b]) =>
+    `<rect x="9" y="${a}" width="41" height="${b - a}" fill="url(#v)"/><rect x="9" y="${a}" width="41" height="${b - a}" fill="none" stroke="#bfb29b" stroke-width=".8"/>`).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 200" preserveAspectRatio="none">
+    <defs><linearGradient id="v" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".3"/><stop offset=".38" stop-color="#fff" stop-opacity=".03"/><stop offset=".62" stop-color="#fff" stop-opacity=".1"/><stop offset="1" stop-color="#d9e6ee" stop-opacity=".12"/></linearGradient>
+    <linearGradient id="f" x1="0" x2="1"><stop offset="0" stop-color="#f1eadc"/><stop offset="1" stop-color="#ddd3c1"/></linearGradient></defs>
+    <g ${mirror ? 'transform="translate(60 0) scale(-1 1)"' : ''}>
+    <path fill="url(#f)" fill-rule="evenodd" d="M0 0H60V200H0Z M9 10H50V66H9Z M9 71H50V127H9Z M9 132H50V188H9Z"/>
+    ${panes}<rect x="53" y="92" width="3" height="16" rx="1.5" fill="#2b2622"/></g></svg>`;
+}
+const doorSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 200" preserveAspectRatio="none">
+  <defs><linearGradient id="d" x1="0" x2="1"><stop offset="0" stop-color="#66727b"/><stop offset=".5" stop-color="#5c6871"/><stop offset="1" stop-color="#525d66"/></linearGradient></defs>
+  <rect width="100" height="200" fill="url(#d)"/>
+  ${[[12, 12, 34, 104], [54, 12, 34, 104], [12, 128, 34, 60], [54, 128, 34, 60]].map(([x, y, w, h]) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#55616a" stroke="#76838c" stroke-width="1.4"/><rect x="${x + 4}" y="${y + 4}" width="${w - 8}" height="${h - 8}" fill="none" stroke="#48535b" stroke-width="1"/>`).join('')}
+  <circle cx="88" cy="120" r="3" fill="#1f1c1a"/><rect x="86.5" y="128" width="3" height="6" rx="1" fill="#1f1c1a"/></svg>`;
+const rootStyle = document.documentElement.style;
+rootStyle.setProperty('--leaf-g', svgUrl(leafSvg(false)));
+rootStyle.setProperty('--leaf-d', svgUrl(leafSvg(true)));
+rootStyle.setProperty('--door', svgUrl(doorSvg));
+[['--leaf-g', 'scenes/battant-g.webp'], ['--leaf-d', 'scenes/battant-d.webp'], ['--door', 'scenes/porte.webp']].forEach(([v, src]) => {
+  const i = new Image(); i.onload = () => rootStyle.setProperty(v, `url("${src}")`); i.src = src;
+});
+
+/* =========================================================
+   AMBIANCE · soleil, poussières, insectes (coords en %)
+   ========================================================= */
+const FXCONF = {
+  facade:  { out: true, sun: [4, -6], motes: 60, insects: 8, zone: [4, 50, 96, 96] },
+  entree:  { beams: [[[0, 14], [6, 9], [62, 73], [28, 86]]], motes: 75 },
+  sejour:  { beams: [[[2, 22], [13, 24], [58, 82], [26, 92]], [[92, 28], [99, 24], [99, 90], [80, 95]]], motes: 80 },
+  cuisine: { beams: [[[84, 13], [96, 8], [72, 97], [40, 86]]], motes: 75 },
+  palier:  { beams: [[[46, 34], [55, 34], [62, 98], [37, 98]]], motes: 55 },
+  chambre: { beams: [[[13, 18], [22, 20], [72, 94], [30, 99]]], motes: 75 },
+  enfant:  { beams: [[[84, 12], [97, 9], [72, 99], [36, 86]]], motes: 75 },
+};
+const FX = (() => {
+  const calm = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  let cv = null, ctx, conf, motes = [], bugs = [], beamCv = null, W = 0, H = 0;
+  const R = Math.random;
+  const sprite = document.createElement('canvas'); sprite.width = sprite.height = 64;
+  { const s = sprite.getContext('2d'), g = s.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, 'rgba(255,246,222,1)'); g.addColorStop(.3, 'rgba(255,232,186,.6)'); g.addColorStop(1, 'rgba(255,222,165,0)');
+    s.fillStyle = g; s.fillRect(0, 0, 64, 64); }
+
+  function inPoly(x, y, p) {
+    let c = false;
+    for (let i = 0, j = p.length - 1; i < p.length; j = i++)
+      if ((p[i][1] > y) !== (p[j][1] > y) && x < (p[j][0] - p[i][0]) * (y - p[i][1]) / (p[j][1] - p[i][1]) + p[i][0]) c = !c;
+    return c;
+  }
+  const inBeam = (x, y) => conf.beams && conf.beams.some(p => inPoly(x, y, p));
+  function spot() {
+    if (conf.beams && R() < .8) {
+      const p = conf.beams[Math.floor(R() * conf.beams.length)];
+      const xs = p.map(q => q[0]), ys = p.map(q => q[1]);
+      for (let k = 0; k < 30; k++) {
+        const x = Math.min(...xs) + R() * (Math.max(...xs) - Math.min(...xs)), y = Math.min(...ys) + R() * (Math.max(...ys) - Math.min(...ys));
+        if (inPoly(x, y, p)) return [x, y];
+      }
+    }
+    return conf.out ? [R() * 100, R() * 85] : [R() * 100, R() * 100];
+  }
+  function mote() {
+    const [x, y] = spot(), big = R() < .1;
+    return { x, y, r: big ? 5 + R() * 8 : 1 + R() * 2, big, vx: conf.out ? .006 + R() * .01 : (R() - .5) * .006, vy: -(.002 + R() * .008), ph: R() * 6.3, a: 0 };
+  }
+  function mount(id) {
+    conf = FXCONF[id]; cv = null; beamCv = null;
+    if (!conf || calm) return;
+    cv = document.createElement('canvas'); cv.className = 'fx'; stage.append(cv);
+    ctx = cv.getContext('2d');
+    motes = Array.from({ length: conf.motes }, mote);
+    const z = conf.zone || [0, 0, 100, 100];
+    bugs = Array.from({ length: conf.insects || 0 }, () => {
+      const x = z[0] + R() * (z[2] - z[0]), y = z[1] + R() * (z[3] - z[1]);
+      return { x, y, vx: 0, vy: 0, tx: x, ty: y, tt: 0, ph: R() * 6.3 };
+    });
+  }
+  function resize() {
+    if (!cv) return;
+    W = stage.offsetWidth; H = stage.offsetHeight;
+    const dpr = Math.min(devicePixelRatio || 1, 1.5);
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (conf.beams) {
+      // rayons dessinés une fois en basse déf, floutés
+      beamCv = document.createElement('canvas'); beamCv.width = Math.ceil(W / 4); beamCv.height = Math.ceil(H / 4);
+      const b = beamCv.getContext('2d'), sx = beamCv.width / 100, sy = beamCv.height / 100;
+      b.filter = 'blur(9px)';
+      conf.beams.forEach(p => {
+        const g = b.createLinearGradient((p[0][0] + p[1][0]) / 2 * sx, (p[0][1] + p[1][1]) / 2 * sy, (p[2][0] + p[3][0]) / 2 * sx, (p[2][1] + p[3][1]) / 2 * sy);
+        g.addColorStop(0, 'rgba(255,228,176,.95)'); g.addColorStop(.55, 'rgba(255,222,165,.45)'); g.addColorStop(1, 'rgba(255,215,155,0)');
+        b.fillStyle = g; b.beginPath(); p.forEach(([x, y], i) => b[i ? 'lineTo' : 'moveTo'](x * sx, y * sy)); b.closePath(); b.fill();
+        // stries : quelques bandes plus claires dans le faisceau
+        const L = (a, c, t) => [a[0] + (c[0] - a[0]) * t, a[1] + (c[1] - a[1]) * t];
+        [[.08, .2], [.33, .41], [.55, .72], [.82, .88]].forEach(([t1, t2]) => {
+          const q = [L(p[0], p[1], t1), L(p[0], p[1], t2), L(p[3], p[2], t2), L(p[3], p[2], t1)];
+          b.fillStyle = g; b.globalAlpha = .55; b.beginPath(); q.forEach(([x, y], i) => b[i ? 'lineTo' : 'moveTo'](x * sx, y * sy)); b.closePath(); b.fill(); b.globalAlpha = 1;
+        });
+      });
+    }
+  }
+  let last = 0;
+  function frame(t) {
+    requestAnimationFrame(frame);
+    if (!cv || !cv.isConnected || document.hidden) { last = t; return; }
+    const dt = Math.min(3, (t - last) / 16.7 || 1); last = t;
+    const k = W / 1700;
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'screen';
+    if (beamCv) { ctx.globalAlpha = .6 + .1 * Math.sin(t / 2600); ctx.drawImage(beamCv, 0, 0, W, H); }
+    if (conf.out) {
+      const sx = conf.sun[0] / 100 * W, sy = conf.sun[1] / 100 * H;
+      const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, W * .6);
+      g.addColorStop(0, 'rgba(255,230,175,.75)'); g.addColorStop(.35, 'rgba(255,214,150,.24)'); g.addColorStop(1, 'rgba(255,210,140,0)');
+      ctx.globalAlpha = .85 + .15 * Math.sin(t / 3000); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    }
+    motes.forEach((m, i) => {
+      m.x += (m.vx + Math.sin(t / 1900 + m.ph) * .004) * dt;
+      m.y += (m.vy + Math.cos(t / 2300 + m.ph) * .003) * dt;
+      const lit = conf.out ? 1 - Math.min(1, Math.hypot(m.x - conf.sun[0], m.y - conf.sun[1]) / 130) * .6 : (inBeam(m.x, m.y) ? 1 : .1);
+      m.a += (lit - m.a) * .04;
+      if (m.x < -2 || m.x > 102 || m.y < -2 || m.y > 102 || (!conf.out && m.a < .12 && R() < .004)) motes[i] = Object.assign(mote(), { a: 0 });
+      const tw = .55 + .45 * Math.sin(t / 700 + m.ph * 3);
+      ctx.globalAlpha = Math.min(1, m.a * tw * (m.big ? .3 : 1.15));
+      const s = m.r * 2.6 * k * (m.big ? 1.6 : 1) + 1;
+      ctx.drawImage(sprite, m.x / 100 * W - s / 2, m.y / 100 * H - s / 2, s, s);
+    });
+    if (bugs.length) {
+      ctx.globalCompositeOperation = 'source-over';
+      const z = conf.zone;
+      bugs.forEach(b => {
+        if (t > b.tt) { b.tx = z[0] + R() * (z[2] - z[0]); b.ty = z[1] + R() * (z[3] - z[1]); b.tt = t + 700 + R() * 2600; }
+        b.vx = (b.vx + (b.tx - b.x) * .0016 + (R() - .5) * .05) * .93;
+        b.vy = (b.vy + (b.ty - b.y) * .0016 + (R() - .5) * .05) * .93;
+        b.x += b.vx * dt * .35; b.y += b.vy * dt * .35;
+        const x = b.x / 100 * W, y = b.y / 100 * H, r = 1.5 * k + .4;
+        ctx.globalAlpha = .3 + .3 * Math.abs(Math.sin(t / 14 + b.ph));
+        ctx.fillStyle = '#fff8e8';
+        ctx.beginPath(); ctx.ellipse(x - r * 1.1, y - r * .9, r * 1.3, r * .7, -.5, 0, 6.3); ctx.ellipse(x + r * 1.1, y - r * .9, r * 1.3, r * .7, .5, 0, 6.3); ctx.fill();
+        ctx.globalAlpha = .85; ctx.fillStyle = '#2b2219';
+        ctx.beginPath(); ctx.arc(x, y, r, 0, 6.3); ctx.fill();
+      });
+    }
+    ctx.globalAlpha = 1;
+  }
+  requestAnimationFrame(frame);
+  return { mount, resize };
+})();
+
+/* =========================================================
+   DÉMARRAGE (toujours en fin de script)
+   ========================================================= */
+Object.values(SCENES).forEach(s => { const i = new Image(); i.src = s.img; });
+saveCart();
+const start = location.hash.slice(1);
+render(SCENES[start] ? start : 'facade');
+if (TEST) document.body.classList.add('test');
+if (TEST && params.has('ouvert')) document.querySelectorAll('.opening').forEach(o => o.classList.add('open'));
+if (TEST && params.has('ajout')) { params.get('ajout').split(',').forEach(addToCart); }
+if (params.has('fiche')) openFiche(params.get('fiche'));
+if (params.has('panier')) openSheet('panier');
+</script>
+</body>
+</html>

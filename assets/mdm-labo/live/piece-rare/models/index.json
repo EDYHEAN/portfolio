@@ -1,0 +1,167 @@
+{
+ "sklum-canape-coco": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/sklum-canape-coco.blend"
+ },
+ "design-eames-lounge": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/design-eames-lounge.blend"
+ },
+ "mdm-249384": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/mdm-249384.blend"
+ },
+ "mdm-249987": {
+  "rot": 0,
+  "reel": true,
+  "blender": "procedural"
+ },
+ "ikea-lindbyn": {
+  "rot": 0,
+  "reel": true,
+  "blender": "procedural"
+ },
+ "habitat-miroir-neptune": {
+  "rot": 0,
+  "reel": true,
+  "blender": "procedural"
+ },
+ "design-ball-clock": {
+  "rot": 0,
+  "reel": true,
+  "blender": "procedural"
+ },
+ "design-hang-it-all": {
+  "rot": 0,
+  "reel": true,
+  "blender": "procedural"
+ },
+ "ikea-fado": {
+  "rot": 0,
+  "reel": true,
+  "blender": "procedural"
+ },
+ "design-ic-t1": {
+  "rot": 0,
+  "reel": true,
+  "blender": "procedural"
+ },
+ "laredoute-lampe-loulou": {
+  "rot": 0,
+  "reel": true,
+  "blender": "procedural"
+ },
+ "design-vase-aalto": {
+  "rot": 0,
+  "reel": true,
+  "blender": "procedural"
+ },
+ "sklum-chandelier-bellvion": {
+  "rot": 0,
+  "reel": true,
+  "blender": "procedural"
+ },
+ "ikea-lack": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "ikea-kallax": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "design-componibili": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "design-tulip": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "sklum-table-darwys": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "tikamoon-bout-de-canape-georges": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "sklum-buffet-michigan": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "mdm-199051": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "fermliving-podo": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "mdm-240085": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "laredoute-vase-izolia": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "ikea-gradvis": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "mdm-223563": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "kavehome-suspension-peralta": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "design-ph5": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "design-arco": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "design-akari": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "mdm-254422": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "mdm-214553": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ },
+ "mdm-250338": {
+  "rot": 0,
+  "reel": true,
+  "blender": "_atelier/blender/modeles-3d.blend (procédural)"
+ }
+}

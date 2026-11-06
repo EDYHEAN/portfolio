@@ -56,6 +56,17 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
   oscillation, se tourne vers le curseur, grossit au survol, parallaxe au scroll), rien hors écran, chargé à l'approche.
 - **Bloc live** (Rhinov Studio) : les vrais prototypes en iframe (`assets/rhinov-studio/live`), rendus à 1440 / 390 px puis réduits
   au cadre, onglets, chargés à l'approche et déchargés (about:blank) loin de l'écran ; au téléphone, le mobile seul.
+  Le cadre bureau tient entier sous le header (100svh − 200 px). Au chargement (`tameFrame`, blocks.js) : barres de
+  défilement masquées dans les cadres, et la molette passe à la page quand le prototype ne peut plus défiler (sans ça, un
+  prototype plein écran piégeait le scroll). Le curseur de la page s'efface au-dessus d'une iframe. Par onglet : `hint`,
+  `mobile: false` (pas de mobile au bureau, le navigateur prend toute la largeur ; seuls les cadres affichés se chargent).
+- **Maisons du Monde · Labo** (06/11) : trois prototypes en live (Pièce Rare, la Visite sans mobile, 24 h à la maison), puis un
+  bloc par prototype : la collection en 3D (meubles de Pièce Rare dans le bento `features` + feature3d.js, affiche = le
+  détourage de la carte), le diaporama des pièces de la Visite, le jour / la nuit de 24 h. Les deux copies de Pièce Rare
+  (bureau, mobile) ont chacune leur sauvegarde (clé localStorage selon la largeur, patchée par le script). `npm run labo` (`scripts/make-mdm-labo.mjs`) recopie les sources
+  (`sources/raw/vibecoded`) dans `assets/mdm-labo/live` en les allégeant (meubles .glb en Draco + textures ≤ 1024 px, scènes
+  et produits en WebP : 37 → 22 Mo) et refait `assets/mdm-labo/rooms`. Ne pas retoucher les copies : refaire depuis les sources.
+  Carte : la pièce de nuit de 24 h + une vraie carte Pièce Rare (rendue par le code du prototype, `sources/cards/mdm-labo`).
 - **Rassembler** les projets cohérents en un seul (ex. Rhinov Studio = landing retail + landing immo + app) plutôt que
   multiplier les cartes.
 - **Visuel de carte** (`card`, 3:5) : une image qui illustre le projet avec élégance et donne envie de cliquer sans tout

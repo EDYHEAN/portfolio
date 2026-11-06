@@ -262,6 +262,9 @@ function initCursor() {
     label.textContent = el ? t(el.dataset.cursorKey || 'cursor.view') : '';
   });
   document.addEventListener('pointerleave', () => c.classList.remove('is-on'));
+  // Dans une iframe (prototype live), la page ne reçoit plus les mouvements : le point restait figé au bord du cadre.
+  // Il s'efface, le prototype garde son propre curseur ; il revient au premier mouvement hors du cadre.
+  document.addEventListener('pointerover', (e) => { if (e.target.tagName === 'IFRAME') c.classList.remove('is-on'); });
 }
 
 function initMagnetic() {

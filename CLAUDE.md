@@ -49,6 +49,8 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
   multiplier les cartes.
 - **Visuel de carte** (`card`, 3:5) : une image qui illustre le projet avec élégance et donne envie de cliquer sans tout
   dévoiler. Jamais une capture de page d'accueil ou un écran pris au hasard (défaut actuel de MyFrenchTool et Vinyl Run).
+  Composés par `scripts/make-cards.mjs` (`npm run cards`, 900×1500) : MFT = le coq et des outils français en orbite,
+  Vinyl Run = le disque qui sort de sa pochette. Tout dans la bande centrale (y 300 à 1150) : les petites cases recadrent.
   Sur la carte, `logo.mark` (le symbole seul : coq MFT, Pokéball NookDex) et `markScale` pour équilibrer les poids.
 - **Outro** : un crâne de hyène 3D (`assets/3d/skull.glb`, 378 Ko : scan University of Dundee, CC BY 4.0, crédité en bas du
   contact ; brut dans `sources/raw/`, allégé et articulé dans `sources/hyena-skull.blend` : Skull + Jaw, origine = la
@@ -91,5 +93,8 @@ Tout vit dans `assets/brand/` :
 
 ## Matière pour les prochains projets
 
+Projets vibecodés de Johan (zip « Rhinov Studio », 06/11) dans `sources/raw/vibecoded/` (ignoré, 1,2 Go) : Booster « Pièce Rare »
+(cartes de meubles 3D en boosters), Catalogue Visite (la maison MDM pièce par pièce), Catalogue « 24 h à la maison » (le
+scroll fait tourner l'heure), et `Rhinov Studio/` (prototypes codés des landings retail et immo, app agents, landing).
 `assets/rhinov-ia/`, `assets/rhinov-rebrand/`, `assets/maisonsdumonde/` : visuels de la V1, à reprendre dans les projets
 Rhinov en préparation (Rhinov Studio, Système Rhinov, rhinov.fr 2026, iA Déco), avec les fichiers Figma de l'équipe Rhinov.

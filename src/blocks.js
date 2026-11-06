@@ -5,10 +5,11 @@ import { gsap, $, $$, t, tx, asset, spawn, revealTitle, countUp } from './core.j
 const img = (src, { cls = '', alt = '', eager = false, style = '' } = {}) =>
   `<img src="${asset(src)}" alt="${alt}" class="${cls}" ${eager ? '' : 'loading="lazy"'} decoding="async" ${style ? `style="${style}"` : ''}>`;
 
+// key : la clé i18n du titre générique, ou un texte {fr, en} propre au bloc (b.title).
 const head = (key, n, note) => `
   <header class="blk-head">
     <span class="mono blk-n">${String(n).padStart(2, '0')}</span>
-    <h2 class="blk-title">${t(key)}</h2>
+    <h2 class="blk-title">${typeof key === 'string' ? t(key) : tx(key)}</h2>
     ${note ? `<p class="blk-note">${tx(note)}</p>` : ''}
   </header>`;
 
@@ -107,7 +108,7 @@ export const BLOCKS = {
      size : full (toute la largeur) ou half (deux par ligne). Pour un outil dont l'image fait tout (NookDex). */
   showcase: {
     render(b, p, n) {
-      return `${head('b.features', n)}
+      return `${head(b.title || 'b.features', n)}
         <div class="shw">${b.items.map((f, i) => `
           <figure class="shw-item shw-${f.size || 'full'}">
             ${browser(f.video
@@ -181,7 +182,7 @@ export const BLOCKS = {
     render(b, p, n) {
       return `
         <div class="sl-pin">
-          ${head('b.slides', n)}
+          ${head(b.title || 'b.slides', n)}
           <div class="sl-track">${b.items.map((s) => `<figure class="slide">${img(s.src, { alt: tx(s.t), eager: true })}<figcaption class="mono">${tx(s.t)}</figcaption></figure>`).join('')}</div>
         </div>`;
     },

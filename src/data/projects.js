@@ -16,6 +16,85 @@ const T = (fr, en) => ({ fr, en });
 
 export const PROJECTS = [
   {
+    // Rhinov Studio (Johan, 06/11) : les deux landings (retail, immo) et l'app agents réunies en un projet.
+    // Sources : Figma « Studio Rhinov » (équipe Rhinov) et les prototypes codés (sources/raw/vibecoded/Rhinov Studio).
+    id: 'rhinov-studio',
+    card: 'rhinov-studio/card.webp', // le fauteuil du hero actuel, logo en ivoire (scripts/make-cards.mjs)
+    name: 'Rhinov Studio',
+    year: '2026',
+    theme: 'dark',
+    colors: { bg: '#3B2A20', fg: '#F4EDE2', accent: '#C9672A', line: 'rgba(244,237,226,.14)', tile: '#4A3629' },
+    logo: { src: 'rhinov-studio/logo.svg', invert: true },
+    shot: 'rhinov-studio/versions/v8.webp',
+    fonts: ['Poppins:wght@400;600', 'Bodoni+Moda:ital,wght@1,500'],
+    type: T('Product design · B2B', 'Product design · B2B'),
+    role: T('Lead UI/UX', 'Lead UI/UX'),
+    tagline: T('Des photos produit sans shooting, des annonces immo qui donnent envie.', 'Product photos without a shoot, property listings people want to click.'),
+    context: T(
+      "Rhinov Studio, c'est l'offre pro de Rhinov : mettre en scène les produits des marques de meubles sans shooting photo, et sublimer les annonces des agents immobiliers par la retouche et le home staging virtuel. J'ai conçu les deux landings, version après version au fil des retours, l'app des agents, et je les ai prototypées en code pour les tester en vrai.",
+      "Rhinov Studio is Rhinov's pro offer: staging furniture brands' products without a photo shoot, and lifting real estate listings with retouching and virtual home staging. I designed both landing pages, version after version as feedback came in, the agents' app, and prototyped them in code to test them for real.",
+    ),
+    blocks: [
+      {
+        type: 'identity',
+        note: T('Une marque fille de Rhinov : le cacao de la maison, une Bodoni en italique pour la promesse.', "A Rhinov sub-brand: the house's cocoa, an italic Bodoni for the promise."),
+        alt: { bg: '#F4EDE2', invert: false },
+        palette: [
+          { c: '#3B2A20', n: T('Cacao', 'Cocoa') },
+          { c: '#F4EDE2', n: T('Ivoire', 'Ivory') },
+          { c: '#8C6A55', n: T('Brun argile', 'Clay brown') },
+          { c: '#C9672A', n: T('Orange', 'Orange') },
+          { c: '#12151A', n: T('Noir riche', 'Rich black') },
+        ],
+        fonts: [
+          { family: 'Poppins', weight: 600, role: T('Interface & texte', 'Interface & text') },
+          { family: 'Bodoni Moda', italic: true, weight: 500, role: T('La promesse', 'The promise') },
+        ],
+      },
+      {
+        // L'itération : le hero de chaque version, de la V1 à aujourd'hui (archives Figma).
+        type: 'slides',
+        title: T('8 versions avant la bonne', '8 versions to get it right'),
+        items: [
+          { src: 'rhinov-studio/versions/v1.webp', t: T('V1 · la promesse seule', 'V1 · just the promise') },
+          { src: 'rhinov-studio/versions/v2.webp', t: T('V2 · la preuve par la galerie', 'V2 · proof by gallery') },
+          { src: 'rhinov-studio/versions/v3.webp', t: T("V3 · le produit dans son décor", 'V3 · the product in its setting') },
+          { src: 'rhinov-studio/versions/v4.webp', t: T('V4 · le gros plan matière', 'V4 · the material close-up') },
+          { src: 'rhinov-studio/versions/v5.webp', t: T('V5 · avant les retours du 30/09', 'V5 · before the 30/09 feedback') },
+          { src: 'rhinov-studio/versions/v6.webp', t: T('V6 · avant le hero vidéo', 'V6 · before the video hero') },
+          { src: 'rhinov-studio/versions/v7.webp', t: T("V7 · le produit seul, sur fond neutre", 'V7 · the product alone, neutral backdrop') },
+          { src: 'rhinov-studio/versions/v8.webp', t: T("V8 · aujourd'hui", 'V8 · today') },
+        ],
+      },
+      {
+        // Les prototypes codés, en pleine page (la retail défile, l'immo à côté, le mobile en surimpression).
+        type: 'pages',
+        pages: [
+          { src: 'rhinov-studio/pages/retail.webp', url: 'Rhinov Studio · retail', label: T('Landing retail', 'Retail landing') },
+          { src: 'rhinov-studio/pages/immo.webp', url: 'Rhinov Studio · immo', label: T('Landing immo', 'Real estate landing') },
+        ],
+        mobile: 'rhinov-studio/pages/m-retail.webp',
+      },
+      {
+        type: 'showcase',
+        title: T("L'app des agents", "The agents' app"),
+        items: [
+          { img: 'rhinov-studio/app/dashboard.webp', url: 'App agents · Mes biens', t: T('Mes biens', 'My listings'), d: T("Chaque bien, son statut et ses photos retouchées, en un coup d'œil.", 'Every listing, its status and its retouched photos, at a glance.') },
+          { img: 'rhinov-studio/app/ajout.webp', size: 'half', url: 'App agents · Ajouter un bien', t: T('Ajouter un bien', 'Add a listing'), d: T('Une adresse, des photos, la prestation : le studio prend le relais.', 'An address, some photos, the service: the studio takes it from there.') },
+          { img: 'rhinov-studio/app/suivi.webp', size: 'half', url: 'App agents · Connexion', t: T('La connexion', 'Sign in'), d: T("L'espace agent, aux couleurs de la marque.", "The agent's space, in the brand's colours.") },
+        ],
+      },
+      {
+        type: 'outcome',
+        stats: [
+          { v: 8, l: T('versions de la landing retail', 'retail landing versions') },
+          { v: 2, l: T('marchés : retail et immobilier', 'markets: retail and real estate') },
+          { v: 1, l: T('app pour les agents', 'app for the agents') },
+        ],
+      },
+    ],
+  },
+  {
     id: 'vinyl-run',
     card: 'vinyl-run/card.webp', // visuel de carte du booster (3:5, sujet centré)
     name: 'Vinyl Run',
@@ -250,11 +329,11 @@ export const PROJECTS = [
       },
       {
         type: 'outcome',
-        // À revérifier avant mise en ligne : le catalogue et le blog bougent chaque semaine.
+        // Trafic relevé dans le rapport hebdo MFT du 05/11/2026 (Search Console sur 28 jours, Bing Webmaster) ; catalogue à revérifier.
         stats: [
-          { v: 60, suffix: '+', l: T('outils SaaS français', 'French SaaS tools') },
-          { v: 50, suffix: '+', l: T('articles publiés', 'articles published') },
-          { v: 1, l: T('baromètre en open data', 'open data barometer') },
+          { v: 60, suffix: '+', l: T('outils SaaS français référencés', 'French SaaS tools listed') },
+          { v: 13146, l: T('impressions sur Google en 28 jours', 'Google impressions in 28 days'), sep: true },
+          { v: 169, l: T('pages indexées par Bing', 'pages indexed by Bing') },
         ],
       },
     ],

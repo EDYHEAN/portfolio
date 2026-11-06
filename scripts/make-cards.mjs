@@ -42,6 +42,20 @@ const CARDS = {
       ${tools.map(([f, x, y, r, s]) => `<div class="tool" style="left:${x}px;top:${y}px;width:${s}px;height:${s}px;transform:rotate(${r}deg)"><img src="${dataUri(path.join(dir, f))}"></div>`).join('')}
       ${GRAIN}`;
   },
+  // Rhinov Studio : le fauteuil en rotin du hero actuel (un rendu Studio, sans shooting), recadré sur lui, le logo en ivoire.
+  'rhinov-studio'() {
+    const photo = dataUri(path.join(ROOT, 'sources/cards/rhinov-studio/hero.webp'));
+    const logo = svgInline(path.join(ROOT, 'assets/rhinov-studio/logo.svg')).replace('<svg ', '<svg class="logo" ');
+    return `<style>${BASE}
+      body{background:#3B2A20}
+      .photo{position:absolute;inset:0;background:url(${photo}) 72% 55% / auto 118%}
+      .shade{position:absolute;inset:0;background:linear-gradient(rgba(59,42,32,.55), transparent 26% 70%, rgba(59,42,32,.6))}
+      .logo{position:absolute;left:50%;top:300px;width:300px;height:auto;transform:translateX(-50%)}
+      .logo path{fill:#F4EDE2}
+      </style>
+      <div class="photo"></div><div class="shade"></div>${logo}
+      ${GRAIN}`;
+  },
   // Vinyl Run : une vraie photo de la boutique (la fresque des platines Technics, sources/cards/vinyl-run), assombrie,
   // le logo du disquaire en blanc par-dessus (Johan, 06/11).
   'vinyl-run'() {

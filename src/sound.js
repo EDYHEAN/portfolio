@@ -83,6 +83,14 @@ const SOUNDS = {
     f.frequency.setValueAtTime(vary(3000), t); f.frequency.exponentialRampToValueAtTime(700, t + 0.07);
     env(g, t, 0.07, 0.003, 0.07); s.connect(f).connect(g).connect(master); s.start(t); s.stop(t + 0.1);
   },
+  // Rire de hyène (texte sélectionné sur la home) : sept « hi » aigus et nasillards qui montent puis retombent.
+  laugh(t) {
+    [980, 1120, 1240, 1300, 1220, 1080, 920].forEach((f, i) => {
+      const s = t + i * 0.085;
+      osc('triangle', vary(f), f * 0.72, 0.065, 0.05, s, 0.004);
+      osc('square', vary(f * 2), f * 1.4, 0.04, 0.008, s, 0.004);
+    });
+  },
   // Tournis (la hyène a trop tourné) : une vrille qui descend en tremblant, puis des petits oiseaux de dessin animé.
   dizzy(t) {
     const o = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), depth = ctx.createGain();

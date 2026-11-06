@@ -35,7 +35,9 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
 - À gauche, une colonne calée en haut (à hauteur de « Ton tirage ») : la hyène SVG (`logo.js` : chaque clic = un tour
   complet sans attente, le rendu change à chaque passage de profil ; 4 tours en 1,6 s = tournis 3,5 s : étoiles, yeux qui
   tournent, son `dizzy`), le nom sur 2 lignes aussi large que son encre (`.who-lock`), poste, phrase (mots-clés en `<em>`,
-  surligneur tracé à l'arrivée), boutons « Avec qui j'ai bossé » (logos en surimpression, sans ombre) et « Rouvrir un booster ».
+  surligneur tracé à l'arrivée), boutons « Avec qui j'ai bossé » (logos en surimpression, sans ombre) et « Ouvrir un booster ».
+- Le rire de la hyène (`bindLaugh`, home.js) : sélectionner du texte du bloc de gauche le change en « hihihi » (une fois la
+  sélection finie), sélection rouge sang, coulures sous les mots, son `laugh` ; tout revient à la désélection.
 - Footer : « Johan Trigeard © 1993 – 202+ », LinkedIn, Mail (adresse jamais en clair, morceaux inversés dans `CONTACT.mail`).
 
 ## Les pages projet
@@ -44,7 +46,10 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
   liste `blocks`). Blocs : `identity`, `pages` (captures pleine page dans un navigateur collant + mobile), `showcase` (les
   écrans en grand et entiers, `full` / `half`, vidéo possible : `video` + `pixel`), `screens`, `features` (bento),
   `stack` (services + automatisations), `slides` (horizontal), `outcome` (chiffres). Intro et « projet suivant » automatiques.
-  Captures : WebP, 1200 px de large (pleine page ≤ 12000 px de haut), dans `assets/{id}/`.
+  Captures : WebP, 1200 px de large (pleine page ≤ 12000 px de haut), dans `assets/{id}/`. `title: T(…)` remplace le titre
+  générique d'un bloc `slides` ou `showcase` (« 8 versions avant la bonne »).
+- Rhinov Studio (06/11) : landings retail + immo + app agents. Versions du hero et écrans de l'app rendus depuis Figma (fichier
+  « Studio Rhinov », équipe Rhinov), pleines pages capturées sur les prototypes codés (`sources/raw/vibecoded/Rhinov Studio`).
 - **Rassembler** les projets cohérents en un seul (ex. Rhinov Studio = landing retail + landing immo + app) plutôt que
   multiplier les cartes.
 - **Visuel de carte** (`card`, 3:5) : une image qui illustre le projet avec élégance et donne envie de cliquer sans tout

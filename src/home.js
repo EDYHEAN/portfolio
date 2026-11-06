@@ -236,9 +236,80 @@ async function showBooster(again = false) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Le rire de la hyène : sélectionner du texte du bloc de gauche le      */
+/* change en « hihihi », la sélection passe au rouge sang et le sang     */
+/* coule sous les mots (Johan, 06/11). Tout revient à la désélection.    */
+/* ------------------------------------------------------------------ */
+const LAUGH_ZONES = '.who-name, .who-role, .who-line';
+// Chaque lettre devient h ou i en alternance (majuscule gardée), espaces et ponctuation restent : la ligne ne saute pas.
+const laughify = (s) => { let k = 0; return s.replace(/\p{L}/gu, (ch) => { const c = k++ % 2 ? 'i' : 'h'; return ch === ch.toUpperCase() && ch !== ch.toLowerCase() ? c.toUpperCase() : c; }); };
+function bindLaugh() {
+  let spans = [], busy = false;
+  const restore = () => {
+    const parents = new Set();
+    spans.forEach((s) => { if (!s.isConnected) return; parents.add(s.parentNode); s.replaceWith(document.createTextNode(s.dataset.orig)); });
+    parents.forEach((p) => p.normalize());
+    spans = [];
+  };
+  const drips = (span) => {
+    const n = Math.max(1, Math.round(span.getBoundingClientRect().width / 46));
+    for (let i = 0; i < n; i++) {
+      const d = document.createElement('i');
+      d.className = 'drip'; d.setAttribute('aria-hidden', 'true');
+      d.style.cssText = `left:${(8 + Math.random() * 84).toFixed(1)}%;--h:${(10 + Math.random() * 34).toFixed(0)}px;--w:${(3 + Math.random() * 3).toFixed(1)}px;animation-delay:${(Math.random() * 0.35).toFixed(2)}s`;
+      span.append(d);
+    }
+  };
+  // On rit une fois la sélection finie (bouton relâché, ou une courte pause au clavier / au doigt) : pendant un glisser,
+  // la sélection grandit lettre à lettre et le rire ne prenait que les premières.
+  let down = false, timer;
+  addEventListener('pointerdown', () => { down = true; }, true);
+  addEventListener('pointerup', () => { down = false; clearTimeout(timer); timer = setTimeout(apply, 30); }, true);
+  document.addEventListener('selectionchange', () => {
+    if (busy) return;
+    const sel = getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) { if (spans.length) restore(); return; }
+    if (spans.length) { restore(); } // la sélection a bougé : on rend le texte, on rira sur la nouvelle
+    clearTimeout(timer);
+    if (!down) timer = setTimeout(apply, 260);
+  });
+  function apply() {
+    if (busy || spans.length) return;
+    const sel = getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) return;
+    const r = sel.getRangeAt(0);
+    const host = $('.who');
+    if (!host || !host.contains(r.commonAncestorContainer)) return;
+    const base = r.commonAncestorContainer.nodeType === 3 ? r.commonAncestorContainer.parentNode : r.commonAncestorContainer;
+    const walker = document.createTreeWalker(base, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) { const t = walker.currentNode; if (r.intersectsNode(t) && t.parentElement.closest(LAUGH_ZONES) && t.data.trim()) nodes.push(t); }
+    if (!nodes.length) return;
+    busy = true;
+    nodes.forEach((t) => {
+      const start = t === r.startContainer ? r.startOffset : 0, end = t === r.endContainer ? r.endOffset : t.length;
+      if (end <= start) return;
+      const mid = start > 0 ? t.splitText(start) : t;
+      if (end - start < mid.length) mid.splitText(end - start);
+      if (!mid.data.trim()) return;
+      const span = document.createElement('span');
+      span.className = 'laugh'; span.dataset.orig = mid.data; span.textContent = laughify(mid.data);
+      mid.replaceWith(span); spans.push(span); drips(span);
+    });
+    if (spans.length) {
+      const nr = document.createRange(); nr.setStartBefore(spans[0]); nr.setEndAfter(spans[spans.length - 1]);
+      sel.removeAllRanges(); sel.addRange(nr);
+      play('laugh');
+    }
+    requestAnimationFrame(() => { busy = false; });
+  }
+}
+
+/* ------------------------------------------------------------------ */
 boot();
 render();
 bindInteractions();
+bindLaugh();
 onLang(() => { render(); });
 
 const fromCurtain = curtainIn();

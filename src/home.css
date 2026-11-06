@@ -218,3 +218,13 @@ body[data-page='home'] .hdr-logo, body[data-page='home'] .hdr-nav { visibility: 
   .who-lock { --hy: min(clamp(120px, 22vh, 200px), 70cqi); }
   .who-line { margin-top: 12px; }
 }
+
+/* Le rire de la hyène (home.js, bindLaugh) : sélection rouge sang, mots changés en « hihihi », sang qui coule dessous. */
+.who ::selection { background: #A3121B; color: #F6EFE4; }
+.laugh { position: relative; color: #A3121B; }
+.laugh::selection { color: #F6EFE4; }
+.drip { position: absolute; top: 88%; width: var(--w, 4px); height: var(--h, 20px); background: #A3121B; border-radius: 0 0 99px 99px;
+  transform-origin: top; transform: scaleY(0); animation: drip 1.1s cubic-bezier(.5, 0, .7, 1) forwards; pointer-events: none; z-index: 1; }
+.drip::after { content: ''; position: absolute; left: 50%; bottom: -3px; width: calc(var(--w, 4px) * 1.9); aspect-ratio: 1; translate: -50% 0; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: inherit; }
+@keyframes drip { 60% { transform: scaleY(0.75); } to { transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) { .drip { animation: none; transform: none; } }

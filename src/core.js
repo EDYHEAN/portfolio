@@ -338,7 +338,6 @@ export function renderOutro({ jaws = true } = {}) {
         <span class="line"><span class="line-in">${t('contact.l1')}</span></span>
         <span class="line"><span class="line-in">${t('contact.l2')}</span></span>
       </h2>
-      <p class="contact-sub">${t('contact.sub')}</p>
       <div class="contact-ctas">
         <!-- TODO Johan : ajouter un mailto si tu veux un email public -->
         <a class="btn btn-primary" href="https://www.linkedin.com/in/hyrule-hero/" target="_blank" rel="noopener" data-magnetic data-sound data-cursor data-cursor-key="cursor.go"><span>${t('contact.li')}</span><span aria-hidden="true">↗</span></a>
@@ -368,7 +367,7 @@ export function outroMotion() {
   const st = { trigger: '.contact', start: jawed ? 'top 1%' : 'top 70%', toggleActions: 'play none none reverse' };
   gsap.from('.contact-title .line-in', { yPercent: 115, duration: 1, stagger: 0.1, ease: 'expo.out', scrollTrigger: st });
   gsap.from('.contact-hyena .hy', { yPercent: 30, rotation: 8, opacity: 0, duration: 1.2, ease: 'expo.out', scrollTrigger: st });
-  gsap.from(['.contact-sub', '.contact-ctas .btn'], { y: 30, opacity: 0, duration: 0.8, stagger: 0.07, ease: 'power3.out', scrollTrigger: jawed ? st : { ...st, trigger: '.contact-ctas', start: 'top 95%' } });
+  gsap.from('.contact-ctas .btn', { y: 30, opacity: 0, duration: 0.8, stagger: 0.07, ease: 'power3.out', scrollTrigger: jawed ? st : { ...st, trigger: '.contact-ctas', start: 'top 95%' } });
 }
 
 /* ------------------------------------------------------------------ */

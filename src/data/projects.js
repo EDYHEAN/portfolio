@@ -98,15 +98,15 @@ export const PROJECTS = [
         title: T('Trois prototypes, en vrai', 'Three prototypes, live'),
         items: [
           {
-            src: 'mdm-labo/live/piece-rare/index.html', url: T('Pièce Rare', 'Pièce Rare'), label: T('Pièce Rare', 'Pièce Rare'),
+            src: 'mdm-labo/live/piece-rare/index.html', url: T('Pièce Rare', 'Pièce Rare'), label: T('Pièce Rare', 'Pièce Rare'), sum: T('Les meubles en cartes à collectionner, et ta pièce en 3D.', 'Furniture as collectible cards, and your room in 3D.'),
             hint: T('Ouvre un booster, garde tes cartes, pose tes meubles dans ta pièce en 3D.', 'Open a pack, keep your cards, place your furniture in your 3D room.'),
           },
           {
-            src: 'mdm-labo/live/visite/index.html', url: T('Catalogue · la visite', 'Catalogue · the tour'), label: T('La visite', 'The tour'), mobile: false,
+            src: 'mdm-labo/live/visite/index.html', url: T('Catalogue · la visite', 'Catalogue · the tour'), label: T('La visite', 'The tour'), sum: T('La maison pièce par pièce : on achète ce qu’on voit.', 'The house room by room: buy what you see.'), mobile: false,
             hint: T('Entre par la porte ou par une fenêtre, puis passe de pièce en pièce.', 'Come in through the door or a window, then go from room to room.'),
           },
           {
-            src: 'mdm-labo/live/24h/index.html', url: T('Catalogue · 24 h à la maison', 'Catalogue · 24 hours at home'), label: T('24 h à la maison', '24 hours at home'),
+            src: 'mdm-labo/live/24h/index.html', url: T('Catalogue · 24 h à la maison', 'Catalogue · 24 hours at home'), label: T('24 h à la maison', '24 hours at home'), sum: T('Une pièce, une journée : chaque heure éclaire d’autres meubles.', 'One room, one day: every hour lights other pieces.'),
             hint: T("Scrolle dans le cadre : l'heure tourne, la lumière suit.", 'Scroll inside the frame: the hours turn, the light follows.'),
           },
         ],

@@ -82,10 +82,9 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .has-signs .b-font { grid-column: span 3; }
 
 /* --- Pages : navigateur collant, la page défile dedans ----------- */
-.pg { position: relative; height: calc(var(--n) * 190vh + 60vh); } /* défilement plus lent (Johan, 06/11 : trop rapide) */
+.pg { position: relative; } /* plus d'épinglage : la capture défile dans son cadre (Johan, 07/11) */
 .pg-sticky {
-  position: sticky; top: 0; height: 100vh;
-  padding: 86px 0 5vh;
+  position: relative; height: clamp(520px, calc(100svh - 140px), 980px);
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(200px, 0.28fr); gap: 3vw; align-items: stretch;
 }
 .pg-main { min-height: 0; display: flex; }
@@ -99,11 +98,16 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .browser-bar i { width: 10px; height: 10px; border-radius: 50%; background: currentColor; opacity: 0.25; }
 .browser-url { margin-left: 12px; opacity: 0.6; text-transform: none; letter-spacing: 0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .browser-view { position: relative; flex: 1; min-height: 0; overflow: hidden; }
-.pg-shot { position: absolute; top: 0; left: 0; width: 100%; height: auto; }
+.pg .browser-view, .pg .phone-view { overflow-y: auto; scrollbar-width: none; }
+.pg .browser-view::-webkit-scrollbar, .pg .phone-view::-webkit-scrollbar { display: none; }
+.pg-shot { display: none; width: 100%; height: auto; }
+.pg-shot.is-on { display: block; }
 .pg-side { display: flex; flex-direction: column; gap: 28px; min-height: 0; }
 .pg-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
-.pg-list li { display: flex; gap: 12px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--s-line); font-weight: 700; font-size: clamp(18px, 1.5vw, 24px); opacity: 0.35; transition: opacity 0.4s; }
-.pg-list li.is-on { opacity: 1; }
+.pg-list button { display: flex; gap: 12px; align-items: baseline; width: 100%; padding: 10px 0; border: 0; border-bottom: 1px solid var(--s-line); background: none; color: inherit; font: inherit; font-weight: 700; font-size: clamp(18px, 1.5vw, 24px); text-align: left; cursor: pointer; opacity: 0.35; transition: opacity 0.4s; }
+.pg-list button:hover { opacity: 0.7; }
+.pg-list button.is-on { opacity: 1; }
+.pg-hint { margin: 0; font-size: 11px; opacity: 0.55; }
 .pg-list .mono { font-weight: 400; }
 .phone {
   flex: 1; min-height: 0; max-height: 62vh; aspect-ratio: 9 / 19.5; align-self: flex-start;
@@ -111,7 +115,7 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
 }
 .phone-view { position: relative; width: 100%; height: 100%; border-radius: 23px; overflow: hidden; background: #000; }
-.pg-phone-shot { position: absolute; top: 0; left: 0; width: 100%; height: auto; }
+.pg-phone-shot { display: block; width: 100%; height: auto; }
 
 /* --- Écrans fixes -------------------------------------------------- */
 /* Vitrine : une image entière par cadre (le ratio de la capture), la légende dessous sur une ligne. */
@@ -124,11 +128,22 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .shw-third .shw-cap p { grid-column: 1 / -1; }
 /* Live : le cadre bien aéré sur un fond teinté, le mobile qui déborde un peu à droite. */
 .live { padding: clamp(20px, 2.6vw, 40px); border-radius: 28px; background: var(--p-tile); }
-.live-tabs { display: flex; gap: 8px; margin-bottom: 22px; }
-.live-tabs button { padding: 9px 18px; border-radius: 999px; border: 1px solid var(--s-line); font-family: var(--f-mono); font-size: 12px;
-  letter-spacing: 0.06em; text-transform: uppercase; transition: background 0.25s, color 0.25s, border-color 0.25s; }
-.live-tabs button:hover { border-color: var(--s-fg); }
-.live-tabs button[aria-selected='true'] { background: var(--s-fg); color: var(--s-bg); border-color: var(--s-fg); }
+.live-tabs { display: grid; grid-template-columns: repeat(var(--k), minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+.live-tab { display: grid; gap: 4px; align-content: start; padding: 14px 18px 16px; border-radius: 16px; border: 1px solid var(--s-line); background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
+  transition: background 0.25s, color 0.25s, border-color 0.25s, transform 0.25s; }
+.live-tab:hover { border-color: var(--s-fg); transform: translateY(-2px); }
+.live-tab b { font-size: clamp(17px, 1.4vw, 22px); font-weight: 750; letter-spacing: -0.015em; }
+.live-tab-n { font-size: 11px; opacity: 0.55; }
+.live-tab-s { font-size: 13px; line-height: 1.35; opacity: 0.7; }
+.live-tab[aria-selected='true'] { background: var(--s-fg); color: var(--s-bg); border-color: var(--s-fg); }
+.live-open { margin-left: auto; padding: 4px 10px; border: 1px solid var(--s-line); border-radius: 999px; color: inherit; font-size: 11px; text-decoration: none; white-space: nowrap; opacity: 0.75; transition: opacity 0.2s, border-color 0.2s; }
+.live-open:hover { opacity: 1; border-color: currentColor; }
+/* Le voile de chargement : levé quand le prototype tourne fluide (blocks.js). */
+.live-wait { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 14px; background: var(--p-tile); transition: opacity 0.5s, visibility 0.5s; }
+.live-wait .mono { font-size: 11px; opacity: 0.7; }
+.live-wait.is-ready { opacity: 0; visibility: hidden; pointer-events: none; }
+.live-spin { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--s-line); border-top-color: var(--s-fg); animation: live-spin 0.9s linear infinite; }
+@keyframes live-spin { to { transform: rotate(360deg); } }
 .live-stage { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) clamp(190px, 19vw, 290px); gap: clamp(20px, 2.6vw, 40px); align-items: end; }
 /* Le cadre tient entier sous le header : la hauteur de l'écran moins le header, les onglets et les marges (Johan : « qu'on voie plus »). */
 .live-desk { height: clamp(460px, calc(100svh - 200px), 980px); }
@@ -242,11 +257,13 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
   .b-palette { grid-row: span 2; }
   .has-signs .b-sign { grid-row: span 2; }
   .font-aa { font-size: calc(56px * var(--fs, 1)); }
-  .pg { height: calc(var(--n) * 90vh + 40vh); }
-  .pg-sticky { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); padding-top: 70px; }
+  .pg-sticky { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); height: 80svh; }
   .pg-side { order: -1; }
   .pg-list { grid-auto-flow: column; }
-  .pg-list li { font-size: 15px; padding: 6px 0; }
+  .pg-list button { font-size: 15px; padding: 6px 0; }
+  .live-tab { padding: 10px 12px; }
+  .live-tab b { font-size: 15px; }
+  .live-tab-s { display: none; }
   .phone { display: none; }
   .screens { grid-template-columns: minmax(0, 1fr); }
   .shw { grid-template-columns: minmax(0, 1fr); }

@@ -43,7 +43,7 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
 ## Les pages projet
 
 - **Ajouter un projet** : une entrée dans `src/data/projects.js` (couleurs, logo, `card`, `shot`, polices, textes `{fr,en}`,
-  liste `blocks`). Blocs : `identity`, `pages` (captures pleine page dans un navigateur collant + mobile), `showcase` (les
+  liste `blocks`). Blocs : `identity`, `pages` (captures pleine page dans un navigateur + mobile : la molette sur un cadre fait défiler la capture, ailleurs la page ; pages au clic, plus d'épinglage depuis le 07/11), `showcase` (les
   écrans en grand et entiers, `full` / `half`, vidéo possible : `video` + `pixel`), `screens`, `features` (bento),
   `stack` (services + automatisations), `slides` (horizontal), `outcome` (chiffres). Intro et « projet suivant » automatiques.
   Captures : WebP, 1200 px de large (pleine page ≤ 12000 px de haut), dans `assets/{id}/`. `title: T(…)` remplace le titre
@@ -60,6 +60,8 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
   défilement masquées dans les cadres, et la molette passe à la page quand le prototype ne peut plus défiler (sans ça, un
   prototype plein écran piégeait le scroll). Le curseur de la page s'efface au-dessus d'une iframe. Par onglet : `hint`,
   `mobile: false` (pas de mobile au bureau, le navigateur prend toute la largeur ; seuls les cadres affichés se chargent).
+  Onglets en cartes (numéro, nom, ligne `sum`), voile « chargement » levé quand le prototype tourne fluide (~24 images
+  < 34 ms, 6 s max), lien « Ouvrir dans un onglet » dans la barre du navigateur.
 - **Maisons du Monde · Labo** (06/11) : trois prototypes en live (Pièce Rare, la Visite sans mobile, 24 h à la maison), puis un
   bloc par prototype : la collection en 3D (meubles de Pièce Rare dans le bento `features` + feature3d.js, affiche = le
   détourage de la carte), le diaporama des pièces de la Visite, le jour / la nuit de 24 h. Les deux copies de Pièce Rare

@@ -76,61 +76,40 @@ export const BLOCKS = {
     motion(el) { spawn($$('.b-tile', el), $('.bento', el)); },
   },
 
-  /* Captures pleine page qui défilent dans un navigateur, la page reste à l'écran (sticky). */
+  /* Pages : les captures pleine page dans un navigateur (+ le mobile). Plus d'épinglage (Johan, 07/11 : devoir dérouler
+     toute la capture pour voir la suite était frustrant) : la molette sur un cadre fait défiler la capture dedans, partout
+     ailleurs elle fait défiler la page. On change de page au clic dans la liste. */
   pages: {
     render(b, p, n) {
-      const shots = b.pages.map((pg, i) => img(pg.src, { cls: 'pg-shot', eager: i === 0, alt: tx(pg.label) })).join('');
+      const shots = b.pages.map((pg, i) => img(pg.src, { cls: `pg-shot${i ? '' : ' is-on'}`, eager: i === 0, alt: tx(pg.label) })).join('');
       return `
         ${head('b.pages', n)}
-        <div class="pg" style="--n:${b.pages.length}">
+        <div class="pg">
           <div class="pg-sticky">
             <div class="pg-main">${browser(shots, b.pages[0].url)}</div>
             <aside class="pg-side">
-              <ol class="pg-list">${b.pages.map((pg, i) => `<li class="${i ? '' : 'is-on'}"><span class="mono">${String(i + 1).padStart(2, '0')}</span>${tx(pg.label)}</li>`).join('')}</ol>
-              ${b.mobile ? `<div class="phone"><div class="phone-view">${img(b.mobile, { cls: 'pg-phone-shot' })}</div></div>` : ''}
+              <ol class="pg-list">${b.pages.map((pg, i) => `<li><button type="button" class="${i ? '' : 'is-on'}" data-pg="${i}" data-sound><span class="mono">${String(i + 1).padStart(2, '0')}</span>${tx(pg.label)}</button></li>`).join('')}</ol>
+              ${b.mobile ? `<div class="phone"><div class="phone-view" data-lenis-prevent>${img(b.mobile, { cls: 'pg-phone-shot' })}</div></div>` : ''}
+              <p class="mono pg-hint">${tx({ fr: 'Scrolle dans le cadre pour parcourir la page.', en: 'Scroll inside the frame to browse the page.' })}</p>
             </aside>
           </div>
         </div>`;
     },
     motion(el, b) {
+      // Le cadre défile en natif (data-lenis-prevent : Lenis laisse la molette au cadre) ; arrivé au bout, la page reprend.
       const view = $('.browser-view', el);
+      view.setAttribute('data-lenis-prevent', '');
       const shots = $$('.pg-shot', el);
-      const items = $$('.pg-list li', el);
       const url = $('.browser-url', el);
-      const phone = $('.pg-phone-shot', el);
-      const phoneView = $('.phone-view', el);
-      const n = shots.length;
-      // La course du bloc suit la longueur des captures : chaque page reçoit autant de scroll que ce qu'elle a à faire défiler
-      // (une hauteur fixe par page faisait filer les pages très longues, comme l'accueil de Vinyl Run).
-      const pg = $('.pg', el);
-      const size = () => {
-        if (!view.clientHeight) return;
-        const runs = shots.map((s) => Math.max(innerHeight * 0.9, (s.offsetHeight - view.clientHeight) * 1.1));
-        pg.style.height = `${runs.reduce((a, b) => a + b, 0) + innerHeight}px`;
-      };
-      size();
-      shots.forEach((s) => { if (!s.complete) s.addEventListener('load', () => { size(); ScrollTrigger.refresh(); }, { once: true }); });
-      addEventListener('resize', size);
-      gsap.set(shots, { opacity: (i) => (i ? 0 : 1) });
-      let current = 0;
-      const setActive = (i) => {
-        if (i === current) return;
-        current = i;
-        items.forEach((li, j) => li.classList.toggle('is-on', j === i));
+      $$('[data-pg]', el).forEach((btn) => btn.addEventListener('click', () => {
+        const i = +btn.dataset.pg;
+        $$('[data-pg]', el).forEach((x) => x.classList.toggle('is-on', x === btn));
+        shots.forEach((s, j) => s.classList.toggle('is-on', j === i));
         url.textContent = b.pages[i].url;
-      };
-      const tl = gsap.timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: {
-          trigger: $('.pg', el), start: 'top top', end: 'bottom bottom', scrub: 0.6, invalidateOnRefresh: true,
-          onUpdate: (s) => setActive(Math.min(n - 1, Math.floor(s.progress * n))),
-        },
-      });
-      shots.forEach((s, i) => {
-        if (i) tl.to(shots[i - 1], { opacity: 0, duration: 0.06 }, i).to(s, { opacity: 1, duration: 0.06 }, i);
-        tl.fromTo(s, { y: 0 }, { y: () => -Math.max(0, s.offsetHeight - view.clientHeight), duration: 0.94 }, i + 0.03);
-      });
-      if (phone) tl.fromTo(phone, { y: 0 }, { y: () => -Math.max(0, phone.offsetHeight - phoneView.clientHeight), duration: n }, 0);
+        view.scrollTop = 0;
+        gsap.fromTo(shots[i], { opacity: 0 }, { opacity: 1, duration: 0.4 });
+      }));
+      spawn([$('.pg-sticky', el)], el, { y: 60 });
     },
   },
 
@@ -144,21 +123,30 @@ export const BLOCKS = {
   },
 
   /* Live : les vrais prototypes, dans un cadre navigateur (rendus en 1440 px puis réduits) et un mobile à côté.
-     Onglets s'il y en a plusieurs. Les iframes ne se chargent qu'en approchant du bloc. Au téléphone : le mobile seul.
+     Plusieurs prototypes : des onglets en cartes (numéro, nom, une ligne `sum`). Les iframes ne se chargent qu'en approchant
+     du bloc, derrière un voile « chargement » qui ne se lève que quand le prototype tourne fluide (pas de lag visible).
+     Lien « ouvrir dans un onglet ». Au téléphone : le mobile seul.
      item.mobile = false : pas de mobile au bureau, le navigateur prend toute la largeur (la Visite). */
   live: {
     render(b, p, n) {
-      const tabs = b.items.length > 1 ? `<div class="live-tabs" role="tablist">${b.items.map((it, i) => `<button type="button" role="tab" class="chip" aria-selected="${!i}" data-live="${i}" data-sound>${tx(it.label)}</button>`).join('')}</div>` : '';
+      const k = b.items.length;
+      const tabs = k > 1 ? `<div class="live-tabs" role="tablist" style="--k:${k}">${b.items.map((it, i) => `
+        <button type="button" role="tab" class="live-tab" aria-selected="${!i}" data-live="${i}" data-sound>
+          <span class="mono live-tab-n">${String(i + 1).padStart(2, '0')} / ${String(k).padStart(2, '0')}</span>
+          <b>${tx(it.label)}</b>${it.sum ? `<span class="live-tab-s">${tx(it.sum)}</span>` : ''}
+        </button>`).join('')}</div>` : '';
       const first = b.items[0];
+      const wait = `<div class="live-wait" aria-hidden="true"><span class="live-spin"></span><span class="mono">${tx({ fr: 'Chargement du prototype', en: 'Loading the prototype' })}</span></div>`;
       return `${head(b.title || 'b.pages', n)}
         <div class="live">
           ${tabs}
           <div class="live-stage${first.mobile === false ? ' is-solo' : ''}">
             <div class="browser live-desk">
-              <div class="browser-bar"><i></i><i></i><i></i><span class="browser-url mono">${tx(first.url)}</span></div>
-              <div class="browser-view"><iframe class="live-frame" data-src="${asset(first.src)}" title="${tx(first.label)}" loading="lazy"></iframe></div>
+              <div class="browser-bar"><i></i><i></i><i></i><span class="browser-url mono">${tx(first.url)}</span>
+                <a class="live-open mono" href="${asset(first.src)}" target="_blank" rel="noopener" data-sound>${tx({ fr: 'Ouvrir dans un onglet', en: 'Open in a new tab' })} <span aria-hidden="true">↗</span></a></div>
+              <div class="browser-view"><iframe class="live-frame" data-src="${asset(first.src)}" title="${tx(first.label)}" loading="lazy"></iframe>${wait}</div>
             </div>
-            <div class="phone live-phone"><div class="phone-view"><iframe class="live-frame-m" data-src="${asset(first.src)}" title="${tx(first.label)} (mobile)" loading="lazy"></iframe></div></div>
+            <div class="phone live-phone"><div class="phone-view"><iframe class="live-frame-m" data-src="${asset(first.src)}" title="${tx(first.label)} (mobile)" loading="lazy"></iframe>${wait}</div></div>
           </div>
           <p class="mono live-hint">${liveHint(first, b)}</p>
         </div>`;
@@ -173,6 +161,28 @@ export const BLOCKS = {
         if (km) Object.assign(mob.style, { width: '390px', height: `${pview.clientHeight / km}px`, transform: `scale(${km})` });
       };
       [desk, mob].forEach(tameFrame);
+      // Le voile : posé à chaque nouveau chargement, levé quand le prototype enchaîne ~0,4 s d'images fluides (< 34 ms),
+      // ou au bout de 6 s quoi qu'il arrive.
+      [desk, mob].forEach((f) => {
+        const cover = f.parentElement.querySelector('.live-wait');
+        let run = 0;
+        f.addEventListener('load', () => {
+          const id = run;
+          if (!f.getAttribute('src') || f.getAttribute('src') === 'about:blank') return;
+          let w; try { w = f.contentWindow; w.document; } catch { cover.classList.add('is-ready'); return; }
+          let last = 0, good = 0;
+          const done = () => { if (id === run) cover.classList.add('is-ready'); };
+          setTimeout(done, 6000);
+          const tick = (t) => {
+            if (id !== run) return;
+            if (last) good = t - last < 34 ? good + 1 : 0;
+            last = t;
+            if (good >= 24) done(); else w.requestAnimationFrame(tick);
+          };
+          w.requestAnimationFrame(tick);
+        });
+        f._wait = () => { run++; cover.classList.remove('is-ready'); };
+      });
       // Chargées à l'approche, déchargées (about:blank) quand on s'éloigne : deux sites complets (Lenis, GSAP, vidéos) ne
       // tournent pas en fond pendant qu'on lit le reste de la page. Seuls les cadres affichés se chargent (au téléphone :
       // le mobile ; au bureau, sans le mobile pour un onglet `mobile: false`).
@@ -180,7 +190,7 @@ export const BLOCKS = {
       const blank = (f) => { if (f.getAttribute('src') && f.getAttribute('src') !== 'about:blank') f.src = 'about:blank'; };
       let near = false;
       const sync = () => [desk, mob].forEach((f) => {
-        if (near && shown(f)) { if (f.getAttribute('src') !== f.dataset.src) f.src = f.dataset.src; } else blank(f);
+        if (near && shown(f)) { if (f.getAttribute('src') !== f.dataset.src) { f._wait(); f.src = f.dataset.src; } } else blank(f);
       });
       new IntersectionObserver(([e]) => { near = e.isIntersecting; sync(); }, { rootMargin: '100% 0px' }).observe(el);
       fit();
@@ -189,6 +199,7 @@ export const BLOCKS = {
         const it = b.items[+t.dataset.live];
         $$('[data-live]', el).forEach((x) => x.setAttribute('aria-selected', String(x === t)));
         $('.browser-url', el).textContent = tx(it.url);
+        $('.live-open', el).href = asset(it.src);
         $('.live-hint', el).textContent = liveHint(it, b);
         $('.live-stage', el).classList.toggle('is-solo', it.mobile === false);
         [desk, mob].forEach((f) => { f.dataset.src = asset(it.src); });

@@ -6,6 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PROJECTS } from '../src/data/projects.js'; // le nombre de projets imprimé sur le paquet
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const A3D = path.join(ROOT, 'assets/3d');
@@ -18,7 +19,7 @@ const HB = { x: 64, y: 66.586, w: 1071.657, h: 1067.914 };
 export const PACK = {
   name: 'Johan Trigeard',
   strip: 'JOHAN TRIGEARD',
-  front: { tl: 'BOOSTER', tr: 'N°01', sub: 'PORTFOLIO · ÉDITION 2026', bl: '04 PROJETS', br: 'UI · UX · PRODUIT' },
+  front: { tl: 'BOOSTER', tr: 'N°01', sub: 'PORTFOLIO · ÉDITION 2026', bl: `${String(PROJECTS.length).padStart(2, '0')} PROJETS`, br: 'UI · UX · PRODUIT' },
   back: ['Lead UI/UX & Product Designer', 'Bordeaux, France', 'Contenu : projets choisis, sans doublon garanti.'],
 };
 

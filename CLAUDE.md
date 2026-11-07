@@ -25,7 +25,7 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
   projet), `src/data/projects.js`, `src/data/home.js` (marques, contact), `src/i18n.js`, `src/style.css`, `src/logo.js`
   (hyène du hero), `src/scenes3d.js` (3D), `src/sound.js`.
 - Scripts de génération (`scripts/`) : `make-lockup.mjs` (logo + `src/wordmark.js`, `npm run lockup`), `make-booster.mjs`
-  (texture du booster, `npm run booster`), `blender/make-jaws.py` (mâchoire 3D). `src/hyena.js` est généré depuis
+  (texture du booster, `npm run booster`). `src/hyena.js` est généré depuis
   `assets/brand/hyena.svg` (corps + 2 pupilles séparées pour le regard qui suit la souris).
 
 ## La home « Booster »
@@ -72,7 +72,7 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
 - **Rassembler** les projets cohérents en un seul (ex. Rhinov Studio = landing retail + landing immo + app) plutôt que
   multiplier les cartes.
 - **Visuel de carte** (`card`, 3:5) : une image qui illustre le projet avec élégance et donne envie de cliquer sans tout
-  dévoiler. Jamais une capture de page d'accueil ou un écran pris au hasard (défaut actuel de MyFrenchTool et Vinyl Run).
+  dévoiler. Jamais une capture de page d'accueil ou un écran pris au hasard.
   Composés par `scripts/make-cards.mjs` (`npm run cards`, 900×1500) : MFT = le coq et des outils français en orbite,
   Vinyl Run = une photo de la boutique (sources/cards/) et le logo en jaune. Tout dans la bande centrale (y 300 à 1150) : les petites cases recadrent.
   Sur la carte, `logo.mark` (le symbole seul : coq MFT, Pokéball NookDex) et `markScale` pour équilibrer les poids.
@@ -85,7 +85,6 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
   la gueule ouverte, il disparaît, le contact épinglé est derrière. Pas de morsure (Johan, 06/11). Course courte
   (`.bite-run` 45vh) : pas de vide. Le canvas reste caché tant que rien n'est dessiné (un canvas WebGL vierge s'affichait
   en noir : le flash noir avant le crâne). Pas de WebGL : le contact s'affiche normalement (l'erreur est dans la console).
-  L'ancienne mâchoire (`jaws.glb`, `scripts/blender/make-jaws.py`) est à supprimer une fois le crâne validé.
 - **Rideau** entre pages : piloté par GSAP en yPercent uniquement (un transform CSS s'y ajoutait) ; la page d'arrivée naît
   couverte (`html.came`, script et style inline du shell).
 - Faits vérifiés uniquement (repos, sites live, kit de marque). Chiffres MFT à revérifier.
@@ -94,7 +93,7 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
 
 - `src/scenes3d.js` (three.js en différé), modèles dans `assets/3d/` : `booster.glb` (objets Pack + Strip ; texture
   `pack-tex.jpg` recto à gauche / verso à droite, faite par `npm run booster` qui remet l'image dans le .glb et refait le repli
-  2D `pack-front.webp`), `jaws.glb`. Sources Blender et scans hors du site : `sources/` (`hyena-plaque.blend`) ; les fichiers bruts trop lourds pour git dans `sources/raw/` (ignoré), seule leur version allégée va dans `assets/`. Décodeur Draco local `assets/3d/draco/`.
+  2D `pack-front.webp`, et le nombre de projets du paquet suit `PROJECTS`), `skull.glb`. Sources Blender et scans hors du site : `sources/` (`hyena-plaque.blend`) ; les fichiers bruts trop lourds pour git dans `sources/raw/` (ignoré), seule leur version allégée va dans `assets/`. Décodeur Draco local `assets/3d/draco/`.
   Tone mapping neutre (ACES grise les noirs). Blender 5.2 + MCP for Blender sur le poste de Johan.
 - Son : `src/sound.js`, synthétisé en Web Audio, activé au premier geste, toggle « Son » (localStorage), rien au survol
   tactile. `data-sound` sur un élément = feedback.

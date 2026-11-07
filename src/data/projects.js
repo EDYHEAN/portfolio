@@ -88,8 +88,8 @@ export const PROJECTS = [
     role: T('Concept, design & prototype codé', 'Concept, design & coded prototype'),
     tagline: T("Trois façons de tomber amoureux d'un meuble, avant le panier.", 'Three ways to fall for a piece of furniture, before the basket.'),
     context: T(
-      "Un labo pour sortir du catalogue en grille. Trois prototypes codés, une idée chacun : collectionner les meubles comme des cartes à jouer (Pièce Rare), visiter une maison pièce par pièce et acheter ce qu'on y voit (la Visite), vivre une journée dans une pièce où chaque heure met d'autres meubles en lumière (24 h à la maison). Les décors sont générés avec Gemini à partir des vrais produits, tout le reste est du code.",
-      "A lab to break out of the grid catalogue. Three coded prototypes, one idea each: collect furniture like trading cards (Pièce Rare), walk through a house room by room and buy what you see (the Tour), spend a day in one room where every hour puts other pieces in the light (24 hours at home). The sets are generated with Gemini from the real products; everything else is code.",
+      "Une initiative perso pour sortir du catalogue en grille. Trois parcours pensés en UX, maquettés dans Figma puis codés : Pièce Rare, une expérience multimarque aux couleurs de Rhinov, fait collectionner les meubles comme des cartes ; la Visite et 24 h à la maison font acheter Maisons du Monde en visitant une maison ou en vivant une journée.",
+      "A personal initiative to break out of the grid catalogue. Three journeys thought through as UX, designed in Figma, then coded: Pièce Rare, a multi-brand experience in Rhinov's colours, turns furniture into collectible cards; the Tour and 24 hours at home sell Maisons du Monde by walking through a house or living through a day.",
     ),
     blocks: [
       {

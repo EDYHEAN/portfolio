@@ -170,7 +170,20 @@ function initHeaderBehaviour() {
 export let lenis = null;
 function initScroll() {
   if (!REDUCE) {
-    lenis = new Lenis({ lerp: 0.1 });
+    // Quand la page rame (3D, prototypes live), on ne voit rien bouger, on scrolle encore, et chaque coup de molette
+    // s'ajoutait à la cible : au retour de la fluidité, l'inertie emportait jusqu'au footer (Johan, 07/11). La molette est
+    // freinée dès que la cible a plus d'une demi-hauteur d'écran d'avance, et coupée à une hauteur d'écran.
+    // Inertie un peu plus courte aussi (lerp 0.1 -> 0.13).
+    lenis = new Lenis({
+      lerp: 0.13,
+      virtualScroll: (d) => {
+        if (!lenis || !d.deltaY) return true;
+        const ahead = (lenis.targetScroll - lenis.animatedScroll) * Math.sign(d.deltaY); // avance dans le sens du geste
+        const half = innerHeight / 2;
+        if (ahead > half) d.deltaY *= Math.max(0, 1 - (ahead - half) / half) || 1e-3; // jamais 0 : Lenis le prendrait pour un clic
+        return true;
+      },
+    });
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add((time) => lenis.raf(time * 1000));
     gsap.ticker.lagSmoothing(0);

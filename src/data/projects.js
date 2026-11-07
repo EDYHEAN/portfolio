@@ -98,30 +98,25 @@ export const PROJECTS = [
         title: T('Trois prototypes, en vrai', 'Three prototypes, live'),
         items: [
           {
-            src: 'mdm-labo/live/piece-rare/index.html', url: T('Pièce Rare', 'Pièce Rare'), label: T('Pièce Rare', 'Pièce Rare'), sum: T('Les meubles en cartes à collectionner, et ta pièce en 3D.', 'Furniture as collectible cards, and your room in 3D.'),
-            hint: T('Ouvre un booster, garde tes cartes, pose tes meubles dans ta pièce en 3D.', 'Open a pack, keep your cards, place your furniture in your 3D room.'),
+            src: 'mdm-labo/live/24h/index.html', url: T('Catalogue · 24 h à la maison', 'Catalogue · 24 hours at home'), label: T('24 h à la maison', '24 hours at home'), sum: T('Une pièce, une journée : chaque heure éclaire d’autres meubles.', 'One room, one day: every hour lights other pieces.'),
+            hint: T("Scrolle dans le cadre : l'heure tourne, la lumière suit.", 'Scroll inside the frame: the hours turn, the light follows.'),
           },
           {
             src: 'mdm-labo/live/visite/index.html', url: T('Catalogue · la visite', 'Catalogue · the tour'), label: T('La visite', 'The tour'), sum: T('La maison pièce par pièce : on achète ce qu’on voit.', 'The house room by room: buy what you see.'), mobile: false,
             hint: T('Entre par la porte ou par une fenêtre, puis passe de pièce en pièce.', 'Come in through the door or a window, then go from room to room.'),
           },
           {
-            src: 'mdm-labo/live/24h/index.html', url: T('Catalogue · 24 h à la maison', 'Catalogue · 24 hours at home'), label: T('24 h à la maison', '24 hours at home'), sum: T('Une pièce, une journée : chaque heure éclaire d’autres meubles.', 'One room, one day: every hour lights other pieces.'),
-            hint: T("Scrolle dans le cadre : l'heure tourne, la lumière suit.", 'Scroll inside the frame: the hours turn, the light follows.'),
+            src: 'mdm-labo/live/piece-rare/index.html', url: T('Pièce Rare', 'Pièce Rare'), label: T('Pièce Rare', 'Pièce Rare'), sum: T('Les meubles en cartes à collectionner, et ta pièce en 3D.', 'Furniture as collectible cards, and your room in 3D.'),
+            hint: T('Ouvre un booster, garde tes cartes, pose tes meubles dans ta pièce en 3D.', 'Open a pack, keep your cards, place your furniture in your 3D room.'),
           },
         ],
       },
       {
-        // Les meubles 3D de Pièce Rare (ceux qu'on pose dans « Ma pièce »), un par rareté, animés par feature3d.js ;
-        // l'affiche le temps du chargement = le détourage de la carte.
-        type: 'features',
-        title: T('La collection, en 3D', 'The collection, in 3D'),
+        type: 'showcase',
+        title: T('Deux images, une journée', 'Two images, one day'),
         items: [
-          { img: 'mdm-labo/live/piece-rare/cut/mdm-223563.webp', model: 'mdm-labo/live/piece-rare/models/mdm-223563.glb', fit: 'contain', pos: 'center', t: T('Lin lavé', 'Lin lavé'), d: T('Commune · Maisons du Monde. Le coussin en lin.', 'Common · Maisons du Monde. The linen cushion.') },
-          { img: 'mdm-labo/live/piece-rare/cut/mdm-214553.webp', model: 'mdm-labo/live/piece-rare/models/mdm-214553.glb', fit: 'contain', pos: 'center', t: T('Kalinda', 'Kalinda'), d: T('Rare · Maisons du Monde. Le tapis rond motif jungle.', 'Rare · Maisons du Monde. The round jungle print rug.') },
-          { img: 'mdm-labo/live/piece-rare/cut/fermliving-podo.webp', model: 'mdm-labo/live/piece-rare/models/fermliving-podo.glb', fit: 'contain', pos: 'center', t: T('Podo', 'Podo'), d: T('Rare · Ferm Living. Le tabouret sculptural.', 'Rare · Ferm Living. The sculptural stool.') },
-          { img: 'mdm-labo/live/piece-rare/cut/sklum-canape-coco.webp', model: 'mdm-labo/live/piece-rare/models/sklum-canape-coco.glb', fit: 'contain', pos: 'center', t: T('Coco', 'Coco'), d: T('Épique · Sklum. Le canapé en chenille épaisse.', 'Epic · Sklum. The thick chenille sofa.') },
-          { img: 'mdm-labo/live/piece-rare/cut/design-tulip.webp', model: 'mdm-labo/live/piece-rare/models/design-tulip.glb', fit: 'contain', pos: 'center', t: T('Table Saarinen', 'Saarinen table'), d: T('Légendaire · Knoll. Une icône du design, la rareté la plus haute.', 'Legendary · Knoll. A design icon, the highest rarity.') },
+          { img: 'mdm-labo/live/24h/img/jour.webp', size: 'half', url: '24 h à la maison · 7 h', t: T('Le jour', 'Day'), d: T('Une seule pièce, quatre coins de vie, les vrais meubles du catalogue.', 'One room, four living corners, the real pieces from the catalogue.') },
+          { img: 'mdm-labo/live/24h/img/nuit.webp', size: 'half', url: '24 h à la maison · 23 h', t: T('La nuit', 'Night'), d: T('Entre les deux, les heures, le soleil et les faisceaux sont calculés dans le code.', 'In between, the hours, the sun and the light beams are computed in code.') },
         ],
       },
       {
@@ -138,11 +133,16 @@ export const PROJECTS = [
         ],
       },
       {
-        type: 'showcase',
-        title: T('Deux images, une journée', 'Two images, one day'),
+        // Les meubles 3D de Pièce Rare (ceux qu'on pose dans « Ma pièce »), un par rareté, animés par feature3d.js ;
+        // l'affiche le temps du chargement = le détourage de la carte.
+        type: 'features',
+        title: T('La collection, en 3D', 'The collection, in 3D'),
         items: [
-          { img: 'mdm-labo/live/24h/img/jour.webp', size: 'half', url: '24 h à la maison · 7 h', t: T('Le jour', 'Day'), d: T('Une seule pièce, quatre coins de vie, les vrais meubles du catalogue.', 'One room, four living corners, the real pieces from the catalogue.') },
-          { img: 'mdm-labo/live/24h/img/nuit.webp', size: 'half', url: '24 h à la maison · 23 h', t: T('La nuit', 'Night'), d: T('Entre les deux, les heures, le soleil et les faisceaux sont calculés dans le code.', 'In between, the hours, the sun and the light beams are computed in code.') },
+          { img: 'mdm-labo/live/piece-rare/cut/mdm-223563.webp', model: 'mdm-labo/live/piece-rare/models/mdm-223563.glb', fit: 'contain', pos: 'center', t: T('Lin lavé', 'Lin lavé'), d: T('Commune · Maisons du Monde. Le coussin en lin.', 'Common · Maisons du Monde. The linen cushion.') },
+          { img: 'mdm-labo/live/piece-rare/cut/mdm-214553.webp', model: 'mdm-labo/live/piece-rare/models/mdm-214553.glb', fit: 'contain', pos: 'center', t: T('Kalinda', 'Kalinda'), d: T('Rare · Maisons du Monde. Le tapis rond motif jungle.', 'Rare · Maisons du Monde. The round jungle print rug.') },
+          { img: 'mdm-labo/live/piece-rare/cut/fermliving-podo.webp', model: 'mdm-labo/live/piece-rare/models/fermliving-podo.glb', fit: 'contain', pos: 'center', t: T('Podo', 'Podo'), d: T('Rare · Ferm Living. Le tabouret sculptural.', 'Rare · Ferm Living. The sculptural stool.') },
+          { img: 'mdm-labo/live/piece-rare/cut/sklum-canape-coco.webp', model: 'mdm-labo/live/piece-rare/models/sklum-canape-coco.glb', fit: 'contain', pos: 'center', t: T('Coco', 'Coco'), d: T('Épique · Sklum. Le canapé en chenille épaisse.', 'Epic · Sklum. The thick chenille sofa.') },
+          { img: 'mdm-labo/live/piece-rare/cut/design-tulip.webp', model: 'mdm-labo/live/piece-rare/models/design-tulip.glb', fit: 'contain', pos: 'center', t: T('Table Saarinen', 'Saarinen table'), d: T('Légendaire · Knoll. Une icône du design, la rareté la plus haute.', 'Legendary · Knoll. A design icon, the highest rarity.') },
         ],
       },
     ],

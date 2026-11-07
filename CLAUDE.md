@@ -55,14 +55,17 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
   par `src/feature3d.js` : UN canvas fixe pour toute la page, chaque modèle dessiné dans le cadre de sa tuile (flottement,
   oscillation, se tourne vers le curseur, grossit au survol, parallaxe au scroll), rien hors écran, chargé à l'approche.
 - **Bloc live** (Rhinov Studio) : les vrais prototypes en iframe (`assets/rhinov-studio/live`), rendus à 1440 / 390 px puis réduits
-  au cadre, onglets, chargés à l'approche et déchargés (about:blank) loin de l'écran ; au téléphone, le mobile seul.
+  au cadre, onglets, chargés à l'approche puis jamais rechargés en scrollant : hors écran ils sont en pause, et un seul
+  cadre tourne à la fois (celui qu'on survole). Chaque prototype doit passer par `scripts/patch-live.mjs` (pause + densité
+  réduite dans le cadre ; fait par `npm run labo`, à relancer à la main sur un nouveau prototype). Au téléphone, le mobile seul.
   Le cadre bureau tient entier sous le header (100svh − 200 px). Au chargement (`tameFrame`, blocks.js) : barres de
   défilement masquées dans les cadres, et la molette passe à la page quand le prototype ne peut plus défiler (sans ça, un
   prototype plein écran piégeait le scroll). Le curseur de la page s'efface au-dessus d'une iframe. Par onglet : `hint`,
   `mobile: false` (pas de mobile au bureau, le navigateur prend toute la largeur ; seuls les cadres affichés se chargent).
   Onglets en cartes (numéro, nom, ligne `sum`), voile « chargement » levé quand le prototype tourne fluide (~24 images
   < 34 ms, 6 s max), lien « Ouvrir dans un onglet » dans la barre du navigateur.
-- **Maisons du Monde · Labo** (06/11) : trois prototypes en live (Pièce Rare, la Visite sans mobile, 24 h à la maison), puis un
+- **Maisons du Monde · Labo** (06/11) : trois prototypes en live, du plus léger au plus lourd pour que le premier charge vite (24 h à la maison, la Visite sans
+  mobile, Pièce Rare), puis un
   bloc par prototype : la collection en 3D (meubles de Pièce Rare dans le bento `features` + feature3d.js, affiche = le
   détourage de la carte), le diaporama des pièces de la Visite, le jour / la nuit de 24 h. Les deux copies de Pièce Rare
   (bureau, mobile) ont chacune leur sauvegarde (clé localStorage selon la largeur, patchée par le script). `npm run labo` (`scripts/make-mdm-labo.mjs`) recopie les sources

@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { patchHtml } from './patch-live.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'sources/raw/vibecoded');
@@ -31,8 +32,9 @@ const swap = (s, from, to, label) => {
 const size = (d) => fs.readdirSync(d, { recursive: true }).reduce((t, f) => t + (fs.statSync(path.join(d, f)).isFile() ? fs.statSync(path.join(d, f)).size : 0), 0);
 
 // Dans le cadre de la page projet (1440 × ~780 px), la photo carrée de la fiche produit poussait le reste hors du drawer :
-// sa hauteur est plafonnée, le drawer se voit en entier (les deux catalogues).
-const SHEET = '@media (min-width:700px){#fiche .visuel{aspect-ratio:auto;height:min(42vh,420px)}}</style>';
+// la photo devient élastique (elle prend la place laissée par le texte et la rangée de produits) et tout se resserre
+// sur un cadre bas : le drawer se voit en entier à toutes les hauteurs (les deux catalogues ; Johan, 07/11).
+const SHEET = '@media (min-width:700px){#fiche .scroll{display:flex;flex-direction:column}#fiche .visuel{aspect-ratio:auto;flex:1 1 0;min-height:110px;max-height:420px}#fiche .corps,#fiche .piece{flex:none}}@media (min-width:700px) and (max-height:760px){#fiche .corps{padding:16px 28px 18px}#fiche .nom{font-size:28px}#fiche .prix{margin-top:10px}#fiche .add{margin-top:14px}#fiche .piece{padding:14px 0 16px 28px}#fiche .piece h3{margin-bottom:8px}.rail button{flex-basis:68px}.rail img{width:68px;height:68px}}</style>';
 
 fs.rmSync(OUT, { recursive: true, force: true });
 
@@ -47,7 +49,7 @@ fs.rmSync(OUT, { recursive: true, force: true });
   // Sur la page projet, le prototype tourne deux fois (cadre bureau 1440 px + mobile 390 px) avec le même localStorage :
   // chaque copie écrasait la partie de l'autre (boosters, collection, pièce). Une sauvegarde par largeur.
   html = swap(html, "const KEY = 'piece-rare-v2';", "const KEY = 'piece-rare-v2' + (innerWidth < 700 ? '-m' : '');", 'clé de sauvegarde');
-  write(path.join(to, 'index.html'), html);
+  write(path.join(to, 'index.html'), patchHtml(html)); // pause + densité 1 dans le cadre (patch-live.mjs)
 
   const { NodeIO } = await import('@gltf-transform/core');
   const { ALL_EXTENSIONS, KHRDracoMeshCompression } = await import('@gltf-transform/extensions');
@@ -91,7 +93,7 @@ fs.rmSync(OUT, { recursive: true, force: true });
   for (const f of fs.readdirSync(path.join(from, 'produits'))) webp(path.join(from, 'produits', f), path.join(to, 'produits', f.replace(/\.\w+$/, '.webp')), { q: 80 });
   html = swap(html, 'produits/${sku}.jpg', 'produits/${sku}.webp', 'image produit');
   html = swap(html, '</style>', SHEET, 'feuille de style');
-  write(path.join(to, 'index.html'), html);
+  write(path.join(to, 'index.html'), patchHtml(html)); // pause + densité 1 dans le cadre (patch-live.mjs)
   copy(path.join(from, 'produits.js'), path.join(to, 'produits.js'));
   // Le diaporama de la page projet (« La maison, pièce par pièce ») : les scènes en 1600 px, pas celles du prototype.
   const rooms = path.join(OUT, '../rooms');
@@ -110,7 +112,7 @@ fs.rmSync(OUT, { recursive: true, force: true });
   let html = fs.readFileSync(path.join(from, 'index.html'), 'utf8');
   html = swap(html, 'produits/${sku}.jpg', 'produits/${sku}.webp', 'image produit');
   html = swap(html, '</style>', SHEET, 'feuille de style');
-  write(path.join(to, 'index.html'), html);
+  write(path.join(to, 'index.html'), patchHtml(html)); // pause + densité 1 dans le cadre (patch-live.mjs)
   copy(path.join(from, 'produits.js'), path.join(to, 'produits.js'));
 }
 

@@ -171,7 +171,7 @@ export const BLOCKS = {
           if (!f.getAttribute('src') || f.getAttribute('src') === 'about:blank') return;
           let w; try { w = f.contentWindow; w.document; } catch { cover.classList.add('is-ready'); return; }
           let last = 0, good = 0;
-          const done = () => { if (id === run) cover.classList.add('is-ready'); };
+          const done = () => { if (id === run && !cover.classList.contains('is-ready')) { cover.classList.add('is-ready'); sync(); } };
           setTimeout(done, 6000);
           const tick = (t) => {
             if (id !== run) return;
@@ -183,16 +183,24 @@ export const BLOCKS = {
         });
         f._wait = () => { run++; cover.classList.remove('is-ready'); };
       });
-      // Chargées à l'approche, déchargées (about:blank) quand on s'éloigne : deux sites complets (Lenis, GSAP, vidéos) ne
-      // tournent pas en fond pendant qu'on lit le reste de la page. Seuls les cadres affichés se chargent (au téléphone :
-      // le mobile ; au bureau, sans le mobile pour un onglet `mobile: false`).
+      // Chargés à l'approche, puis jamais déchargés en scrollant : hors écran, ils sont mis en pause (window.__pause, posé
+      // dans chaque prototype par scripts/patch-live.mjs) et reprennent où ils en étaient, sans rechargement (Johan, 07/11).
+      // Un seul cadre tourne à la fois : celui qu'on survole (au départ, le navigateur) ; l'autre reste figé sur sa dernière
+      // image. Un cadre masqué (le mobile d'un onglet `mobile: false`, le navigateur au téléphone) est déchargé.
       const shown = (f) => f.offsetParent !== null;
       const blank = (f) => { if (f.getAttribute('src') && f.getAttribute('src') !== 'about:blank') f.src = 'about:blank'; };
-      let near = false;
+      const pause = (f, v) => { try { f.contentWindow?.__pause?.(v); } catch {} };
+      let near = false, inView = false, focus = desk;
       const sync = () => [desk, mob].forEach((f) => {
-        if (near && shown(f)) { if (f.getAttribute('src') !== f.dataset.src) { f._wait(); f.src = f.dataset.src; } } else blank(f);
+        if (!shown(f)) return blank(f);
+        if (near && f.getAttribute('src') !== f.dataset.src) { f._wait(); f.src = f.dataset.src; return; }
+        const ready = f.parentElement.querySelector('.live-wait').classList.contains('is-ready');
+        const lead = shown(focus) ? focus : f; // au téléphone, le mobile est seul : c'est lui qui tourne
+        if (ready) pause(f, !(inView && f === lead));
       });
       new IntersectionObserver(([e]) => { near = e.isIntersecting; sync(); }, { rootMargin: '100% 0px' }).observe(el);
+      new IntersectionObserver(([e]) => { inView = e.isIntersecting; sync(); }).observe($('.live-stage', el));
+      [[desk, '.live-desk'], [mob, '.live-phone']].forEach(([f, s]) => $(s, el).addEventListener('pointerenter', () => { focus = f; sync(); }));
       fit();
       const ro = new ResizeObserver(() => { fit(); sync(); }); ro.observe(view); ro.observe(pview);
       $$('[data-live]', el).forEach((t) => t.addEventListener('click', () => {

@@ -1,6 +1,12 @@
 <!doctype html>
 <html lang="fr" class="light">
-<head>
+<head><!-- live:pause --><script>(()=>{if(window===top)return;
+try{const d=devicePixelRatio;Object.defineProperty(window,'devicePixelRatio',{get:()=>{try{const k=frameElement.getBoundingClientRect().width/innerWidth;return Math.max(1,Math.min(d,k*d))}catch(e){return 1}}})}catch(e){}
+const r=requestAnimationFrame.bind(window),c=cancelAnimationFrame.bind(window),q=new Map();let p=false,n=0;
+window.requestAnimationFrame=f=>{if(!p)return r(f);const id=-(++n);q.set(id,f);return id};
+window.cancelAnimationFrame=id=>id<0?q.delete(id):c(id);
+window.__pause=v=>{if(p===v)return;p=v;if(!v){const fs=[...q.values()];q.clear();fs.forEach(f=>r(f))}
+document.querySelectorAll('video').forEach(m=>{if(v){m.__was=!m.paused;m.pause()}else if(m.__was)m.play().catch(()=>{})})};})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Pièce Rare</title>

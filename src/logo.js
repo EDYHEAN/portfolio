@@ -1,6 +1,6 @@
 // Le logo du hero : la hyène SVG (regard qui suit la souris), légère inclinaison 3D vers le curseur,
 // et au clic elle se retourne comme une carte et change de rendu.
-import { gsap, REDUCE, hyenaSVG, lang } from './core.js';
+import { gsap, REDUCE, FINE, hyenaSVG, lang } from './core.js';
 import { play } from './sound.js';
 import { HYENA_PUPILS } from './hyena.js';
 
@@ -14,7 +14,7 @@ export const STYLES = [
   { id: 'glitch', fr: 'Glitch', en: 'Glitch' },
 ];
 let index = 0;
-let tiltTo = null, listening = false;
+let tiltTo = null, listening = false, sway = null;
 
 // Motifs SVG partagés (trame de points, dégradé holographique qui tourne).
 function ensureDefs() {
@@ -81,7 +81,10 @@ export function mountLogo(host) {
   if (!REDUCE) {
     gsap.set(tilt, { transformPerspective: 900 });
     tiltTo = { host, rx: gsap.quickTo(tilt, 'rotationX', { duration: 0.6, ease: 'power3' }), ry: gsap.quickTo(tilt, 'rotationY', { duration: 0.6, ease: 'power3' }) };
-    if (!listening) {
+    // Sans souris : elle se balance doucement toute seule, sinon le rendu Relief n'aurait jamais d'épaisseur.
+    sway?.kill();
+    if (!FINE) sway = gsap.fromTo(tilt, { rotationY: -14, rotationX: 5 }, { rotationY: 14, rotationX: -5, duration: 3.4, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+    else if (!listening) {
       listening = true;
       addEventListener('pointermove', (e) => {
         if (!tiltTo?.host.isConnected) return;

@@ -48,11 +48,13 @@ export default {
       'pull.title': 'Votre tirage',
       'pull.count': 'projets imaginés',
       'booster.hint': 'Cliquez pour ouvrir le booster',
+      'booster.tap': 'Touchez pour ouvrir le booster',
     },
     en: {
       'pull.title': 'Your draw',
       'pull.count': 'imagined projects',
       'booster.hint': 'Click to open the booster',
+      'booster.tap': 'Tap to open the booster',
     },
   },
   projects: [

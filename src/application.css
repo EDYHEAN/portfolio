@@ -16,7 +16,7 @@ body[data-application] { --reality-h: 52px; }
   font-size: 14px; line-height: 1.2; font-weight: 600; text-decoration: none; white-space: nowrap;
   transition: transform 0.14s var(--ease-out), background 0.2s;
 }
-.reality-cta:hover { transform: translateY(-1px); background: #fff; }
+@media (hover: hover) { .reality-cta:hover { transform: translateY(-1px); background: #fff; } }
 .reality-mail {
   flex: none; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; white-space: nowrap;
   text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px;
@@ -81,12 +81,57 @@ body[data-application] .home > .who { align-self: center; margin-top: 0; }
 
 @media (max-width: 860px) {
   body[data-application] { --reality-h: 54px; }
-  .reality { gap: 14px; justify-content: space-between; }
+  .reality { gap: 8px; justify-content: space-between; }
   .reality-long { display: none; }
   .reality-short { display: inline; }
   .reality-txt { font-size: 13px; }
-  .reality-cta { margin-left: auto; padding: 9px 15px; font-size: 13px; }
-  .reality-mail { font-size: 13px; }
+  .reality-cta { margin-left: auto; min-height: 44px; padding: 0 15px; font-size: 13px; }
+  .reality-mail { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; font-size: 13px; }
+}
+@media (hover: none) {
+  .reality-cta, .reality-mail { -webkit-tap-highlight-color: transparent; touch-action: manipulation; min-height: 44px; }
+  .reality-mail { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; }
+  .reality-cta:active { transform: scale(0.97); }
+}
+
+/* En colonne : la page défile, plus de hauteur imposée (mêmes seuils que home.css). */
+@media (max-width: 860px), (max-height: 500px) and (pointer: coarse) {
+  body[data-application] .home { height: auto; padding-top: 64px; }
   body[data-application] .home > .who { align-self: start; }
-  body[data-application] .home { height: auto; }
+  .who-co .who-lock { margin: 0; }
+  .who-co .who-name { margin: 0 0 0 calc(var(--hy) * 0.08); }
+  .who-us { margin-top: 22px; }
+  .who-legal { margin-top: 14px; }
+  .who-real .key { min-height: 48px; justify-content: center; }
+}
+
+/* Debout, le bouton du vrai book est calé en bas de l'écran : toujours à portée de pouce, et les éclats d'une carte
+   l'atteignent sans faire remonter la page. position:fixed exige de retirer le conteneur de requêtes de .who
+   (il deviendrait le repère du fixed) : les tailles en cqi passent sur --cq, la même largeur calculée à la main. */
+@media (max-width: 860px) and (min-height: 501px) {
+  body[data-application] .who { container-type: normal; --cq: calc((100vw - 2 * var(--gutter)) / 100); }
+  .who-co { gap: calc(3 * var(--cq)); }
+  .who-co .who-lock { --hy: calc(15.5 * var(--cq)); }
+  .who-x { font-size: calc(5.5 * var(--cq)); }
+  .who-co-logo { width: calc(39 * var(--cq)); }
+  .who-us { font-size: clamp(44px, calc(14.5 * var(--cq)), 96px); }
+  .who-real { position: fixed; left: var(--gutter); right: var(--gutter); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 45; margin: 0; }
+  .who-real .key { display: flex; }
+  .who-real.is-called::after { animation-name: who-ring-dock; }
+  /* Le bouton calé ne recouvre pas le bas de page. */
+  body[data-application] .bar { padding-bottom: calc(82px + env(safe-area-inset-bottom, 0px)); }
+}
+/* Tablette debout : un bouton à sa taille, au coin de l'écran, plutôt qu'une barre de 700 px. */
+@media (min-width: 600px) and (max-width: 860px) and (min-height: 501px) {
+  .who-real { left: auto; width: 340px; }
+}
+@keyframes who-ring-dock { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.04, 1.5); opacity: 0; } }
+
+/* Téléphone couché : le bloc de gauche reste à l'écran, il doit tenir sous le bandeau et le header. */
+@media (max-height: 500px) and (pointer: coarse) and (orientation: landscape) {
+  body[data-application] .home { padding-top: 56px; }
+  body[data-application] .home > .who { top: calc(var(--reality-h) + 54px); }
+  .who-us { margin-top: 12px; font-size: 40px; }
+  .who-real { margin-top: 12px; }
+  .who-legal { margin-top: 10px; font-size: 10px; }
 }

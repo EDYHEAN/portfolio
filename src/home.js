@@ -9,7 +9,13 @@ import { mountLogo } from './logo.js';
 import { PROJECTS } from './data/projects.js';
 import { CONTACT, mailAddress } from './data/home.js';
 import { APP, mountReality, glitchCard } from './application.js';
+import { UI } from './i18n.js';
 import { reelCard, openReel, closeReel, isReelOpen, isReelBusy, bindReel } from './reel.js';
+
+const TOUCH = matchMedia('(hover: none)').matches; // au doigt : pas de survol, d'autres gestes
+// Au doigt, on touche : même sens que « booster.hint » (une candidature peut le redéfinir dans sa config).
+UI.fr['booster.tap'] ??= 'Touche pour ouvrir le booster';
+UI.en['booster.tap'] ??= 'Tap to open the pack';
 
 // Le tirage : les vrais projets, ou ceux imaginés pour une candidature (/{slug}/).
 const LIST = APP ? APP.projects : PROJECTS;
@@ -51,6 +57,7 @@ const card = (p, i) => p ? `
 function renderPull() {
   $$('.slot').forEach((s, i) => { s.innerHTML = pull[i] === REEL ? reelCard() : card(pull[i], i); });
   fillHyenas($('.pull-grid'));
+  refreshTilt();
 }
 
 function render() {
@@ -133,7 +140,8 @@ function reroll() {
   if (busy || isReelBusy()) return;
   busy = true;
   const grid = $('.pull-grid').getBoundingClientRect();
-  const c = { x: grid.left + grid.width / 2, y: grid.top + grid.height / 2 };
+  // Le tas se forme dans la partie visible : au téléphone, le centre du tirage peut être sous l'écran.
+  const c = { x: grid.left + grid.width / 2, y: Math.min(innerHeight * 0.8, Math.max(innerHeight * 0.2, grid.top + grid.height / 2)) };
   const slots = $$('.slot');
   gsap.to('.reroll-ico', { rotation: '+=360', duration: 0.7, ease: 'power3.inOut' });
   // les cartes se rassemblent en tas au centre…
@@ -187,6 +195,41 @@ function bindInteractions() {
     const c = e.target.closest?.('.card[href]');
     if (c && !c.contains(e.relatedTarget)) ['--rx', '--ry'].forEach((p) => c.style.setProperty(p, '0deg'));
   });
+  bindTouchCards();
+}
+
+/* Sans souris, les cartes s'inclinent et leur reflet glisse selon leur place dans l'écran : c'est le scroll qui les anime.
+   Une carte qu'on presse se penche vers le doigt (pointermove ci-dessus + pointerdown ici). */
+let refreshTilt = () => {};
+function bindTouchCards() {
+  if (!TOUCH || REDUCE) return;
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    $$('.card[href]').forEach((c) => {
+      const r = c.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) return;
+      const p = Math.max(0, Math.min(1, (r.top + r.height / 2) / innerHeight));
+      c.style.setProperty('--rx', `${((0.5 - p) * 7).toFixed(2)}deg`);
+      c.style.setProperty('--ry', '0deg');
+      c.style.setProperty('--mx', '50%');
+      c.style.setProperty('--my', `${(p * 100).toFixed(1)}%`);
+    });
+  };
+  refreshTilt = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+  addEventListener('scroll', refreshTilt, { passive: true });
+  document.addEventListener('pointerdown', (e) => {
+    const c = e.target.closest?.('.card[href]');
+    if (!c) return;
+    const r = c.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+    c.style.setProperty('--rx', `${(0.5 - py) * 6}deg`);
+    c.style.setProperty('--ry', `${(px - 0.5) * 8}deg`);
+    c.style.setProperty('--mx', `${px * 100}%`);
+    c.style.setProperty('--my', `${py * 100}%`);
+  }, { passive: true });
+  ['pointerup', 'pointercancel'].forEach((ev) => addEventListener(ev, refreshTilt, { passive: true }));
+  refreshTilt();
 }
 
 /* ------------------------------------------------------------------ */
@@ -208,24 +251,45 @@ const seen = () => { try { return sessionStorage.getItem(BOOSTER_KEY) === '1'; }
 const markSeen = () => { try { sessionStorage.setItem(BOOSTER_KEY, '1'); } catch { /* rien */ } };
 
 async function showBooster(again = false) {
+  const hint = t(TOUCH ? 'booster.tap' : 'booster.hint');
   const el = document.createElement('div');
   el.className = 'booster';
   el.innerHTML = `
-    <div class="booster-stage" role="button" tabindex="0" aria-label="${t('booster.hint')}"><img class="booster-img" src="${asset(APP?.booster?.front || '3d/pack-front.webp')}" alt=""></div>
-    <p class="booster-hint mono">${t('booster.hint')}</p>
+    <div class="booster-stage" role="button" tabindex="0" aria-label="${hint}"><img class="booster-img" src="${asset(APP?.booster?.front || '3d/pack-front.webp')}" alt=""></div>
+    <p class="booster-hint mono">${hint}</p>
     <button type="button" class="booster-skip mono" data-sound>${t('booster.skip')}</button>`;
   document.body.append(el);
   const stage = $('.booster-stage', el);
-  let api = null;
+  let api = null, loading = !REDUCE, opened = false, closed = false, waiting = 0;
   const close = (origin) => {
+    closed = true;
     markSeen();
     if (again) { pull = draw(pull); renderPull(); }
     gsap.set('.slot', { opacity: 0 });
-    gsap.to(el, { opacity: 0, duration: 0.6, delay: 0.5, ease: 'power2.out', onComplete: () => el.remove() });
+    gsap.to(el, { opacity: 0, duration: 0.6, delay: 0.5, ease: 'power2.out', onComplete: () => { el.remove(); if (!opened) api?.dispose(); } });
     deal(origin || { x: innerWidth / 2, y: innerHeight / 2 }, { delay: 0.15 });
     if (!again) introLeft(0.2);
   };
   const fallback = () => el.classList.add('is-ready'); // sans WebGL : le booster reste en image
+  const start = () => {
+    if (opened || closed) return;
+    opened = true;
+    clearTimeout(waiting);
+    el.classList.add('is-opening');
+    if (api) api.open();
+    else { play('tear'); const r = stage.getBoundingClientRect(); close({ x: r.left + r.width / 2, y: r.top + r.height * 0.2 }); }
+  };
+  // Une tape pendant le chargement ne se perd pas : le paquet s'ouvre dès que la 3D est là, en image après 1,5 s.
+  const openIt = () => {
+    if (!api && loading) { waiting ||= setTimeout(start, 1500); return; }
+    start();
+  };
+  const arm = () => {
+    (TOUCH ? el : stage).addEventListener('click', (e) => { if (!e.target.closest('.booster-skip')) openIt(); });
+    stage.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openIt(); } });
+  };
+  // Au doigt, on peut toucher tout l'écran et dès l'affichage du paquet ; à la souris, c'est le paquet, une fois la 3D prête.
+  if (TOUCH) { el.classList.add('is-ready'); arm(); }
   if (REDUCE) fallback();
   else {
     try {
@@ -235,16 +299,13 @@ async function showBooster(again = false) {
         ...(APP?.booster?.glb ? { glb: APP.booster.glb } : {}),
         onTear: (step, origin) => { if (step === 'tear') play('tear'); else close(origin); },
       });
+      loading = false;
+      if (closed) { api.dispose(); api = null; return; } // déjà passé ou ouvert en image : la 3D arrive trop tard
       el.classList.add('is-ready', 'has-3d');
-    } catch { fallback(); }
+      if (waiting) start();
+    } catch { loading = false; fallback(); if (waiting) start(); }
   }
-  const openIt = () => {
-    el.classList.add('is-opening');
-    if (api) api.open();
-    else { play('tear'); const r = stage.getBoundingClientRect(); close({ x: r.left + r.width / 2, y: r.top + r.height * 0.2 }); }
-  };
-  stage.addEventListener('click', openIt, { once: true });
-  stage.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openIt(); } });
+  if (!TOUCH) arm();
   $('.booster-skip', el).addEventListener('click', () => { el.classList.add('is-opening'); close(); }, { once: true });
   stage.focus({ preventScroll: true });
 }
@@ -258,8 +319,9 @@ const LAUGH_ZONES = '.who-name, .who-role, .who-line';
 // Chaque lettre devient h ou i en alternance (majuscule gardée), espaces et ponctuation restent : la ligne ne saute pas.
 const laughify = (s) => { let k = 0; return s.replace(/\p{L}/gu, (ch) => { const c = k++ % 2 ? 'i' : 'h'; return ch === ch.toUpperCase() && ch !== ch.toLowerCase() ? c.toUpperCase() : c; }); };
 function bindLaugh() {
-  let spans = [], busy = false;
+  let spans = [], busy = false, held = false, heldOff = 0;
   const restore = () => {
+    held = false; clearTimeout(heldOff);
     const parents = new Set();
     spans.forEach((s) => { if (!s.isConnected) return; parents.add(s.parentNode); s.replaceWith(document.createTextNode(s.dataset.orig)); });
     parents.forEach((p) => p.normalize());
@@ -280,13 +342,51 @@ function bindLaugh() {
   addEventListener('pointerdown', () => { down = true; }, true);
   addEventListener('pointerup', () => { down = false; clearTimeout(timer); timer = setTimeout(apply, 30); }, true);
   document.addEventListener('selectionchange', () => {
-    if (busy) return;
+    if (busy || held) return;
     const sel = getSelection();
     if (!sel || sel.isCollapsed || !sel.rangeCount) { if (spans.length) restore(); return; }
     if (spans.length) { restore(); } // la sélection a bougé : on rend le texte, on rira sur la nouvelle
     clearTimeout(timer);
     if (!down) timer = setTimeout(apply, 260);
   });
+  function wrap(node, cls = '') {
+    const span = document.createElement('span');
+    span.className = `laugh ${cls}`.trim(); span.dataset.orig = node.data; span.textContent = laughify(node.data);
+    node.replaceWith(span); spans.push(span); drips(span);
+  }
+  // Au doigt, la sélection native se bat avec le texte qui change (et ses poignées recouvrent tout). Le geste qui sert à
+  // sélectionner, l'appui long, fait rire tout le bloc touché ; ça revient à la tape suivante, ou seul au bout de 5 s.
+  if (TOUCH) {
+    let hold = 0, sx = 0, sy = 0, y0 = 0, zone = null;
+    const cancel = () => { clearTimeout(hold); zone = null; };
+    const laugh = () => {
+      clearTimeout(hold);
+      // Un doigt qui fait défiler la page n'appuie pas : le scroll a le dernier mot, même si ses événements arrivent en retard.
+      if (!zone || spans.length || Math.abs(scrollY - y0) > 4) return;
+      const walker = document.createTreeWalker(zone, NodeFilter.SHOW_TEXT), nodes = [];
+      while (walker.nextNode()) if (walker.currentNode.data.trim()) nodes.push(walker.currentNode);
+      zone = null;
+      held = true;
+      nodes.forEach((n) => wrap(n, 'is-held'));
+      navigator.vibrate?.(15);
+      play('laugh');
+      heldOff = setTimeout(restore, 5000);
+    };
+    addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'touch') return;
+      if (spans.length) restore();
+      cancel();
+      zone = e.target.closest?.(LAUGH_ZONES) || null;
+      if (!zone) return;
+      sx = e.clientX; sy = e.clientY; y0 = scrollY;
+      hold = setTimeout(laugh, 420); // avant les ~500 ms où le système prend la main sur l'appui long
+    }, true);
+    // Android annonce lui-même l'appui long ; iOS non, d'où le minuteur.
+    addEventListener('contextmenu', (e) => { if (zone) { e.preventDefault(); laugh(); } }, true);
+    addEventListener('pointermove', (e) => { if (e.pointerType === 'touch' && Math.hypot(e.clientX - sx, e.clientY - sy) > 10) cancel(); }, true);
+    addEventListener('pointerup', cancel, true);
+    addEventListener('pointercancel', cancel, true); // le navigateur a pris le geste : c'est un scroll
+  }
   function apply() {
     if (busy || spans.length) return;
     const sel = getSelection();
@@ -305,10 +405,7 @@ function bindLaugh() {
       if (end <= start) return;
       const mid = start > 0 ? t.splitText(start) : t;
       if (end - start < mid.length) mid.splitText(end - start);
-      if (!mid.data.trim()) return;
-      const span = document.createElement('span');
-      span.className = 'laugh'; span.dataset.orig = mid.data; span.textContent = laughify(mid.data);
-      mid.replaceWith(span); spans.push(span); drips(span);
+      if (mid.data.trim()) wrap(mid);
     });
     if (spans.length) {
       const nr = document.createRange(); nr.setStartBefore(spans[0]); nr.setEndAfter(spans[spans.length - 1]);

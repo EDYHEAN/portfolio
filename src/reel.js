@@ -1,6 +1,6 @@
 // Le showreel : une carte tirée au hasard comme les autres (home.js), toujours à la dernière place, avec un aperçu vidéo muet. Au clic, elle passe en 16:9 dans la zone du tirage et les autres
 // cartes dégagent (la colonne de gauche ne bouge pas) ; le vrai film se charge depuis Vimeo. À la fermeture, tout revient en place.
-import { gsap, $, $$, REDUCE, MOBILE, t, asset } from './core.js';
+import { gsap, $, $$, REDUCE, t, asset, lenis } from './core.js';
 import { play } from './sound.js';
 
 const ID = '591673847';
@@ -8,6 +8,9 @@ const PAGE = `https://vimeo.com/${ID}`;
 const PLAYER = `https://player.vimeo.com/video/${ID}?autoplay=1&autopause=0&title=0&byline=0&portrait=0&badge=0&dnt=1`;
 const D = REDUCE ? 0 : 0.8;
 const GAP = 48; // la place du bouton Fermer, au-dessus de la vidéo
+const COMPACT = '(max-width: 860px), (max-height: 500px) and (pointer: coarse)'; // comme home.css
+const compact = () => matchMedia(COMPACT).matches;
+const EDGE = 8; // marge du film au bord de l'écran, au téléphone
 
 let open = false, busy = false, rest = null, width = 0;
 
@@ -29,14 +32,28 @@ export const reelCard = () => {
 
 const others = () => $$('.slot').filter((s) => !s.querySelector('.reel-card'));
 
-// Bureau : centré dans la zone du tirage. Téléphone : pleine largeur, au milieu de l'écran.
+// Bureau : centré dans la zone du tirage, Fermer au-dessus à droite. Téléphone : centré dans l'écran, le plus grand possible.
+// Debout, Fermer est au-dessus du film ; couché, le film prend toute la hauteur et la croix se loge dans le coin de l'écran.
 function target(grid) {
-  if (matchMedia(MOBILE).matches) {
-    const h = grid.width * 9 / 16;
-    return { left: grid.left, top: Math.max(96, (innerHeight - h) / 2), width: grid.width, height: h };
+  if (compact()) {
+    const bar = $('.reality')?.offsetHeight || 0, H = innerHeight - bar;
+    const flat = innerHeight <= 500 && innerWidth > innerHeight;
+    const room = flat ? H - 2 * EDGE : H - 2 * (44 + 2 * EDGE); // debout : la place de Fermer en haut, et autant en bas pour rester centré
+    const width = Math.min(innerWidth - 2 * EDGE, room * 16 / 9), height = width * 9 / 16;
+    const left = (innerWidth - width) / 2, top = bar + (H - height) / 2;
+    return { left, top, width, height, closeX: flat ? innerWidth - EDGE : left + width, closeY: flat ? bar + EDGE : top - 44 - EDGE };
   }
   const width = Math.min(grid.width, (grid.height - GAP) * 16 / 9), height = width * 9 / 16;
-  return { left: grid.left + (grid.width - width) / 2, top: grid.top + GAP + (grid.height - GAP - height) / 2, width, height };
+  const left = grid.left + (grid.width - width) / 2, top = grid.top + GAP + (grid.height - GAP - height) / 2;
+  return { left, top, width, height, closeX: left + width, closeY: top - 44 };
+}
+
+// Le téléphone a tourné, film ouvert : il reste ouvert et reprend toute la place (tourner l'écran, c'est le geste pour voir plus grand).
+function refit() {
+  const card = $('.reel-card'), slot = card.parentElement, s = slot.getBoundingClientRect(), to = target($('.pull-grid').getBoundingClientRect());
+  gsap.to(card, { left: to.left - s.left, top: to.top - s.top, width: to.width, height: to.height, duration: REDUCE ? 0 : 0.3, ease: 'power2.out' });
+  const close = $('.reel-close');
+  if (close) { close.style.left = `${to.closeX - s.left}px`; close.style.top = `${to.closeY - s.top}px`; }
 }
 
 export function openReel(card) {
@@ -52,14 +69,24 @@ export function openReel(card) {
   ['--rx', '--ry'].forEach((p) => card.style.setProperty(p, '0deg'));
   card.classList.add('is-open');
   $('.home').classList.add('is-reel');
-  gsap.set(slot, { zIndex: 20 });
+  const small = compact();
+  gsap.set(slot, { zIndex: small ? 70 : 20 });
+  if (small) {
+    // Le fond sombre passe devant le header et capte le doigt (rien ne défile derrière) ; une tape dessus ferme.
+    lenis?.stop();
+    const scrim = document.createElement('div');
+    scrim.className = 'reel-scrim';
+    $('.home').append(scrim);
+    gsap.fromTo(scrim, { opacity: 0 }, { opacity: 1, duration: REDUCE ? 0 : 0.5, ease: 'power2.out' });
+  }
   gsap.set(card, { left: 0, top: 0, right: 'auto', bottom: 'auto', width: s.width, height: s.height });
 
   const close = document.createElement('button');
   close.type = 'button';
   close.className = 'chip reel-close';
-  close.innerHTML = `${t('reel.close')} <i aria-hidden="true">×</i>`;
-  close.style.cssText = `left:${to.left - s.left + to.width}px;top:${to.top - s.top - 44}px`;
+  close.innerHTML = `<span class="reel-close-t">${t('reel.close')}</span> <i aria-hidden="true">×</i>`;
+  close.setAttribute('aria-label', t('reel.close'));
+  close.style.cssText = `left:${to.closeX - s.left}px;top:${to.closeY - s.top}px`;
   slot.append(close);
 
   const cx = box.left + box.width / 2, cy = box.top + box.height / 2;
@@ -97,6 +124,8 @@ export function closeReel() {
   const s = slot.getBoundingClientRect();
   $('.reel-frame')?.remove();
   $('.reel-close')?.remove();
+  const scrim = $('.reel-scrim');
+  if (scrim) { lenis?.start(); gsap.to(scrim, { opacity: 0, duration: REDUCE ? 0 : 0.45, ease: 'power2.in', onComplete: () => scrim.remove() }); }
   if (!REDUCE) $('video', art).play().catch(() => {});
   gsap.timeline({
     defaults: { duration: D, ease: 'power3.inOut' },
@@ -119,5 +148,8 @@ export function closeReel() {
 
 export function bindReel() {
   addEventListener('keydown', (e) => { if (e.key === 'Escape') closeReel(); });
-  addEventListener('resize', () => { if (innerWidth !== width) closeReel(); }); // la barre d'adresse du téléphone ne ferme rien
+  addEventListener('resize', () => { // la barre d'adresse du téléphone ne ferme rien
+    if (innerWidth === width || !open) return;
+    if (compact() && !busy) { width = innerWidth; refit(); } else closeReel();
+  });
 }

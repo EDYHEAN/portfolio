@@ -54,7 +54,7 @@ export const PROJECTS = [
       {
         // Les vrais prototypes codés, à scroller dans le cadre (assets/rhinov-studio/live, copiés des sources de Johan).
         type: 'live',
-        title: T('Les landings, en vrai', 'The landing pages, live'), titleStill: T('Les landings', 'The landing pages'),
+        title: T('Les landings, en vrai', 'The landing pages, live'),
         items: [
           { src: 'rhinov-studio/live/retail/index.html', poster: 'rhinov-studio/posters/retail.webp', url: T('Rhinov Studio · retail', 'Rhinov Studio · retail'), label: T('Retail', 'Retail') },
           { src: 'rhinov-studio/live/immo/index.html', poster: 'rhinov-studio/posters/immo.webp', url: T('Rhinov Studio · immo', 'Rhinov Studio · real estate'), label: T('Immo', 'Real estate') },
@@ -425,15 +425,15 @@ export const PROJECTS = [
         title: T('Trois prototypes, en vrai', 'Three prototypes, live'), titleStill: T('Trois prototypes', 'Three prototypes'),
         items: [
           {
-            src: 'mdm-labo/live/24h/index.html', poster: 'mdm-labo/posters/24h.webp', url: T('Catalogue · 24 h à la maison', 'Catalogue · 24 hours at home'), label: T('24 h à la maison', '24 hours at home'), sum: T('Une pièce, une journée : chaque heure éclaire d’autres meubles.', 'One room, one day: every hour lights other pieces.'),
+            src: 'mdm-labo/live/24h/index.html', poster: 'mdm-labo/posters/24h.webp', stills: [1, 2, 3, 4, 5].map((k) => `mdm-labo/stills/24h-${k}.webp`), url: T('Catalogue · 24 h à la maison', 'Catalogue · 24 hours at home'), label: T('24 h à la maison', '24 hours at home'), sum: T('Une pièce, une journée : chaque heure éclaire d’autres meubles.', 'One room, one day: every hour lights other pieces.'),
             hint: T("Scrolle dans le cadre : l'heure tourne, la lumière suit.", 'Scroll inside the frame: the hours turn, the light follows.'),
           },
           {
-            src: 'mdm-labo/live/visite/index.html', poster: 'mdm-labo/posters/visite.webp', url: T('Catalogue · la visite', 'Catalogue · the tour'), label: T('La visite', 'The tour'), sum: T('La maison pièce par pièce : on achète ce qu’on voit.', 'The house room by room: buy what you see.'), mobile: false,
+            src: 'mdm-labo/live/visite/index.html', poster: 'mdm-labo/posters/visite.webp', stills: [1, 2, 3, 4, 5].map((k) => `mdm-labo/stills/visite-${k}.webp`), url: T('Catalogue · la visite', 'Catalogue · the tour'), label: T('La visite', 'The tour'), sum: T('La maison pièce par pièce : on achète ce qu’on voit.', 'The house room by room: buy what you see.'), mobile: false,
             hint: T('Entre par la porte ou par une fenêtre, puis passe de pièce en pièce.', 'Come in through the door or a window, then go from room to room.'),
           },
           {
-            src: 'mdm-labo/live/piece-rare/index.html', poster: 'mdm-labo/posters/piece-rare.webp', url: T('Pièce Rare', 'Pièce Rare'), label: T('Pièce Rare', 'Pièce Rare'), sum: T('Les meubles en cartes à collectionner, et ta pièce en 3D.', 'Furniture as collectible cards, and your room in 3D.'),
+            src: 'mdm-labo/live/piece-rare/index.html', poster: 'mdm-labo/posters/piece-rare.webp', stills: [1, 2, 3, 4, 5].map((k) => `mdm-labo/stills/piece-rare-${k}.webp`), url: T('Pièce Rare', 'Pièce Rare'), label: T('Pièce Rare', 'Pièce Rare'), sum: T('Les meubles en cartes à collectionner, et ta pièce en 3D.', 'Furniture as collectible cards, and your room in 3D.'),
             hint: T('Ouvre un booster, garde tes cartes, pose tes meubles dans ta pièce en 3D.', 'Open a pack, keep your cards, place your furniture in your 3D room.'),
           },
         ],
@@ -514,6 +514,8 @@ export const PROJECTS = [
           { src: 'vinyl-run/pages/blog.webp', url: 'vinyl-run.com/blog', label: T('Magazine', 'Magazine') },
         ],
         mobile: 'vinyl-run/pages/m-home.webp',
+        titlePhone: T('La page d’accueil', 'The home page'),
+        mobileShots: [1, 2, 3, 4].map((k) => `vinyl-run/pages/m/${k}.webp`),
       },
       {
         // Illustrations 3D (scripts/blender/make-features.py) à la place des captures (Johan, 06/11).
@@ -680,6 +682,8 @@ export const PROJECTS = [
           { src: 'myfrenchtool/pages/brand.webp', url: 'myfrenchtool.com/marque', label: T('Page marque', 'Brand page') },
         ],
         mobile: 'myfrenchtool/pages/m-home.webp',
+        titlePhone: T('La page d’accueil', 'The home page'),
+        mobileShots: [1, 2, 3, 4].map((k) => `myfrenchtool/pages/m/${k}.webp`),
       },
       {
         type: 'features',

@@ -251,7 +251,11 @@ export function jumpToHash() {
 export function navigate(href) {
   const c = $('.curtain');
   if (REDUCE || !c) { location.href = href; return; }
-  try { sessionStorage.setItem('edy-curtain', '1'); } catch { /* rien */ }
+  // La page d'arrivée naît couverte : on lui passe la hyène, sinon le rideau reste vide le temps que son JS se charge.
+  try {
+    sessionStorage.setItem('edy-curtain', '1');
+    sessionStorage.setItem('edy-curtain-mark', `<svg class="hy" viewBox="0 0 1200 1200" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d="${HYENA_BODY}"/>${HYENA_PUPILS.map((p) => `<path fill="currentColor" d="${p.d}"/>`).join('')}</svg>`);
+  } catch { /* rien */ }
   lenis?.stop();
   gsap.fromTo(c, { yPercent: 100, visibility: 'visible' }, { yPercent: 0, duration: 0.6, ease: 'power3.inOut', onComplete: () => { location.href = href; } });
 }

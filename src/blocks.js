@@ -60,7 +60,8 @@ function tameFrame(frame) {
 // L'indice sous un prototype live : celui de l'onglet (on ne scrolle pas un jeu, on le clique), sinon celui du bloc.
 const liveHint = (it, b) => tx(it.hint || b.hint || { fr: 'Scrolle dans le cadre : c’est le vrai prototype.', en: 'Scroll inside the frame: it’s the real prototype.' });
 
-// Au téléphone et à la tablette : rien d'interactif dans les cadres. Pas de prototype (ils font planter l'onglet, Johan 09/11),
+// Au téléphone et à la tablette : rien d'interactif dans les cadres. Pas de prototype dans la page (ils font planter l'onglet) :
+// des captures en action (item.stills, MDM Labo), ou une carte qui l'ouvre dans un nouvel onglet (Rhinov Studio ; Johan, 09/11),
 // et aucune capture qui bouge avec le scroll de la page : les visuels sont fixes, un tap les ouvre en grand (viewer.js).
 const STILL = '(max-width: 860px), (pointer: coarse)';
 // Le téléphone (debout ou couché) : on y retire les maquettes de bureau, sauf s'il n'y a rien d'autre à montrer.
@@ -107,13 +108,14 @@ export const BLOCKS = {
       const phoneFirst = matchMedia(MOBILE).matches; // au téléphone, la longue capture de bureau n'est plus la première image à charger
       const shots = b.pages.map((pg, i) => img(pg.src, { cls: `pg-shot${i ? '' : ' is-on'}`, eager: i === 0 && !phoneFirst, alt: tx(pg.label) })).join('');
       return `
-        ${head(b.title || 'b.pages', n)}
-        <div class="pg">
+        ${head((matchMedia(PHONE).matches && b.titlePhone) || b.title || 'b.pages', n)}
+        <div class="pg${b.mobileShots ? ' has-shots' : ''}">
           <div class="pg-sticky">
             <div class="pg-main">${browser(shots, b.pages[0].url, 'wide')}</div>
             <aside class="pg-side">
               <ol class="pg-list">${b.pages.map((pg, i) => `<li><button type="button" class="${i ? '' : 'is-on'}" data-pg="${i}" data-sound><span class="mono">${String(i + 1).padStart(2, '0')}</span>${tx(pg.label)}</button></li>`).join('')}</ol>
-              ${b.mobile ? `<div class="phone"><div class="phone-view" data-lenis-prevent data-zoom="phone">${img(b.mobile, { cls: 'pg-phone-shot', alt: `${p.name} · mobile` })}${zoomBtn()}</div></div>` : ''}
+              ${b.mobile ? `<div class="phone"><div class="phone-view" data-lenis-prevent>${img(b.mobile, { cls: 'pg-phone-shot', alt: `${p.name} · mobile` })}</div></div>` : ''}
+              ${b.mobileShots ? `<div class="pg-shots">${b.mobileShots.map((src) => `<div class="phone"><div class="phone-view">${img(src, { alt: `${p.name} · mobile` })}</div></div>`).join('')}</div>` : ''}
               <p class="mono pg-hint"><span class="pg-h-desk">${tx({ fr: 'Scrolle dans le cadre pour parcourir la page.', en: 'Scroll inside the frame to browse the page.' })}</span><span class="pg-h-touch">${tx({ fr: 'Touche la capture pour l’agrandir.', en: 'Tap the capture to enlarge it.' })}</span></p>
             </aside>
           </div>
@@ -166,7 +168,7 @@ export const BLOCKS = {
       const first = b.items[0];
       const wait = `<div class="live-wait" aria-hidden="true"><span class="live-spin"></span><span class="mono">${tx({ fr: 'Chargement du prototype', en: 'Loading the prototype' })}</span></div>`;
       return `${head(blockTitle(b) || 'b.pages', n)}
-        <div class="live">
+        <div class="live${b.items[0].stills ? ' is-sets' : ''}">
           ${tabs}
           <div class="live-stage${first.mobile === false ? ' is-solo' : ''}">
             <div class="browser live-desk">
@@ -177,16 +179,20 @@ export const BLOCKS = {
             <div class="phone live-phone"><div class="phone-view"><iframe class="live-frame-m" data-src="${asset(first.src)}" title="${tx(first.label)} (mobile)" loading="lazy"></iframe>${wait}</div></div>
           </div>
           <p class="mono live-hint">${liveHint(first, b)}</p>
-          <div class="live-reel">${b.items.map((it, i) => `
-            <figure class="live-card">
-              <span class="live-card-ph">${it.poster ? img(it.poster, { alt: tx(it.label) }) : ''}</span>
+          <div class="live-reel">${b.items.map((it) => (it.stills ? `
+            <section class="live-set">
+              <h3>${tx(it.label)}</h3>${it.sum ? `<p>${tx(it.sum)}</p>` : ''}
+              <div class="live-rail">${it.stills.map((src) => img(src, { alt: tx(it.label) })).join('')}</div>
+            </section>` : `
+            <a class="live-card" href="${asset(it.src)}" target="_blank" rel="noopener" data-sound>
+              <span class="live-card-ph">${it.poster ? img(it.poster, { alt: '' }) : ''}<span class="live-go"><i aria-hidden="true"></i>${tx({ fr: 'Lancer le prototype', en: 'Launch the prototype' })}</span></span>
               <span class="live-card-t"><b>${tx(it.label)}</b>${it.sum ? `<span>${tx(it.sum)}</span>` : ''}</span>
-            </figure>`).join('')}
+            </a>`)).join('')}
           </div>
         </div>`;
     },
     motion(el, b) {
-      if (matchMedia(STILL).matches) { spawn($$('.live-card', el), $('.live-reel', el), { y: 50, stagger: 0.1 }); return; } // des images : aucune iframe ne se charge
+      if (matchMedia(STILL).matches) { spawn($$('.live-card, .live-set', el), $('.live-reel', el), { y: 50, stagger: 0.1 }); return; } // aucune iframe dans la page
       const desk = $('.live-frame', el), mob = $('.live-frame-m', el), view = $('.live-desk .browser-view', el), pview = $('.live-phone .phone-view', el);
       // Le site est rendu à sa vraie largeur (1440 / 390 px), puis réduit au cadre : il se comporte comme sur un vrai écran.
       const fit = () => { // un cadre masqué (largeur 0) garde sa dernière échelle
@@ -455,7 +461,7 @@ export const BLOCKS = {
           <div class="var-tabs" role="tablist">${b.items.map((it, i) => `<button type="button" role="tab" class="var-tab" aria-selected="${!i}" data-var="${i}" data-sound><span class="mono">${num(i)}</span>${tx(it.label)}</button>`).join('')}</div>
           <div class="var-stage${f.mobile ? '' : ' is-solo'}">
             ${browser(img(f.desk, { cls: 'var-desk', eager: !matchMedia(PHONE).matches, alt: tx(f.t) }), tx(f.url), 'wide')}
-            <div class="phone var-phone"><div class="phone-view" data-zoom="phone">${img(f.mobile || f.desk, { cls: 'var-mob', alt: '' })}${zoomBtn()}</div></div>
+            <div class="phone var-phone"><div class="phone-view">${img(f.mobile || f.desk, { cls: 'var-mob', alt: '' })}</div></div>
           </div>
           <div class="var-cap"><h3>${tx(f.t)}</h3><p>${tx(f.d)}</p></div>
           ${b.photos ? `<p class="mono fd-label">${tx(b.photos.title)}</p><div class="var-photos">${b.photos.items.map((src) => `<img src="${asset(src)}" alt="" loading="lazy" decoding="async" data-zoom="wide">`).join('')}</div>` : ''}

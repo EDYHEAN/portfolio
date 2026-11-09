@@ -128,7 +128,7 @@ html.came .curtain { visibility: visible; }
   transition: background-size 0.4s var(--ease-out);
   padding-block: 3px; /* symétrique : les capitales tombent sur l'axe de la hyène */
 }
-.hdr-nav a:hover, .hdr-about:hover { background-size: 100% 1px; }
+@media (hover: hover) { .hdr-nav a:hover, .hdr-about:hover { background-size: 100% 1px; } }
 .hdr-about { white-space: nowrap; }
 .hdr-about.is-here { background-size: 100% 1px; }
 .hdr-end { grid-column: 3; justify-self: end; display: flex; align-items: center; gap: clamp(16px, 2vw, 28px); }
@@ -184,25 +184,93 @@ html.came .curtain { visibility: visible; }
   text-decoration: none; font-weight: 600;
   transition: background 0.3s, color 0.3s;
 }
-.btn:hover { background: var(--paper); color: var(--ink); }
+@media (hover: hover) { .btn:hover { background: var(--paper); color: var(--ink); } }
 .btn-primary { background: var(--paper); color: var(--ink); border-color: var(--paper); }
-.btn-primary:hover { background: #fff; }
+@media (hover: hover) { .btn-primary:hover { background: #fff; } }
 .foot { grid-column: 1 / -1; align-self: end; display: flex; justify-content: space-between; gap: 16px; margin-top: 12vh; padding-top: 16px; border-top: 1px solid rgba(239, 233, 221, 0.2); opacity: 0.7; }
 .foot-credit { text-decoration: none; opacity: 0.75; } /* crédit du scan du crâne (licence CC BY) */
-.foot-credit:hover { opacity: 1; text-decoration: underline; }
+@media (hover: hover) { .foot-credit:hover { opacity: 1; text-decoration: underline; } }
+
+/* ------------------------------------------------------------------ */
+/* Tactile : pas de survol, de vrais retours au doigt                  */
+/* ------------------------------------------------------------------ */
+@media (pointer: coarse) {
+  a, button, [role='button'] { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .btn { transition: background 0.3s, color 0.3s, scale 0.12s var(--ease-out); }
+  .btn:active { scale: 0.97; } /* scale, pas transform : GSAP garde la main sur le transform des boutons */
+  .hdr-nav a:active, .hdr-about:active, .hdr-sound:active, .hdr-lang button:active { opacity: 0.55; }
+  /* Grain figé : un calque de deux écrans qui s'agite coûte cher sur téléphone, et ne se voit pas à cette taille. */
+  body::after { animation: none; inset: 0; }
+  /* 100vh = la hauteur barres d'adresse repliées, stable : ces calques ne se redimensionnent pas pendant le scroll
+     (le crâne clignotait) et couvrent toujours jusqu'en bas de l'écran. */
+  .curtain, .bite-stage { inset: 0 0 auto 0; height: 100vh; }
+  /* Pareil pour le contact, et pas 100svh : épinglé, il couvre tout l'écran, et la page reste assez longue pour finir l'épinglage. */
+  .contact { min-height: 100vh; }
+}
+
+/* Cibles de 44 px (téléphone, mais aussi tablette et grand téléphone à l'horizontale, qui ont la mise en page du bureau) ;
+   le trait de l'état actif reste sous le texte, pas au pied de la cible. */
+@media (max-width: 860px), (pointer: coarse) {
+  .hdr-nav a, .hdr-about, .hdr-sound, .hdr-lang button { display: inline-flex; align-items: center; min-height: 44px; padding-block: 0; background-position: 0 calc(100% - 11px); }
+  .hdr-sound { justify-content: center; min-width: 44px; }
+  .hdr-lang { gap: 2px; }
+  .hdr-lang button { justify-content: center; min-width: 44px; background-position: 50% calc(100% - 11px); }
+  .hdr-lang button[aria-pressed='true'] { background-size: 16px 1px; }
+}
 
 /* ------------------------------------------------------------------ */
 /* Mobile                                                              */
 /* ------------------------------------------------------------------ */
 @media (max-width: 860px) {
-  .hdr-nav { display: none; }
+  .hdr { --logo: 38px; gap: 8px; padding-block: 6px; }
+  .hdr-logo { padding-block: 3px; } /* 44 px de cible avec les 38 px du logo */
+  body[data-page='home'] .hdr-nav { display: none; } /* sur la home, le lien est à droite avec le son et la langue */
+  .hdr-end { gap: 6px; }
+
   .sec-title { font-size: clamp(40px, 11vw, 80px); }
-  .contact { grid-template-columns: minmax(0, 1fr); }
-  .contact-hyena { grid-column: 1; grid-row: 1; width: 52vw; margin-bottom: 24px; }
-  .contact-title { grid-row: 2; }
-  .contact-ctas { grid-row: 3; }
-  .foot { flex-direction: column; }
-  .foot-credit { order: 3; }
+
+  /* Le contact tient sur un écran, boutons à portée de pouce. */
+  .contact { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto 1fr; padding: clamp(72px, 11svh, 112px) var(--gutter) 20px; }
+  .contact-hyena { grid-column: 1; grid-row: 1; width: clamp(96px, min(40vw, 22svh), 240px); margin-bottom: clamp(10px, 2.4svh, 24px); }
+  .contact-title { grid-row: 2; font-size: clamp(46px, min(18vw, 13svh), 132px); }
+  html[lang='en'] .contact-title { font-size: clamp(38px, min(13.4vw, 13svh), 100px); }
+  .contact-ctas { grid-row: 3; margin-top: clamp(16px, 3.4svh, 32px); }
+  .btn { min-height: 48px; padding-block: 12px; }
+  .foot { grid-row: 4; flex-direction: column; gap: 0; margin-top: 20px; padding-top: 10px; }
+  .foot > span { padding-block: 6px; }
+  .foot-credit { order: 3; display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-underline-offset: 3px; } /* sans survol, il doit se lire comme un lien */
+}
+
+/* Trop étroit pour toute la nav : on ne garde que « C'est qui celui-là ? », aligné à droite à côté du son et de la langue. */
+@media (max-width: 719px) {
+  .hdr { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .hdr-nav { grid-column: 2; justify-self: end; }
+  .hdr-nav a:not(.hdr-about), .hdr-nav .is-here { display: none; }
+}
+
+/* Téléphone : le lien sur deux lignes (comme le nom à côté), une seule touche de langue (l'autre langue). */
+@media (max-width: 480px) {
+  .hdr { padding-block: 4px; }
+  .hdr-nav .hdr-about { white-space: normal; max-width: 7.7em; text-align: right; line-height: 1.15; font-size: 11px; }
+  .hdr-sound { font-size: 11px; gap: 6px; }
+  .hdr-end { gap: 2px; }
+  body[data-page='home'] .hdr-end { gap: 12px; } /* pas de logo sur la home : il y a la place de respirer */
+  .hdr-lang span, .hdr-lang button[aria-pressed='true'] { display: none; }
+  .hdr-lang button[aria-pressed='false'] { opacity: 1; font-size: 12px; }
+
+  .contact-ctas { flex-direction: column; gap: 10px; }
+  .contact-ctas .btn { justify-content: space-between; }
+}
+
+/* Téléphone à l'horizontale : le contact passe en deux colonnes pour tenir dans la hauteur. */
+@media (max-height: 500px) and (pointer: coarse) {
+  .contact { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto 1fr; padding-top: 62px; }
+  .contact-hyena { grid-column: 2; grid-row: 1 / 3; width: 26vh; margin: 0; }
+  .contact-title { grid-row: 1; font-size: min(9vw, 21vh); }
+  html[lang='en'] .contact-title { font-size: min(7.4vw, 21vh); }
+  .contact-ctas { grid-column: 1; grid-row: 2; flex-direction: row; margin-top: 12px; gap: 8px; }
+  .contact-ctas .btn { padding-inline: 16px; min-height: 44px; padding-block: 8px; font-size: 14px; }
+  .foot { grid-row: 3; flex-direction: row; align-items: center; margin-top: 10px; padding-top: 2px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

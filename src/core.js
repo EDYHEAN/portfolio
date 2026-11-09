@@ -110,15 +110,30 @@ function initEyes() {
   if (FINE) {
     addEventListener('pointermove', (e) => { look(e.clientX, e.clientY); clearTimeout(idle); idle = setTimeout(wander, 3500); }, { passive: true });
     idle = setTimeout(wander, 3500);
-  } else wander();
+    return;
+  }
+  // Au doigt : elle regarde l'endroit touché, et suit le sens du scroll (vers le bas quand la page descend).
+  const rest = (ms = 1800) => { clearTimeout(idle); idle = setTimeout(wander, ms); };
+  addEventListener('pointerdown', (e) => { look(e.clientX, e.clientY); rest(); }, { passive: true });
+  let lastY = scrollY, lastLook = 0;
+  addEventListener('scroll', () => {
+    const now = performance.now(), dy = scrollY - lastY;
+    lastY = scrollY;
+    if (!dy || now - lastLook < 120) return;
+    lastLook = now;
+    look(innerWidth / 2, dy > 0 ? innerHeight * 2 : -innerHeight);
+    rest();
+  }, { passive: true });
+  wander();
 }
 
 function initBoil() {
   if (REDUCE) return;
   const noise = $('#boilNoise');
   let seed = 1, last = 0;
+  const every = FINE ? 0.11 : 0.2; // un filtre SVG à recalculer : moins souvent au téléphone
   gsap.ticker.add((time) => {
-    if (time - last < 0.11 || document.hidden) return;
+    if (time - last < every || document.hidden) return;
     last = time;
     seed = (seed % 6) + 1;
     noise.setAttribute('seed', String(seed));
@@ -353,17 +368,44 @@ export function countUp(root) {
 // (changement de langue). Le scroll écrit dans JAWS, la boucle 3D le lit.
 const JAWS = { a: 0, c: 0 };
 let jaws = null;
+// Pas de crâne sans WebGL, ni sur un téléphone à bout de mémoire : pas d'approche ni d'épinglage, le contact arrive normalement.
+const canJaws = (() => {
+  let ok = null;
+  return () => {
+    if (ok === null) {
+      try {
+        const gl = document.createElement('canvas').getContext('webgl2') || document.createElement('canvas').getContext('webgl');
+        ok = !!gl && !((navigator.deviceMemory || 8) <= 2);
+        gl?.getExtension('WEBGL_lose_context')?.loseContext();
+      } catch { ok = false; }
+    }
+    return ok;
+  };
+})();
+let jawMotion = [], jawsBroken = false;
+/** Le crâne n'a pas pu se monter après coup (réseau, contexte perdu) : on retire la séquence, le contact s'affiche sans attendre. */
+function dropJaws() {
+  jawsBroken = true; // un changement de langue redessine l'outro : pas de séquence à nouveau
+  jawMotion.forEach((m) => { m.scrollTrigger?.kill(true); m.kill(); });
+  jawMotion = [];
+  $$('.bite-stage, .bite-run').forEach((el) => el.remove());
+  const shown = '.contact, .contact-title .line-in, .contact-hyena .hy, .contact-ctas .btn';
+  gsap.killTweensOf(shown);
+  gsap.set(shown, { clearProps: 'opacity,transform' });
+  ScrollTrigger.refresh();
+}
 function loadJaws() {
   const stage = $('.bite-stage');
   if (!stage) return;
   if (jaws) { jaws.then((j) => j?.attach(stage)); return; }
   jaws = import('./scenes3d.js')
     .then(({ mountSkull }) => mountSkull(stage, { root: ROOT, state: JAWS }))
-    .catch((e) => { console.warn('Crâne 3D indisponible :', e); $('.bite-stage')?.remove(); return null; }); // pas de WebGL : le contact s'affiche
+    .catch((e) => { console.warn('Crâne 3D indisponible :', e); dropJaws(); return null; }); // le contact s'affiche
 }
 
 export function renderOutro({ jaws = true } = {}) {
   const el = $('#outro');
+  jaws = jaws && !jawsBroken && canJaws();
   el.innerHTML = `
     ${jaws ? '<div class="bite-stage" aria-hidden="true"></div><div class="bite-run" aria-hidden="true"></div>' : ''}
     <section class="contact" id="contact" data-theme="dark">
@@ -391,10 +433,12 @@ export function outroMotion() {
   if (jawed) {
     ScrollTrigger.create({ trigger: '#outro', start: 'top 300%', once: true, onEnter: loadJaws });
     if (jaws) loadJaws(); // outro redessinée : on y remet le canvas
-    gsap.fromTo(JAWS, { a: 0 }, { a: 1, ease: 'none', scrollTrigger: { trigger: '#outro', start: 'top bottom-=10', endTrigger: '.contact', end: 'top top', scrub: 0.6 } });
-    gsap.timeline({ scrollTrigger: { trigger: '.contact', start: 'top top', end: '+=60%', pin: true, scrub: 0.6 } })
+    const approach = gsap.fromTo(JAWS, { a: 0 }, { a: 1, ease: 'none', scrollTrigger: { trigger: '#outro', start: 'top bottom-=10', endTrigger: '.contact', end: 'top top', scrub: 0.6 } });
+    // Au doigt, le scroll natif file devant le JS : anticipatePin engage l'épinglage juste avant d'arriver, sans à-coup.
+    const dive = gsap.timeline({ scrollTrigger: { trigger: '.contact', start: 'top top', end: '+=60%', pin: true, scrub: 0.6, anticipatePin: FINE ? 0 : 1 } })
       .fromTo(JAWS, { c: 0 }, { c: 1, duration: 1, ease: 'power1.in' }, 0)
       .fromTo('.contact', { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'none' }, 0.25);
+    jawMotion = [approach, dive];
   }
 
   // Le contenu du contact entre quand la gueule s'ouvre (ou en arrivant, sans mâchoire).
@@ -425,10 +469,14 @@ export function boot() {
 /** Rafraîchit les ScrollTriggers quand les images arrivent (hauteurs réelles). */
 export function refreshOnImages(root = document) {
   let pending = 0, timer;
+  // Au doigt, un refresh en plein geste casse l'inertie et fait sauter l'épinglage : on attend que le scroll se pose.
+  const whenIdle = () => { if (!FINE && performance.now() - lastScroll < 220) { timer = setTimeout(whenIdle, 120); return; } ScrollTrigger.refresh(); };
+  let lastScroll = 0;
+  if (!FINE) addEventListener('scroll', () => { lastScroll = performance.now(); }, { passive: true });
   $$('img', root).forEach((img) => {
     if (img.complete) return;
     pending++;
-    img.addEventListener('load', () => { clearTimeout(timer); timer = setTimeout(() => ScrollTrigger.refresh(), 120); }, { once: true });
+    img.addEventListener('load', () => { clearTimeout(timer); timer = setTimeout(whenIdle, 120); }, { once: true });
   });
   return pending;
 }

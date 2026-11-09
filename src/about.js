@@ -2,7 +2,7 @@
 import './style.css';
 import './home.css';
 import './about.css';
-import { gsap, $, $$, REDUCE, t, tx, asset, onLang, ROOT, boot, fillHyenas, curtainIn, revealTitle } from './core.js';
+import { gsap, ScrollTrigger, $, $$, REDUCE, MOBILE, t, tx, asset, onLang, ROOT, boot, fillHyenas, curtainIn, revealTitle } from './core.js';
 import { PATH, BRANDS, CONTACT, mailAddress } from './data/home.js';
 import { play } from './sound.js';
 
@@ -27,13 +27,13 @@ function show(i) {
 }
 
 // Le contenu change côté dos, quand la carte est retournée ; chaque tour demandé passe une image, même en cliquant vite.
-function spin() {
+function spin(dir = 1) {
   const n = SLIDES.length;
   asked = (asked + 1) % n;
   if (REDUCE) { show(asked); return; }
   play('deal');
   const left = $('.ab-left'), card = $('.ab-card');
-  turn += 360;
+  turn += 360 * dir;
   // Départ vif, arrivée lente : le tour file pendant le dos, la nouvelle image se pose doucement. La carte se soulève pendant ce temps.
   gsap.to(left, {
     rotationY: turn, transformPerspective: 2200, duration: 1.15, ease: 'power3.out', overwrite: 'auto',
@@ -56,7 +56,8 @@ function burst(left) {
   if ($$('.ab-fleck').length > 70) return; // clics en rafale
   const box = left.getBoundingClientRect(), w = left.offsetWidth, h = left.offsetHeight;
   const cx = box.left + box.width / 2, cy = box.top + box.height / 2;
-  for (let i = 0; i < 28; i++) {
+  const count = innerWidth < 640 ? 14 : 28; // au téléphone, moitié moins d'éclats
+  for (let i = 0; i < count; i++) {
     // Un point sur le pourtour de la carte, et sa direction depuis le centre.
     const t = Math.random(), side = i % 4;
     const px = side < 2 ? (t - 0.5) * w : (side === 2 ? -w / 2 : w / 2);
@@ -89,6 +90,7 @@ function render() {
           </span>
           <span class="card-shine" aria-hidden="true"></span>
           <span class="ab-tag mono">${t('about.tag')}</span>
+          <span class="ab-hint mono" aria-hidden="true"><i>↻</i>${t('about.next')}</span>
           <span class="ab-back" aria-hidden="true"><span class="ab-back-hy" data-hyena></span></span>
         </div>
       </div>
@@ -134,14 +136,24 @@ function render() {
 function bind() {
   document.addEventListener('click', (e) => {
     if (e.target.closest('[data-mail]')) location.href = `mailto:${mailAddress()}`;
-    else if (e.target.closest('.ab-card')) spin();
+    else if (e.target.closest('.ab-card') && e.timeStamp - swiped > 400) spin();
   });
+  // Au doigt : glisser la carte de côté la fait tourner dans le sens du geste (le tap marche aussi ; le scroll vertical passe).
+  let start = null, swiped = -1000;
+  document.addEventListener('pointerdown', (e) => { start = e.pointerType !== 'mouse' && e.target.closest?.('.ab-card') ? { x: e.clientX, y: e.clientY } : null; }, { passive: true });
+  document.addEventListener('pointercancel', () => { start = null; }, { passive: true });
+  document.addEventListener('pointerup', (e) => {
+    if (!start) return;
+    const dx = e.clientX - start.x, dy = e.clientY - start.y;
+    start = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.4) { swiped = e.timeStamp; spin(dx < 0 ? 1 : -1); }
+  }, { passive: true });
   document.addEventListener('keydown', (e) => {
     if ((e.key === 'Enter' || e.key === ' ') && e.target.closest?.('.ab-card')) { e.preventDefault(); spin(); }
   });
   // Comme les cartes du tirage : légère inclinaison et reflet qui suit la souris.
   document.addEventListener('pointermove', (e) => {
-    const c = e.target.closest?.('.ab-card');
+    const c = e.pointerType === 'mouse' && e.target.closest?.('.ab-card');
     if (!c) return;
     const r = c.getBoundingClientRect();
     const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
@@ -158,13 +170,20 @@ function bind() {
 
 function intro(delay) {
   if (REDUCE) return;
-  gsap.from('.ab-left', { x: 140, y: 70, rotation: 12, scale: 0.84, opacity: 0, duration: 1.1, delay, ease: 'back.out(1.25)' });
+  const phone = matchMedia(MOBILE).matches; // au téléphone, le bas de la page n'est pas à l'écran : le parcours et les outils arrivent au scroll
+  gsap.from('.ab-left', { x: phone ? 60 : 140, y: 70, rotation: 12, scale: 0.84, opacity: 0, duration: 1.1, delay, ease: 'back.out(1.25)' });
   revealTitle($('.ab-title'));
-  gsap.timeline({ delay: delay + 0.15 })
-    .from(['.ab-kicker', '.ab-bio', '.ab-cta'], { y: 16, opacity: 0, duration: 0.7, stagger: 0.06, ease: 'power3.out' }, 0)
-    .from('.ab-path li', { x: -14, opacity: 0, duration: 0.5, stagger: 0.04, ease: 'power3.out' }, 0.2)
-    .from(['.ab-path h2', '.ab-side section', '.bar', '#hdr > *'], { y: 12, opacity: 0, duration: 0.6, stagger: 0.05, ease: 'power3.out' }, 0.3)
+  const tl = gsap.timeline({ delay: delay + 0.15 })
+    .from(['.ab-kicker', '.ab-bio', '.ab-cta'], { y: 16, opacity: 0, duration: 0.7, stagger: 0.06, ease: 'power3.out' }, 0);
+  if (!phone) tl.from('.ab-path li', { x: -14, opacity: 0, duration: 0.5, stagger: 0.04, ease: 'power3.out' }, 0.2);
+  tl.from(phone ? '#hdr > *' : ['.ab-path h2', '.ab-side section', '.bar', '#hdr > *'], { y: 12, opacity: 0, duration: 0.6, stagger: 0.05, ease: 'power3.out' }, 0.3)
     .fromTo('.ab-bio em', { '--hl': '0%' }, { '--hl': '100%', duration: 0.6, stagger: 0.25, ease: 'power2.inOut' }, 0.7);
+  if (phone) {
+    ScrollTrigger.batch(['.ab-path h2', '.ab-path li', '.ab-side section'], {
+      start: 'top 92%', once: true,
+      onEnter: (els) => gsap.from(els, { x: -14, opacity: 0, duration: 0.5, stagger: 0.04, ease: 'power3.out', overwrite: true }),
+    });
+  }
 }
 
 boot();

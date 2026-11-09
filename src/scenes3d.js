@@ -249,24 +249,32 @@ export async function mountSkull(host, { root = './', state }) {
   pivot.add(head);
   scene.add(pivot);
 
+  let drawFrame = null, sizeW = 0, sizeH = 0;
   const resize = () => {
     const r = host.getBoundingClientRect();
+    if (r.width === sizeW && r.height === sizeH) return; // RO se réveille aussi sans vrai changement : un setSize vide le canvas
+    sizeW = r.width; sizeH = r.height;
     renderer.setSize(r.width, r.height, false);
     camera.aspect = r.width / Math.max(1, r.height);
     camera.updateProjectionMatrix();
+    drawFrame?.(); // redessiné avant l'affichage : pas d'image vide (le flash au redimensionnement)
   };
   const ro = new ResizeObserver(resize);
-  const attach = (el) => { host = el; el.append(canvas); ro.disconnect(); ro.observe(el); resize(); };
+  const attach = (el) => { host = el; el.append(canvas); ro.disconnect(); ro.observe(el); sizeW = 0; resize(); };
   attach(host);
 
   const lerp = (a, b, t) => a + (b - a) * t;
   const smooth = (e0, e1, x) => { const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0))); return t * t * (3 - 2 * t); };
   let yaw = 0, idle = false;
+  const coarse = !matchMedia('(pointer: fine)').matches;
+  // Téléphone qui peine : on baisse la définition une fois (un peu moins fin) plutôt que de saccader.
+  const small = innerWidth < 860;
+  let slow = 0, lastT = 0, lowered = false;
   // Le canvas reste caché tant qu'il n'y a rien à dessiner : un canvas WebGL encore vierge s'affiche en noir sur
   // certains rendus (c'était le flash noir avant l'arrivée du crâne).
   canvas.style.visibility = 'hidden';
   const outro = document.getElementById('outro');
-  loop(canvas, (t) => {
+  const draw = (t) => {
     const { a = 0, c = 0 } = state;
     if (a <= 0.0001 || c >= 0.9999) {
       if (!idle) { canvas.style.visibility = 'hidden'; host.style.backgroundColor = ''; idle = true; }
@@ -274,6 +282,11 @@ export async function mountSkull(host, { root = './', state }) {
     }
     idle = false;
     uniforms.uTime.value = t;
+    if (small && !lowered && lastT && t > lastT) {
+      slow = t - lastT > 0.034 ? slow + 1 : Math.max(0, slow - 1);
+      if (slow > 24) { lowered = true; const ratio = Math.max(1, dpr * 0.66); renderer.setPixelRatio(ratio); uniforms.uDpr.value = ratio; sizeW = 0; resize(); }
+    }
+    lastT = t;
     // a : il naît juste sous le dernier bloc, accroché à lui, rejoint le centre en accélérant vers l'écran, de trois-quarts
     //     puis face à toi, la gueule s'ouvrant jusqu'à recouvrir tout l'écran. c : on plonge dans la gueule ouverte, il
     //     disparaît : derrière, le contact (épinglé) est là.
@@ -284,7 +297,7 @@ export async function mountSkull(host, { root = './', state }) {
     // la caméra file au milieu de l'ouverture (pas à travers l'os).
     pivot.position.y = lerp(0.5, 0.6, smooth(0, 1, a)) + 1.2 * smooth(0, 0.8, c);
     jaw.rotation.x = 0.75 * smooth(0.12, 0.8, a) + 0.35 * smooth(0, 0.6, c);
-    yaw += ((pointer.x * 0.25) - yaw) * 0.05;
+    yaw += ((coarse ? 0 : pointer.x * 0.25) - yaw) * 0.05; // au doigt, pas de pointeur à suivre
     pivot.rotation.y = lerp(0.6, 0, smooth(0, 0.8, a)) + yaw * (1 - c) + Math.sin(t * 0.9) * 0.06 * (1 - a);
     pivot.rotation.x = lerp(0.3, -0.1, smooth(0, 1, a)) - 0.2 * smooth(0, 1, c); // museau un peu relevé : on voit les crocs
     pivot.visible = c < 0.98;
@@ -299,6 +312,9 @@ export async function mountSkull(host, { root = './', state }) {
     host.style.backgroundColor = dark > 0.001 ? `rgba(11, 11, 11, ${dark.toFixed(3)})` : '';
     renderer.render(scene, camera);
     canvas.style.visibility = 'visible';
-  });
+  };
+  let last = 0;
+  loop(canvas, (t) => { last = t; draw(t); });
+  drawFrame = () => draw(last);
   return { attach };
 }

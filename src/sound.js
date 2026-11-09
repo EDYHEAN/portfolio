@@ -17,11 +17,12 @@ function ensure() {
     master.gain.value = 0.9;
     master.connect(ctx.destination);
   }
-  if (ctx.state === 'suspended') ctx.resume();
+  if (ctx.state === 'suspended' || ctx.state === 'interrupted') ctx.resume().catch(() => {}); // « interrupted » : iOS, après un appel ou un changement d'app
   return ctx;
 }
-// Le premier geste "arme" l'audio.
-['pointerdown', 'keydown'].forEach((ev) => addEventListener(ev, () => ensure(), { once: true, passive: true }));
+// Le geste "arme" l'audio. Au doigt, pointerdown ne compte pas comme un geste pour le navigateur (seuls pointerup, touchend
+// et click comptent) : on écoute tout, et on réarme tant que le contexte ne tourne pas.
+['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'].forEach((ev) => addEventListener(ev, () => { if (!ctx || ctx.state !== 'running') ensure(); }, { passive: true }));
 
 const vary = (f) => f * (1 + (Math.random() - 0.5) * 0.08);
 
@@ -118,8 +119,12 @@ export function play(name, e) {
     if (now - lastHover < 60) return;
     lastHover = now;
   }
-  if (!ensure() || ctx.state !== 'running') return;
-  SOUNDS[name]?.(ctx.currentTime + 0.005);
+  if (!ensure()) return;
+  const fire = () => SOUNDS[name]?.(ctx.currentTime + 0.005);
+  if (ctx.state === 'running') { fire(); return; }
+  // L'audio se réveille (premier tap) : le son part dès qu'il est prêt, ou jamais s'il arrive trop tard.
+  const t0 = performance.now();
+  if (name !== 'tick') ctx.resume().then(() => { if (performance.now() - t0 < 250) fire(); }).catch(() => {});
 }
 
 export const isSoundOn = () => enabled;
@@ -136,7 +141,8 @@ export function bindSounds(root = document) {
     if (!el || el.contains(e.relatedTarget)) return;
     play('tick', e);
   });
-  root.addEventListener('pointerdown', (e) => { if (e.target.closest?.('[data-sound]')) play('press'); });
-  root.addEventListener('pointerup', (e) => { if (e.target.closest?.('[data-sound]')) play('release'); });
+  // Au doigt, le contact peut être le début d'un scroll : le son attend pointerup, qui n'arrive que pour un vrai tap (un scroll donne pointercancel).
+  root.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse' && e.target.closest?.('[data-sound]')) play('press'); });
+  root.addEventListener('pointerup', (e) => { if (e.target.closest?.('[data-sound]')) play(e.pointerType === 'mouse' ? 'release' : 'press'); });
   root.addEventListener('focusin', (e) => { if (e.target.matches?.('[data-sound]:focus-visible')) play('tick'); });
 }

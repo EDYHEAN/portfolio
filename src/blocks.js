@@ -1,7 +1,8 @@
 // Blocs des pages projet. Chaque bloc = render (HTML) + motion (dans un gsap.matchMedia).
 // Motion minimaliste : les visuels parlent, le mouvement guide la lecture.
-import { gsap, ScrollTrigger, $, $$, t, tx, asset, spawn, revealTitle, countUp, REDUCE, ROOT, lenis } from './core.js';
+import { gsap, ScrollTrigger, $, $$, t, tx, asset, spawn, revealTitle, countUp, REDUCE, ROOT, lenis, MOBILE } from './core.js';
 import { heroStep } from './heroSnap.js';
+import './viewer.js';
 
 const img = (src, { cls = '', alt = '', eager = false, style = '' } = {}) =>
   `<img src="${asset(src)}" alt="${alt}" class="${cls}" ${eager ? '' : 'loading="lazy"'} decoding="async" ${style ? `style="${style}"` : ''}>`;
@@ -14,11 +15,21 @@ const head = (key, n, note) => `
     ${note ? `<p class="blk-note">${tx(note)}</p>` : ''}
   </header>`;
 
-const browser = (inner, url) => `
+// Le petit bouton « agrandir » d'un cadre (visible au tactile seulement, voir viewer.js).
+const zoomBtn = () => `<button type="button" class="zm-btn" data-sound aria-label="${tx({ fr: 'Agrandir', en: 'Enlarge' })}"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+
+// zoom : 'wide' ou 'phone', le cadre s'ouvre en grand au doigt (viewer.js).
+const browser = (inner, url, zoom) => `
   <div class="browser">
     <div class="browser-bar"><i></i><i></i><i></i><span class="browser-url mono">${url || ''}</span></div>
-    <div class="browser-view">${inner}</div>
+    <div class="browser-view"${zoom ? ` data-zoom="${zoom}"` : ''}>${inner}${zoom ? zoomBtn() : ''}</div>
   </div>`;
+
+// Une rangée de puces qui défile au doigt : la puce choisie revient au milieu. Sans effet quand tout tient (bureau).
+const centerChip = (btn) => {
+  const rail = btn.closest('.pg-list, .var-tabs'), r = rail.getBoundingClientRect(), b = btn.getBoundingClientRect();
+  rail.scrollBy({ left: b.left + b.width / 2 - (r.left + r.width / 2), behavior: REDUCE ? 'auto' : 'smooth' });
+};
 
 // Un prototype live, une fois chargé (même origine seulement : sinon on n'y touche pas) :
 // - sans barre de défilement : dans un cadre réduit, elle mangeait la largeur et faisait « fenêtre Windows » ;
@@ -80,37 +91,70 @@ export const BLOCKS = {
 
   /* Pages : les captures pleine page dans un navigateur (+ le mobile). Plus d'épinglage (Johan, 07/11 : devoir dérouler
      toute la capture pour voir la suite était frustrant) : la molette sur un cadre fait défiler la capture dedans, partout
-     ailleurs elle fait défiler la page. On change de page au clic dans la liste. */
+     ailleurs elle fait défiler la page. On change de page au clic dans la liste.
+     Au doigt : un cadre qui défile piégerait le pouce (il prend presque tout l'écran). Le cadre ne capture donc rien, la
+     capture suit le scroll de la page, et un toucher l'ouvre en grand (viewer.js). Au téléphone, le mobile passe devant :
+     c'est lui qui se lit à cette taille. */
   pages: {
     render(b, p, n) {
-      const shots = b.pages.map((pg, i) => img(pg.src, { cls: `pg-shot${i ? '' : ' is-on'}`, eager: i === 0, alt: tx(pg.label) })).join('');
+      const phoneFirst = matchMedia(MOBILE).matches; // au téléphone, la longue capture de bureau n'est plus la première image à charger
+      const shots = b.pages.map((pg, i) => img(pg.src, { cls: `pg-shot${i ? '' : ' is-on'}`, eager: i === 0 && !phoneFirst, alt: tx(pg.label) })).join('');
       return `
         ${head(b.title || 'b.pages', n)}
         <div class="pg">
           <div class="pg-sticky">
-            <div class="pg-main">${browser(shots, b.pages[0].url)}</div>
+            <div class="pg-main">${browser(shots, b.pages[0].url, 'wide')}</div>
             <aside class="pg-side">
               <ol class="pg-list">${b.pages.map((pg, i) => `<li><button type="button" class="${i ? '' : 'is-on'}" data-pg="${i}" data-sound><span class="mono">${String(i + 1).padStart(2, '0')}</span>${tx(pg.label)}</button></li>`).join('')}</ol>
-              ${b.mobile ? `<div class="phone"><div class="phone-view" data-lenis-prevent>${img(b.mobile, { cls: 'pg-phone-shot' })}</div></div>` : ''}
-              <p class="mono pg-hint">${tx({ fr: 'Scrolle dans le cadre pour parcourir la page.', en: 'Scroll inside the frame to browse the page.' })}</p>
+              ${b.mobile ? `<div class="phone"><div class="phone-view" data-lenis-prevent data-zoom="phone">${img(b.mobile, { cls: 'pg-phone-shot', alt: `${p.name} · mobile` })}${zoomBtn()}</div></div>` : ''}
+              <p class="mono pg-hint"><span class="pg-h-desk">${tx({ fr: 'Scrolle dans le cadre pour parcourir la page.', en: 'Scroll inside the frame to browse the page.' })}</span><span class="pg-h-touch">${tx({ fr: 'Touche la capture pour l’agrandir.', en: 'Tap the capture to enlarge it.' })}</span></p>
             </aside>
           </div>
         </div>`;
     },
-    motion(el, b) {
-      // Le cadre défile en natif (data-lenis-prevent : Lenis laisse la molette au cadre) ; arrivé au bout, la page reprend.
-      const view = $('.browser-view', el);
-      view.setAttribute('data-lenis-prevent', '');
-      const shots = $$('.pg-shot', el);
-      const url = $('.browser-url', el);
+    // Les interactions, posées une seule fois et même sans animation (prefers-reduced-motion).
+    bind(el, b) {
+      const view = $('.browser-view', el), shots = $$('.pg-shot', el), url = $('.browser-url', el);
       $$('[data-pg]', el).forEach((btn) => btn.addEventListener('click', () => {
         const i = +btn.dataset.pg;
         $$('[data-pg]', el).forEach((x) => x.classList.toggle('is-on', x === btn));
         shots.forEach((s, j) => s.classList.toggle('is-on', j === i));
         url.textContent = b.pages[i].url;
         view.scrollTop = 0;
-        gsap.fromTo(shots[i], { opacity: 0 }, { opacity: 1, duration: 0.4 });
+        centerChip(btn);
+        el._pgFollow?.();
+        if (!REDUCE) gsap.fromTo(shots[i], { opacity: 0 }, { opacity: 1, duration: 0.4 });
       }));
+      $$('img', el).forEach((s) => s.addEventListener('load', () => el._pgFollow?.()));
+    },
+    motion(el, b, p, { mobile }) {
+      const view = $('.browser-view', el), pview = $('.phone-view', el), pg = $('.pg', el);
+      const follow = mobile || matchMedia('(pointer: coarse)').matches;
+      pg.classList.toggle('is-follow', follow);
+      if (follow) {
+        // Pas de cadre à part pour Lenis : le doigt reste à la page.
+        [view, pview].forEach((f) => f?.removeAttribute('data-lenis-prevent'));
+        const frames = [[view, () => $('.pg-shot.is-on', el)], ...(pview ? [[pview, () => $('.pg-phone-shot', el)]] : [])].map(([box, shot]) => {
+          const o = { v: 0 };
+          let tw = null; // onRefresh peut tomber pendant la création de la tween
+          const apply = () => {
+            const s = shot(), st = tw?.scrollTrigger;
+            if (!s || !st) return;
+            // Une capture très longue ne doit pas filer à toute allure : au plus 3,4 fois le scroll. Le reste se lit en grand.
+            const d = Math.min(Math.max(0, s.offsetHeight - box.clientHeight), (st.end - st.start) * 3.4);
+            s.style.transform = `translate3d(0, ${(-o.v * d).toFixed(1)}px, 0)`;
+          };
+          tw = gsap.to(o, { v: 1, ease: 'none', onUpdate: apply, scrollTrigger: { trigger: box, start: 'top 88%', end: 'bottom 12%', scrub: 0.3, onRefresh: apply } });
+          return apply;
+        });
+        el._pgFollow = () => frames.forEach((f) => f());
+      } else {
+        // Le cadre défile en natif (data-lenis-prevent : Lenis laisse la molette au cadre) ; arrivé au bout, la page reprend.
+        view.setAttribute('data-lenis-prevent', '');
+        pview?.setAttribute('data-lenis-prevent', '');
+        el._pgFollow = null;
+        $$('.pg-shot, .pg-phone-shot', el).forEach((s) => { s.style.transform = ''; });
+      }
       spawn([$('.pg-sticky', el)], el, { y: 60 });
     },
   },
@@ -119,7 +163,7 @@ export const BLOCKS = {
   screens: {
     render(b, p, n) {
       return `${head('b.screens', n)}
-        <div class="screens">${b.items.map((s) => `<figure class="screen">${browser(img(s.src, { alt: tx(s.label) }), s.url)}<figcaption class="mono">${tx(s.label)}</figcaption></figure>`).join('')}</div>`;
+        <div class="screens">${b.items.map((s) => `<figure class="screen">${browser(img(s.src, { alt: tx(s.label) }), s.url, 'wide')}<figcaption class="mono">${tx(s.label)}</figcaption></figure>`).join('')}</div>`;
     },
     motion(el) { spawn($$('.screen', el), $('.screens', el), { stagger: 0.12 }); },
   },
@@ -220,21 +264,26 @@ export const BLOCKS = {
   },
 
   /* Vitrine : les écrans en grand, entiers (pas de recadrage), dans un navigateur, une légende chacun.
-     size : full (toute la largeur) ou half (deux par ligne). Pour un outil dont l'image fait tout (NookDex). */
+     size : full (toute la largeur) ou half (deux par ligne). Pour un outil dont l'image fait tout (NookDex).
+     Les écrans mobiles qui se suivent sont regroupés dans .shw-rail : sans effet au bureau (display: contents), une rangée
+     à balayer au téléphone (neuf téléphones empilés faisaient six mille pixels de scroll). */
   showcase: {
     render(b, p, n) {
-      return `${head(b.title || 'b.features', n)}
-        <div class="shw">${b.items.map((f, i) => `
+      const item = (f, i) => `
           <figure class="shw-item shw-${f.size || 'full'}">
             ${f.size === 'phone' ? `<div class="phone shw-ph"><div class="phone-view">${img(f.img, { alt: tx(f.t) })}</div></div>` : browser(f.video
               ? `<video class="shw-video${f.pixel ? ' pix' : ''}" src="${asset(f.video)}" poster="${asset(f.img)}" muted loop playsinline autoplay preload="metadata" aria-label="${tx(f.t)}"></video>`
-              : img(f.img, { alt: tx(f.t), cls: f.pixel ? 'pix' : '' }), f.url || '')}
+              : img(f.img, { alt: tx(f.t), cls: f.pixel ? 'pix' : '' }), f.url || '', f.video ? '' : 'wide')}
             <figcaption class="shw-cap">
               <span class="mono shw-n">${String(i + 1).padStart(2, '0')}</span>
               <h3>${tx(f.t)}</h3>
               <p>${tx(f.d)}</p>
             </figcaption>
-          </figure>`).join('')}
+          </figure>`;
+      const isPhone = (f) => f?.size === 'phone';
+      const html = b.items.map((f, i) => `${isPhone(f) && !isPhone(b.items[i - 1]) ? '<div class="shw-rail">' : ''}${item(f, i)}${isPhone(f) && !isPhone(b.items[i + 1]) ? '</div>' : ''}`).join('');
+      return `${head(b.title || 'b.features', n)}
+        <div class="shw">${html}
         </div>`;
     },
     motion(el) {
@@ -415,28 +464,34 @@ export const BLOCKS = {
         <div class="var">
           <div class="var-tabs" role="tablist">${b.items.map((it, i) => `<button type="button" role="tab" class="var-tab" aria-selected="${!i}" data-var="${i}" data-sound><span class="mono">${num(i)}</span>${tx(it.label)}</button>`).join('')}</div>
           <div class="var-stage${f.mobile ? '' : ' is-solo'}">
-            ${browser(img(f.desk, { cls: 'var-desk', eager: true, alt: tx(f.t) }), tx(f.url))}
-            <div class="phone var-phone"><div class="phone-view">${img(f.mobile || f.desk, { cls: 'var-mob', alt: '' })}</div></div>
+            ${browser(img(f.desk, { cls: 'var-desk', eager: true, alt: tx(f.t) }), tx(f.url), 'wide')}
+            <div class="phone var-phone"><div class="phone-view" data-zoom="phone">${img(f.mobile || f.desk, { cls: 'var-mob', alt: '' })}${zoomBtn()}</div></div>
           </div>
           <div class="var-cap"><h3>${tx(f.t)}</h3><p>${tx(f.d)}</p></div>
-          ${b.photos ? `<p class="mono fd-label">${tx(b.photos.title)}</p><div class="var-photos">${b.photos.items.map((src) => img(src, { alt: '' })).join('')}</div>` : ''}
+          ${b.photos ? `<p class="mono fd-label">${tx(b.photos.title)}</p><div class="var-photos">${b.photos.items.map((src) => `<img src="${asset(src)}" alt="" loading="lazy" decoding="async" data-zoom="wide">`).join('')}</div>` : ''}
         </div>`;
     },
-    motion(el, b) {
+    // Les interactions, posées une seule fois et même sans animation (prefers-reduced-motion).
+    bind(el, b) {
       const desk = $('.var-desk', el), mob = $('.var-mob', el), stage = $('.var-stage', el);
-      const preload = () => b.items.forEach((it) => [it.desk, it.mobile].filter(Boolean).forEach((s) => { new Image().src = asset(s); }));
-      new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); preload(); } }, { rootMargin: '60% 0px' }).observe(el);
       $$('[data-var]', el).forEach((btn) => btn.addEventListener('click', () => {
         const it = b.items[+btn.dataset.var];
         $$('[data-var]', el).forEach((x) => x.setAttribute('aria-selected', String(x === btn)));
         desk.src = asset(it.desk); desk.alt = tx(it.t);
         if (it.mobile) mob.src = asset(it.mobile);
+        const h = stage.offsetHeight;
         stage.classList.toggle('is-solo', !it.mobile);
+        if (stage.offsetHeight !== h) ScrollTrigger.refresh(); // au téléphone, une piste sans mobile raccourcit le bloc : la suite remonte
         $('.browser-url', el).textContent = tx(it.url);
         $('.var-cap h3', el).textContent = tx(it.t);
         $('.var-cap p', el).textContent = tx(it.d);
+        centerChip(btn);
         if (!REDUCE) gsap.fromTo([desk, mob, $('.var-cap', el)], { opacity: 0 }, { opacity: 1, duration: 0.35 });
       }));
+    },
+    motion(el, b) {
+      const preload = () => b.items.forEach((it) => [it.desk, it.mobile].filter(Boolean).forEach((s) => { new Image().src = asset(s); }));
+      new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); preload(); } }, { rootMargin: '60% 0px' }).observe(el);
       spawn([$('.var-stage', el)], el, { y: 60 });
       const grid = $('.var-photos', el);
       if (grid) spawn($$('img', grid), grid, { stagger: 0.04, y: 40 });

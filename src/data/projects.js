@@ -270,6 +270,135 @@ export const PROJECTS = [
     ],
   },
   {
+    // iA Déco (09/11) : fichier Figma « iA Déco ». En-têtes des écrans du chat mobile mis au nouveau logo.
+    id: 'ia-deco',
+    card: 'ia-deco/card.webp', // le couloir bleu des tests de marque, sans logo, puis le logo en blanc (scripts/make-cards.mjs)
+    name: 'iA Déco',
+    year: '2025',
+    url: 'https://ia.rhinov.fr/login/',
+    theme: 'dark',
+    colors: { bg: '#1C2553', fg: '#F5F3EE', accent: '#F5F3EE', line: 'rgba(245,243,238,.2)', tile: '#FFFFFF', surface: '#F5F3EE', surfaceFg: '#12151B', surfaceLine: 'rgba(18,21,27,.14)' },
+    logo: { src: 'ia-deco/logo.svg', invert: true, introScale: 0.55 },
+    shot: 'ia-deco/noel/d-london.webp',
+    fonts: ['Poppins:wght@400;600'],
+    type: T('Product design · IA', 'Product design · AI'),
+    role: T('Lead UI/UX', 'Lead UI/UX'),
+    tagline: T('Une photo de sa pièce, des conseils déco en quelques messages.', 'A photo of your room, decor advice in a few messages.'),
+    context: T(
+      "L'assistant déco de Rhinov, imaginé avec ses décoratrices et nourri de plus de 45 000 intérieurs décorés. On envoie une photo, il pose quelques questions, puis propose des palettes, des avant / après et des meubles, gratuitement. De la landing au chat, sur mobile et ordinateur, tout est passé par Figma. Le même socle a ensuite donné Mon Salon de Noël, pour Maisons du Monde.",
+      "Rhinov's decor assistant, shaped with its decorators and built on more than 45,000 decorated interiors. You send a photo, it asks a few questions, then suggests palettes, before / afters and furniture, for free. From the landing page to the chat on mobile and desktop, everything went through Figma. The same foundation later became My Christmas Living Room, for Maisons du Monde.",
+    ),
+    blocks: [
+      {
+        type: 'pages',
+        title: T("La landing et l'entrée", 'Landing page and sign-up'),
+        pages: [
+          { src: 'ia-deco/pages/lp-a.webp', url: 'ia.rhinov.fr', label: T('Landing', 'Landing page') },
+          { src: 'ia-deco/pages/lp-b.webp', url: 'ia.rhinov.fr', label: T('Landing, autre piste', 'Landing page, other route') },
+          { src: 'ia-deco/pages/entree.webp', url: 'ia.rhinov.fr/login', label: T("L'entrée", 'Sign-up') },
+        ],
+        mobile: 'ia-deco/pages/lp-m.webp',
+      },
+      {
+        // La conversation jouée en vrai HTML, d'après les maquettes récentes (bloc `chat`, blocks.js). Les choix sont cliquables.
+        type: 'chat',
+        title: T('Une photo, et la conversation commence', 'One photo, and the conversation starts'),
+        url: 'ia.rhinov.fr',
+        logo: 'ia-deco/logo.svg',
+        picto: 'ia-deco/sim/picto.svg',
+        placeholder: T('Message', 'Message'),
+        side: {
+          actions: [T('Nouveau chat', 'New chat'), T('Mes produits favoris', 'My favourites'), T('Mes projections', 'My projections')],
+          day: T("Aujourd'hui", 'Today'),
+          history: [T("Ma chambre n'est pas prête pour l'arrivée du bébé", "My room isn't ready for the baby"), T('Agrandir ma pièce de vie', 'Making my living room feel bigger'), T('Un canapé pour le salon', 'A sofa for the living room')],
+        },
+        again: T('Rejouer', 'Replay'),
+        steps: [
+          { from: 'user', label: T('La photo', 'The photo'), photo: 'ia-deco/sim/photo.webp', text: T('Comment décorer et agrandir ma pièce ?', 'How can I decorate my room and make it feel bigger?') },
+          { from: 'bot', label: T("L'analyse", 'The analysis'), text: T("Je comprends et je vais vous aider. D'après ce que je constate sur votre photo, il s'agit d'une <b>pièce de vie</b> avec une partie salle à manger et une partie salon. Est-ce bien le cas ?", "I understand, and I'm here to help. From your photo, this looks like a <b>living space</b> with a dining area and a lounge area. Is that right?"), choices: [T('Oui tout à fait', 'Yes, exactly'), T('Pas vraiment', 'Not really')], pick: 0 },
+          { from: 'bot', label: T('La question', 'The question'), text: T('Certains de mes conseils peuvent nécessiter des travaux. Il est important pour moi de savoir si vous êtes <b>propriétaire</b> ou <b>locataire</b> ?', 'Some of my advice may involve building work. It matters to know whether you are an <b>owner</b> or a <b>tenant</b>.'), choices: [T('Je suis locataire', "I'm a tenant"), T('Je suis propriétaire', "I'm an owner")], pick: 1 },
+          {
+            from: 'bot', label: T("L'ambiance", 'The mood'), text: T('<b>Quel salon vous inspire le plus ?</b> Choisissez celui qui se rapproche le plus de vos goûts :', '<b>Which living room inspires you most?</b> Pick the one closest to your taste:'), pick: 1,
+            rooms: [
+              { img: 'ia-deco/sim/room1.webp', echo: T("J'aime ce côté épuré", 'I like how clean it is') },
+              { img: 'ia-deco/sim/room2.webp', echo: T("J'aime le côté cosy", 'I like the cosy feel') },
+              { img: 'ia-deco/sim/room3.webp', echo: T("J'aime ce côté végétal", 'I like all the greenery') },
+            ],
+          },
+          {
+            from: 'bot', label: T('La palette', 'The palette'), text: T('Très bon choix ! Voici une <b>palette de couleurs</b> pour cette ambiance :', 'Great choice! Here is a <b>colour palette</b> for this mood:'), salon: 'ia-deco/sim/salon.webp',
+            palette: [
+              { c: '#FAF0CA', n: T('Ivoire vanillé', 'Vanilla ivory'), dark: true },
+              { c: '#F4D35E', n: T('Jaune maïs', 'Corn yellow'), dark: true },
+              { c: '#F95738', n: T('Orange corail', 'Coral orange') },
+              { c: '#0D3B66', n: T('Bleu profond', 'Deep blue') },
+            ],
+          },
+          {
+            from: 'bot', label: T('La sélection', 'The selection'), text: T('Voici des <b>canapés</b> qui iraient bien dans votre pièce :', 'Here are some <b>sofas</b> that would suit your room:'),
+            products: [
+              { img: 'ia-deco/sim/elvis.webp', name: 'Elvis, canapé clic-clac 3 places en velours vert', price: '399,00 €' },
+              { img: 'ia-deco/sim/lilo.webp', name: 'Lilo, canapé nuage 3/4 places beige sable', price: '1 199,00 €' },
+              { img: 'ia-deco/sim/dorset.webp', name: 'Dorset Business, 3/4 places écru', price: '1 199,00 €' },
+            ],
+            more: T('En savoir +', 'Learn more'), brand: 'Maisons du Monde',
+            rebounds: [T("Découvrir d'autres couleurs", 'Discover other colours'), T('En savoir plus sur Rhinov', 'Learn more about Rhinov'), T('Analyser ma pièce de vie', 'Analyse my living room')],
+          },
+        ],
+      },
+      {
+        type: 'showcase',
+        title: T('Écran par écran', 'Screen by screen'),
+        items: [
+          { img: 'ia-deco/chat/photos.webp', size: 'phone', t: T('Envoyer sa pièce', 'Send your room'), d: T('Une phrase ou une photo : on commence comme on veut.', 'A sentence or a photo: start however you like.') },
+          { img: 'ia-deco/chat/analyse.webp', size: 'phone', t: T("L'iA regarde", 'The AI looks'), d: T("Elle décrit ce qu'elle voit et vérifie qu'elle a bien compris.", 'It describes what it sees and checks it got it right.') },
+          { img: 'ia-deco/chat/question.webp', size: 'phone', t: T('Elle demande', 'It asks'), d: T('Propriétaire ou locataire : la réponse change les conseils.', 'Owner or tenant: the answer changes the advice.') },
+          { img: 'ia-deco/chat/style.webp', size: 'phone', t: T('Choisir une ambiance', 'Pick a mood'), d: T('Des images plutôt que des mots pour dire ses goûts.', 'Pictures rather than words to say what you like.') },
+          { img: 'ia-deco/chat/palette.webp', size: 'phone', t: T('La palette', 'The palette'), d: T('Les couleurs et leur code, à côté d’une pièce qui les porte.', 'Colours and their codes, next to a room wearing them.') },
+          { img: 'ia-deco/chat/avap.webp', size: 'phone', t: T('Avant / après', 'Before / after'), d: T('Un exemple réalisé par une décoratrice Rhinov illustre le conseil.', 'An example by a Rhinov decorator illustrates the advice.') },
+          { img: 'ia-deco/chat/selection.webp', size: 'phone', t: T('La sélection', 'The selection'), d: T('Des meubles du catalogue, directement dans la conversation.', 'Furniture from the catalogue, right in the conversation.') },
+          { img: 'ia-deco/chat/fiche.webp', size: 'phone', t: T('La fiche produit', 'The product sheet'), d: T('Ajouter au panier ou projeter dans sa pièce, sans quitter le chat.', 'Add to cart or project it in your room, without leaving the chat.') },
+          { img: 'ia-deco/chat/push.webp', size: 'phone', t: T('Passer à une décoratrice', 'Hand over to a decorator'), d: T('Pour aller plus loin, le chat propose un vrai projet Rhinov.', 'To go further, the chat offers a real Rhinov project.') },
+        ],
+      },
+      {
+        // Diag de Noël (fichier Figma « Diag de Noël », page VFinale) : le même socle, pour Maisons du Monde.
+        type: 'fan',
+        title: T('Mon Salon de Noël', 'My Christmas Living Room'),
+        note: T('Le même socle pour Maisons du Monde, une autre mécanique : on choisit une destination, on envoie une photo, on reçoit son salon transformé.', 'The same foundation for Maisons du Monde, a different mechanic: pick a destination, send a photo, get your living room transformed.'),
+        items: [
+          { img: 'ia-deco/noel/m-london.webp', t: T('Noël à London', 'Christmas in London'), d: T('Le tartan sur le canapé, le thé qui infuse, un Noël feutré.', 'Tartan on the sofa, tea brewing, a hushed Christmas.') },
+          { img: 'ia-deco/noel/m-paris.webp', t: T('Noël à Paris', 'Christmas in Paris'), d: T('Un appartement haussmannien, le doré du champagne, un sapin graphique.', 'A Haussmann apartment, champagne gold, a graphic tree.') },
+          { img: 'ia-deco/noel/m-quebec.webp', t: T('Noël à Québec', 'Christmas in Quebec'), d: T('Un chalet dans la forêt enneigée, des plaids et des bougies.', 'A chalet in the snowy forest, throws and candles.') },
+          { img: 'ia-deco/noel/m-chamonix.webp', t: T('Noël à Chamonix', 'Christmas in Chamonix'), d: T('Bonnets colorés, télésièges et Père Noël surfeur : un Noël décalé.', 'Colourful beanies, chairlifts and a surfing Santa: a quirky Christmas.') },
+          { img: 'ia-deco/noel/m-jaipur.webp', t: T('Noël à Jaipur', 'Christmas in Jaipur'), d: T('Guirlandes colorées et broderies perlées, un Noël chatoyant.', 'Colourful garlands and beaded embroidery, a shimmering Christmas.') },
+          { img: 'ia-deco/noel/m-mars.webp', t: T('Noël sur Mars', 'Christmas on Mars'), d: T('Boules à facettes et décorations irisées, un Noël d’une autre dimension.', 'Disco balls and iridescent decorations, a Christmas from another dimension.') },
+        ],
+      },
+      {
+        type: 'showcase',
+        title: T('Du salon réel au salon de Noël', 'From the real room to the Christmas room'),
+        items: [
+          { img: 'ia-deco/noel/f-photo.webp', size: 'phone', t: T('Ajouter sa photo', 'Add your photo'), d: T('Un seul geste, dans le décor de sa destination.', 'One gesture, set in your destination.') },
+          { img: 'ia-deco/noel/f-mail.webp', size: 'phone', t: T('Laisser son e-mail', 'Leave your email'), d: T('Le prix à payer, juste avant la magie.', 'The only ask, right before the magic.') },
+          { img: 'ia-deco/noel/f-prep.webp', size: 'phone', t: T('Patienter', 'Waiting'), d: T('Une attente qui prépare, version Rhinov.', 'A wait that builds anticipation, Rhinov version.') },
+          { img: 'ia-deco/noel/f-result.webp', size: 'phone', t: T('Le résultat', 'The result'), d: T('L’avant / après, les partis pris, puis les pépites à acheter.', 'The before / after, the design choices, then the finds to buy.') },
+          { img: 'ia-deco/noel/f-rh.webp', size: 'phone', t: T('La version Rhinov', 'The Rhinov version'), d: T('Les mêmes destinations, sous la marque Rhinov.', 'The same destinations, under the Rhinov brand.') },
+          { img: 'ia-deco/noel/f-gros.webp', size: 'phone', t: T('Le gros lot', 'The jackpot'), d: T('Un jeu pour revenir, avec un projet déco à gagner.', 'A game to bring people back, with a decor project to win.') },
+        ],
+      },
+      {
+        type: 'pages',
+        title: T('La page de résultat', 'The result page'),
+        pages: [
+          { src: 'ia-deco/noel/r-london.webp', url: 'Mon Salon de Noël · London', label: 'London' },
+          { src: 'ia-deco/noel/r-mars.webp', url: 'Mon Salon de Noël · Mars', label: 'Mars' },
+        ],
+        mobile: 'ia-deco/noel/r-mobile.webp',
+      },
+    ],
+  },
+  {
     // Maisons du Monde · Labo (Johan, 06/11) : trois prototypes codés réunis en un projet (Pièce Rare, Catalogue Visite,
     // 24 h à la maison). Sources : sources/raw/vibecoded ; copies allégées par scripts/make-mdm-labo.mjs.
     // Décors générés avec Gemini (prompts dans les sources), heures et lumière de « 24 h » calculées dans le code.

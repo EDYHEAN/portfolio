@@ -167,6 +167,13 @@ export const BLOCKS = {
         </button>`).join('')}</div>` : '';
       const first = b.items[0];
       const wait = `<div class="live-wait" aria-hidden="true"><span class="live-spin"></span><span class="mono">${tx({ fr: 'Chargement du prototype', en: 'Loading the prototype' })}</span></div>`;
+      // item.gallery : les captures sous les cartes (Rhinov Studio). Au tactile seulement, comme les cartes.
+      const gallery = b.items.some((it) => it.gallery) ? `<div class="live-gallery">${b.items.filter((it) => it.gallery).map((it) => `
+          <section class="live-set">
+            <h3>${tx(it.label)}</h3>
+            <div class="live-rail">${it.gallery.map((src) => img(src, { alt: tx(it.label) })).join('')}</div>
+          </section>`).join('')}
+        </div>` : '';
       return `${head(blockTitle(b) || 'b.pages', n)}
         <div class="live${b.items[0].stills ? ' is-sets' : ''}">
           ${tabs}
@@ -189,7 +196,7 @@ export const BLOCKS = {
               <span class="live-card-t"><b>${tx(it.label)}</b>${it.sum ? `<span>${tx(it.sum)}</span>` : ''}</span>
             </a>`)).join('')}
           </div>
-        </div>`;
+        </div>${gallery}`;
     },
     motion(el, b) {
       if (matchMedia(STILL).matches) { spawn($$('.live-card, .live-set', el), $('.live-reel', el), { y: 50, stagger: 0.1 }); return; } // aucune iframe dans la page

@@ -56,8 +56,8 @@ export const PROJECTS = [
         type: 'live',
         title: T('Les landings, en vrai', 'The landing pages, live'),
         items: [
-          { src: 'rhinov-studio/live/retail/index.html', poster: 'rhinov-studio/posters/retail.webp', url: T('Rhinov Studio · retail', 'Rhinov Studio · retail'), label: T('Retail', 'Retail') },
-          { src: 'rhinov-studio/live/immo/index.html', poster: 'rhinov-studio/posters/immo.webp', url: T('Rhinov Studio · immo', 'Rhinov Studio · real estate'), label: T('Immo', 'Real estate') },
+          { src: 'rhinov-studio/live/retail/index.html', poster: 'rhinov-studio/posters/retail.webp', gallery: [1, 2, 3, 4, 5].map((k) => `rhinov-studio/stills/retail-${k}.webp`), url: T('Rhinov Studio · retail', 'Rhinov Studio · retail'), label: T('Retail', 'Retail') },
+          { src: 'rhinov-studio/live/immo/index.html', poster: 'rhinov-studio/posters/immo.webp', gallery: [1, 2, 3, 4].map((k) => `rhinov-studio/stills/immo-${k}.webp`), url: T('Rhinov Studio · immo', 'Rhinov Studio · real estate'), label: T('Immo', 'Real estate') },
         ],
       },
       {

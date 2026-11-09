@@ -30,7 +30,7 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .intro .btn { margin-top: 32px; }
 /* Au téléphone, l'intro tient sur l'écran autant que possible : logo plus petit, marges resserrées, retour à 44 px au doigt. */
 @media (max-width: 860px) {
-  .intro { padding: 118px var(--gutter) 40px; }
+  .intro { padding: 134px var(--gutter) 40px; }
   .intro .intro-back { top: 66px; left: 0; display: inline-flex; align-items: center; gap: 0.6em; min-height: 44px; padding: 0 var(--gutter); }
   .intro-logo { height: calc(min(20svh, 190px) * var(--logo-k, 1)); }
   .intro-name { margin-top: 2.4svh; font-size: clamp(38px, 10.5vw, 64px); }
@@ -249,7 +249,7 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .live-hint { margin: 18px 0 0; opacity: 0.6; }
 /* Au téléphone et au doigt : les cartes (l'affiche du prototype, un tap pour le lancer) remplacent onglets et cadres.
    On passe de l'une à l'autre au balayage, et rien ne se charge tant qu'on n'a pas tapé (blocks.js, openLive). */
-.live-reel { display: none; }
+.live-reel, .live-gallery { display: none; }
 @media (max-width: 860px), (pointer: coarse) {
   .blk-live .live { padding: 18px 0 20px; overflow: hidden; }
   .blk-live .live-tabs, .blk-live .live-stage, .blk-live .live-hint { display: none; }
@@ -264,6 +264,7 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
   .live-card:active .live-card-ph { transform: scale(0.97); }
   .live-go { position: absolute; left: 50%; bottom: 22px; translate: -50% 0; display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 20px 0 16px; border-radius: 999px; background: #fff; color: #111; font-weight: 700; font-size: 14px; white-space: nowrap; box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3); }
   .live-go i { width: 0; height: 0; border-style: solid; border-width: 7px 0 7px 11px; border-color: transparent transparent transparent currentColor; }
+  .live-gallery { display: block; margin-top: 40px; }
   .blk-live .live.is-sets { padding: 0; overflow: visible; background: none; border: 0; box-shadow: none; }
   .blk-live .is-sets .live-reel { display: block; overflow: visible; padding: 0; }
   .live-set + .live-set { margin-top: 40px; }
@@ -717,7 +718,7 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 }
 @media (max-width: 599px) {
   .blk-n, .shw-n, .blk-note, .blk-stack { display: none; }
-  .intro { min-height: 0; padding: 96px var(--gutter) 44px; }
+  .intro { min-height: 0; padding: 134px var(--gutter) 44px; }
   .blk { padding-top: 64px; }
   .blk-next { padding-bottom: 64px; }
   .blk-head { display: block; margin-bottom: 16px; }

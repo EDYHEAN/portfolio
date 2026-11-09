@@ -36,6 +36,7 @@
     </defs>
   </svg>
   <div class="curtain" aria-hidden="true"><span class="curtain-mark" data-hyena></span></div>
+  <script>try { if (document.documentElement.classList.contains('came')) document.querySelector('.curtain-mark').innerHTML = sessionStorage.getItem('edy-curtain-mark') || ''; } catch (e) {}</script>
   <header class="hdr" id="hdr" data-theme="light"></header>
   <div class="cursor" aria-hidden="true"><span class="cursor-label"></span></div>
   <main id="app"></main>

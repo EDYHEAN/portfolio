@@ -177,6 +177,49 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 /* Un onglet sans mobile (la Visite) : le navigateur prend toute la largeur. Au téléphone, le mobile reste le seul cadre. */
 @media (min-width: 861px) { .live-stage.is-solo { grid-template-columns: minmax(0, 1fr); } .live-stage.is-solo .live-phone { display: none; } }
 .live-hint { margin: 18px 0 0; opacity: 0.6; }
+/* Au téléphone et au doigt : les cartes (l'affiche du prototype, un tap pour le lancer) remplacent onglets et cadres.
+   On passe de l'une à l'autre au balayage, et rien ne se charge tant qu'on n'a pas tapé (blocks.js, openLive). */
+.live-reel { display: none; }
+@media (max-width: 860px), (pointer: coarse) {
+  .blk-live .live { padding: 18px 0 20px; overflow: hidden; }
+  .blk-live .live-tabs, .blk-live .live-stage, .blk-live .live-hint { display: none; }
+  .blk-live .live-reel {
+    display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 18px; padding: 0 18px;
+    scrollbar-width: none; overscroll-behavior-x: contain; justify-content: safe center;
+  }
+  .live-reel::-webkit-scrollbar { display: none; }
+  .live-card { flex: none; display: flex; flex-direction: column; gap: 12px; width: min(72vw, 300px, calc(68svh * 9 / 19.5)); color: inherit; text-decoration: none; scroll-snap-align: center; -webkit-tap-highlight-color: transparent; }
+  .live-card-ph { position: relative; display: block; aspect-ratio: 9 / 19.5; border-radius: 28px; padding: 7px; background: #111; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3); transition: transform 0.25s var(--ease-out); }
+  .live-card:active .live-card-ph { transform: scale(0.97); }
+  .live-card-ph img { display: block; width: 100%; height: 100%; border-radius: 22px; object-fit: cover; background: var(--s-line); }
+  .live-go { position: absolute; left: 50%; bottom: 22px; translate: -50% 0; display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 20px 0 16px; border-radius: 999px; background: #fff; color: #111; font-weight: 700; font-size: 14px; white-space: nowrap; box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32); }
+  .live-go i { width: 0; height: 0; border-style: solid; border-width: 7px 0 7px 11px; border-color: transparent transparent transparent currentColor; }
+  .live-card-t { display: grid; gap: 3px; padding: 0 4px; }
+  .live-card-t b { font-size: 18px; font-weight: 750; letter-spacing: -0.015em; }
+  .live-card-t span { font-size: 14px; line-height: 1.35; opacity: 0.7; }
+}
+/* Paysage au téléphone : l'affiche à gauche, le titre à droite, tout tient dans la hauteur. */
+@media (max-height: 500px) and (max-width: 960px) {
+  .live-card { flex-direction: row; align-items: center; width: min(62vw, 400px); gap: 16px; }
+  .live-card-ph { flex: none; height: 76svh; aspect-ratio: 9 / 19.5; border-radius: 20px; padding: 5px; }
+  .live-card-ph img { border-radius: 15px; }
+  .live-go { left: calc(100% + 16px); bottom: 0; translate: 0 0; box-shadow: none; background: var(--s-fg); color: var(--s-bg); }
+  .live-card-t { padding: 0 0 60px; }
+}
+/* Le prototype ouvert : tout l'écran, une barre fine pour en sortir (elle ne recouvre jamais le prototype). */
+.lv-sheet { position: fixed; inset: 0; z-index: 80; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: var(--p-tile); color: var(--s-fg); }
+@supports (height: 100dvh) { .lv-sheet { bottom: auto; height: 100dvh; } }
+.lv-bar { flex: none; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: env(safe-area-inset-top) 8px 0; }
+.lv-close { flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: none; color: inherit; font: inherit; font-weight: 700; font-size: 15px; cursor: pointer; }
+.lv-name { flex: 1; min-width: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.75; }
+.lv-bar .live-open { flex: none; display: inline-flex; align-items: center; min-height: 44px; margin: 0; padding: 0 12px; border: 0; }
+.lv-view { position: relative; flex: 1; min-height: 0; overflow: hidden; background: #000; }
+.lv-frame { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; border: 0; opacity: 0; background: #fff; transition: opacity 0.4s; }
+.lv-frame.is-on { opacity: 1; }
+.lv-poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.lv-view .live-wait { grid-template-columns: minmax(0, 1fr); justify-content: stretch; background: rgba(10, 10, 10, 0.55); color: #fff; padding: 24px; text-align: center; backdrop-filter: blur(3px); }
+.lv-view .live-spin { border-color: rgba(255, 255, 255, 0.3); border-top-color: #fff; }
+.lv-hint { margin: 2px 0 0; max-width: 30ch; font-size: 15px; line-height: 1.4; }
 .shw-item .browser-view img, .shw-video { display: block; width: 100%; height: auto; }
 .shw-item .pix { image-rendering: pixelated; } /* pixel art agrandi : des pixels nets, pas de flou */
 .shw-cap { display: grid; grid-template-columns: auto auto minmax(0, 1fr); align-items: baseline; gap: 6px 16px; margin-top: 16px; }
@@ -288,14 +331,27 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .cs-again { position: absolute; top: 9px; right: 12px; padding: 7px 12px; border: 0; border-radius: 20px; background: #111; color: #fff; cursor: pointer; font-size: 10px; }
 @media (max-width: 860px) {
   .cs { grid-template-columns: minmax(0, 1fr); gap: 0; }
-  .cs-rail { display: none; }
-  .cs-app { grid-template-columns: minmax(0, 1fr); height: min(72svh, 600px); }
+  /* Les étapes tiennent sur une ligne : seule celle en cours, juste au-dessus de la conversation. */
+  .cs-rail { position: static; display: block; min-height: 26px; margin: 0 0 12px; }
+  .cs-rail li { display: none; padding: 0; border: 0; opacity: 1; font-size: 15px; }
+  .cs-rail li.is-on, .cs-rail:not(:has(.is-on)) li:first-child { display: flex; }
+  .cs-rail li .mono { opacity: 0.55; }
+  .cs-app { grid-template-columns: minmax(0, 1fr); height: clamp(340px, 74svh, 640px); }
   .cs-side { display: none; }
   .cs-list { padding: 18px 14px 28px; }
-  .cs-m { font-size: 13px; }
-  .cs-prods { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .cs-prods .cs-prod:nth-child(3) { display: none; }
+  .cs-m { font-size: 14px; }
+  /* Cibles au doigt : 44 px au moins. */
+  .cs-chip { min-height: 44px; padding: 10px 16px; font-size: 14px; }
+  .cs-again { top: 0; right: 4px; min-height: 44px; padding: 0 14px; font-size: 12px; background: none; color: #111; font-weight: 600; }
+  /* Les trois produits, au balayage (on en coupait un). */
+  .cs-prods { display: flex; gap: 10px; margin-right: -14px; padding-right: 14px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; }
+  .cs-prods::-webkit-scrollbar { display: none; }
+  .cs-prod { flex: 0 0 44%; scroll-snap-align: start; }
+  .cs-rebounds span { font-size: 13px; }
 }
+@media (max-width: 860px) and (prefers-reduced-motion: reduce) { .cs-rail { display: none; } } /* pas d'animation, pas d'étape en cours */
+@media (max-width: 560px) { .cs .browser-bar { display: none; } } /* sur un écran de téléphone, un faux navigateur ne fait que manger la place */
+@media (hover: none) { .cs-chip:hover:not(:disabled) { background: #F2F2F2; } .cs-room:hover:not(:disabled) img { transform: none; } }
 
 /* Écrans mobiles d'une vitrine : dans un téléphone, à taille de poche. */
 .shw-phone { grid-column: span 2; display: flex; flex-direction: column; align-items: center; }
@@ -383,6 +439,32 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .ft-txt { padding: 20px 24px 28px; } /* de l'air sous le texte : il collait au bord bas de la tuile (Johan, 06/11) */
 .ft-txt h3 { margin: 0; font-size: clamp(17px, 1.3vw, 21px); font-weight: 750; letter-spacing: -0.015em; }
 .ft-txt p { margin: 3px 0 0; font-size: 14px; line-height: 1.4; opacity: 0.72; }
+/* Au téléphone : la hauteur suit le contenu (à hauteur fixe, l'image était écrasée et le texte coupé). Chaque format a son
+   cadre, pour que les composants restent lisibles. .blk-features : passe après les règles génériques du bas du fichier. */
+@media (max-width: 860px) {
+  .blk-features .ft-bento { grid-auto-rows: auto; gap: 10px; }
+  .blk-features .ft-t, .blk-features .ft-l { grid-row: auto; }
+  .blk-features .ft-img { flex: none; aspect-ratio: 1; }
+  .blk-features .ft-l .ft-img { aspect-ratio: 4 / 3; }
+  .blk-features .ft-w .ft-img { aspect-ratio: 16 / 9; }
+  .blk-features .ft-t .ft-img { aspect-ratio: 3 / 4; }
+  .blk-features .ft-img img { position: absolute; inset: 0; }
+  .blk-features .ft-txt { padding: 12px 16px 18px; }
+  .blk-features .ft-txt h3 { font-size: 17px; }
+  /* Les tuiles 3D : un même cadre partout. */
+  .blk-features .ft-bento:has(.ft-img[data-model]) .ft-img { height: auto; aspect-ratio: 4 / 3; }
+}
+/* Tuiles 3D au téléphone : en liste, le modèle à gauche et le texte à droite (lisible, et bien moins long à parcourir). */
+@media (max-width: 560px) {
+  .blk-features .ft-bento:has(.ft-img[data-model]) { grid-template-columns: minmax(0, 1fr); }
+  .blk-features .ft-bento:has(.ft-img[data-model]) .ft, .blk-features .ft-bento:has(.ft-img[data-model]) .ft:last-child:nth-child(odd) { grid-column: span 1; flex-direction: row; align-items: center; }
+  .blk-features .ft-bento:has(.ft-img[data-model]) .ft-img { flex: 0 0 42%; height: auto; aspect-ratio: 1; overflow: visible; } /* l'ombre de l'affiche ne se coupe pas net */
+  .blk-features .ft-bento:has(.ft-img[data-model]) .ft-txt { flex: 1; min-width: 0; padding: 14px 18px 14px 4px; }
+  .blk-features .ft-bento:has(.ft-img[data-model]) .ft-txt p { font-size: 14px; }
+}
+@media (hover: none) { .blk-features .ft:hover .ft-img img { transform: none; } }
+/* Repli sur l'affiche (appareil qui ne suit pas la 3D) : sur tuile claire, l'ombre gravée dans l'image se voyait coupée au bord. */
+@media (max-width: 860px) { .ft-img[data-soft]:not(.is-3d) img { mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent), linear-gradient(to bottom, #000 90%, transparent); mask-composite: intersect; -webkit-mask-composite: source-in; } }
 
 /* --- Sous le capot ------------------------------------------------- */
 .stk { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); gap: 4vw; align-items: center; }
@@ -409,6 +491,7 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .stk-autos li { padding: 18px 0; border-top: 1px solid var(--s-line); }
 .stk-autos li .mono { color: var(--s-fg); opacity: 0.55; }
 .stk-autos li p { margin: 6px 0 0; font-size: clamp(16px, 1.2vw, 19px); line-height: 1.4; }
+@media (max-width: 860px) { .blk-stack .stk-core { width: 104px; margin-bottom: 4px; } .blk-stack .stk { gap: 34px; } }
 
 /* --- Déclinaisons (horizontal) ------------------------------------ */
 .blk-slides { padding: 0; }
@@ -418,6 +501,23 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .slide { margin: 0; width: clamp(320px, 52vw, 860px); }
 .slide img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 14px; box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18); }
 .slide figcaption { margin-top: 12px; opacity: 0.65; }
+.sl-count { display: none; }
+/* Au téléphone : une piste qu'on balaie, aimantée à chaque slide, la suivante qui dépasse pour inviter le geste. Le balayage
+   est natif : le navigateur choisit seul entre horizontal et vertical, le scroll de la page n'est jamais retenu. */
+@media (max-width: 860px) {
+  .blk-slides .sl-pin { padding-bottom: 0; }
+  .blk-slides .sl-track {
+    flex-direction: row; width: auto; gap: 12px; padding-bottom: 4px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter);
+    overscroll-behavior-x: contain; scrollbar-width: none;
+  }
+  .blk-slides .sl-track::-webkit-scrollbar { display: none; }
+  .blk-slides .slide { flex: none; width: min(84vw, 620px, calc((100svh - 120px) * 16 / 9)); scroll-snap-align: start; }
+  .blk-slides .slide img { background: var(--p-tile); box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16); }
+  .sl-count { display: flex; align-items: center; gap: 8px; margin: 14px var(--gutter) 0; font-size: 12px; opacity: 0.75; }
+  .sl-bar { flex: 1; max-width: 120px; height: 2px; margin-left: 8px; background: var(--s-line); overflow: hidden; }
+  .sl-bar i { display: block; height: 100%; background: currentColor; transform: scaleX(0); transform-origin: 0 50%; }
+}
+@media (prefers-reduced-motion: reduce) { .sl-count { display: none; } } /* il est tenu à jour par le script des slides */
 
 /* --- Chiffres ------------------------------------------------------ */
 .out-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 40px; }
@@ -425,6 +525,8 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .out-num { font-weight: 800; font-size: clamp(56px, 6.5vw, 116px); line-height: 0.95; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
 [data-project='myfrenchtool'] .out-num { color: #0052CC; }
 .out-lbl { font-size: 16px; opacity: 0.75; }
+@media (max-width: 860px) { .blk-outcome .out-row { gap: 10px; } .blk-outcome .out-stat { padding: 22px 22px 24px; } }
+@media (min-width: 600px) and (max-width: 860px) { .blk-outcome .out-row { grid-template-columns: repeat(3, minmax(0, 1fr)); } .blk-outcome .out-num { font-size: clamp(38px, 6.4vw, 56px); } }
 
 /* --- Projet suivant ------------------------------------------------ */
 .blk-next { padding-bottom: 14vh; }

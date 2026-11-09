@@ -57,6 +57,10 @@ Au téléphone, chaque fonctionnalité est repensée pour le doigt, le bureau ne
 - Showreel (`src/reel.js`, Vimeo 591673847) : une carte tirée au hasard comme les autres, toujours à la dernière place (en bas à droite), aperçu muet (`assets/reel/preview.mp4`). Au clic, la carte passe en 16:9 dans la zone du tirage, les autres cartes s'écartent, le film se charge ; Fermer, Échap ou un clic ailleurs ramène l'état neutre.
 - Footer : « Johan Trigeard © 1993 – 202+ », LinkedIn, Mail (adresse jamais en clair, morceaux inversés dans `CONTACT.mail`).
 
+## L'image de partage
+
+`npm run og` (`scripts/make-og.mjs`) : `assets/og.jpg`, 1200×630, le lockup, le poste et trois vraies cartes du tirage. Balises Open Graph dans `scripts/shell.mjs`, la même image sur toutes les pages (adresse absolue vers johantrigeard.com). LinkedIn garde l'aperçu en cache : après un changement, le rafraîchir avec son Post Inspector.
+
 ## Le CV
 
 Variante deux colonnes gardée en option : `node scripts/make-cv-aere.mjs` (`sources/cv-aere/`).

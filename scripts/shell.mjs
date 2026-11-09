@@ -8,6 +8,15 @@ export const shell = ({ title, desc, root, attrs, theme = "#EFE9DD", script, loa
   <link rel="preload" as="image" href="${root}${preload}" fetchpriority="high">` : ''}
   <meta name="description" content="${desc}">${noindex ? '\n  <meta name="robots" content="noindex, nofollow">' : ''}
   <meta name="theme-color" content="${theme}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Johan Trigeard">
+  <meta property="og:title" content="${title}">
+  <meta property="og:description" content="${desc}">
+  <meta property="og:image" content="https://johantrigeard.com/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Johan Trigeard, Lead UI/UX et Product Designer à Bordeaux">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="${root}brand/hyena-favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="${root}brand/favicon-32.png">
   <link rel="apple-touch-icon" href="${root}brand/apple-touch-icon.png">

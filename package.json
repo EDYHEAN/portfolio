@@ -6,6 +6,7 @@
   "scripts": {
     "pages": "node scripts/make-home.mjs && node scripts/make-pages.mjs && node scripts/make-applications.mjs",
     "cv": "node scripts/make-cv.mjs",
+    "og": "node scripts/make-og.mjs",
     "predev": "npm run pages",
     "dev": "vite",
     "prebuild": "npm run pages",

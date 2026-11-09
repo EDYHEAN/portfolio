@@ -3,7 +3,7 @@
 // `node scripts/make-cards.mjs [id…]` (sans argument : toutes). Les logos d'outils de MFT sont dans sources/cards/.
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { launch } from './make-booster.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -121,11 +121,30 @@ const CARDS = {
   },
 };
 
-const ids = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(CARDS);
+// node scripts/make-cards.mjs apply:{slug} : les cartes d'une candidature (config src/data/applications/{slug}.js).
+const appCard = (a) => `<style>${BASE}
+  body{background:${a.bg}}
+  .art{position:absolute;left:50%;top:50%;height:1270px;width:auto;transform:translate(-50%,-50%);
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 9% 91%,transparent),linear-gradient(transparent,#000 7% 90%,transparent);-webkit-mask-composite:source-in;
+    mask-image:linear-gradient(90deg,transparent,#000 9% 91%,transparent),linear-gradient(transparent,#000 7% 90%,transparent);mask-composite:intersect}
+  svg.court{position:absolute;inset:0;width:100%;height:100%}
+  </style>
+  <svg class="court" viewBox="0 0 ${W} ${H}" fill="none" stroke="${a.lines}" stroke-width="5"><path d="M90 -20V1520M810 -20V1520M90 330H810M90 1170H810M450 330V1170"/></svg>
+  <img class="art" src="${dataUri(path.join(ROOT, 'assets', a.poster))}">
+  ${GRAIN}`;
+const jobs = [];
+for (const arg of process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(CARDS)) {
+  if (arg.startsWith('apply:')) {
+    const slug = arg.slice(6);
+    const app = (await import(pathToFileURL(path.join(ROOT, 'src/data/applications', `${slug}.js`)).href)).default;
+    fs.mkdirSync(path.join(ROOT, 'assets/apply', slug, 'cards'), { recursive: true });
+    for (const p of app.projects) jobs.push({ id: `${slug}/${p.id}`, html: () => appCard(p.cardArt), out: path.join(ROOT, 'assets', p.card) });
+  } else jobs.push({ id: arg, html: () => CARDS[arg](), out: path.join(ROOT, `assets/${arg}/card.webp`) });
+}
 const browser = await launch();
 const page = await browser.newPage({ viewport: { width: W, height: H } });
-for (const id of ids) {
-  await page.setContent(`<!doctype html><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600&display=block" rel="stylesheet">${CARDS[id]()}`);
+for (const { id, html, out } of jobs) {
+  await page.setContent(`<!doctype html><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600&display=block" rel="stylesheet">${html()}`);
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(150);
   const png = await page.screenshot({ type: 'png' });
@@ -134,7 +153,7 @@ for (const id of ids) {
     const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; c.getContext('2d').drawImage(im, 0, 0);
     return c.toDataURL('image/webp', 0.86).split(',')[1];
   }, png.toString('base64')), 'base64');
-  fs.writeFileSync(path.join(ROOT, `assets/${id}/card.webp`), webp);
+  fs.writeFileSync(out, webp);
   console.log(id, `${(webp.length / 1024).toFixed(0)} Ko`);
 }
 await browser.close();

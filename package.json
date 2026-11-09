@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "pages": "node scripts/make-home.mjs && node scripts/make-pages.mjs",
+    "pages": "node scripts/make-home.mjs && node scripts/make-pages.mjs && node scripts/make-applications.mjs",
     "predev": "npm run pages",
     "dev": "vite",
     "prebuild": "npm run pages",

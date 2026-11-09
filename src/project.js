@@ -6,6 +6,7 @@ import {
 } from './core.js';
 import { projectById, nextProject } from './data/projects.js';
 import { BLOCKS } from './blocks.js';
+import { heroSnap } from './heroSnap.js';
 
 const p = projectById(document.body.dataset.project);
 const next = nextProject(p.id);
@@ -82,6 +83,7 @@ boot();
 render();
 motion();
 onLang(() => { mm.revert(); render(); motion(); });
+heroSnap();
 const came = curtainIn();
 runLoader(came).then((played) => intro(came || played ? 0.35 : 0.05));
 refreshOnImages();

@@ -1,4 +1,4 @@
-# Les illustrations 3D des « Features clés » (Johan, 06/11 : les captures n'apportaient rien) : de petites scènes en pâte
+﻿# Les illustrations 3D des « Features clés » (Johan, 06/11 : les captures n'apportaient rien) : de petites scènes en pâte
 # à modeler douce, aux couleurs du projet, rendues au format de leur tuile du bento.
 #   blender -b --factory-startup -P scripts/blender/make-features.py -- vinyl-run [nom…] [--glb-only]
 # Écrit assets/<projet>/features3d/<nom>.glb (le modèle, animé en temps réel dans la tuile : src/feature3d.js) et
@@ -495,7 +495,193 @@ def mf_blog():
     render('blog')
 
 
+# --------------------------------------------------------------------------------------------------------------------
+# Candidature Lacoste (projets imaginés) : des objets originaux, univers club de tennis. Vert, rouge et noir relevés dans le
+# logo 2026 ; le reste (papier, balle, terre battue, bois) sont des couleurs d'objets.
+#   blender -b --factory-startup -P scripts/blender/make-features.py -- apply/lacoste [nom…]
+LC = {'green': '#06532A', 'deep': '#0B3A20', 'ink': '#181713', 'red': '#D30018', 'paper': '#F3EFE4', 'white': '#FBF8F1',
+      'ball': '#D7DF3F', 'clay': '#C4673E', 'wood': '#C39A69', 'gold': '#D9B15C', 'pale': '#DCE6D8', 'grey': '#8E938C'}
+
+
+def lc_scene(bg, cam, target, lens=50, power=480):
+    scene(bg, 't', cam, target, lens=lens, key_power=power, ambient=0.5, back=0.15)
+    if os.environ.get('PREVIEW_SAMPLES'):
+        bpy.context.scene.cycles.samples = int(os.environ['PREVIEW_SAMPLES'])
+
+
+def lean(angle, axis='Y', margin=0.02):
+    """Incline tout ce qui est posé (axe du monde), puis le repose sur le sol."""
+    objs = [o for o in bpy.context.scene.objects if o.type == 'MESH' and o.name != 'ground']
+    bpy.context.view_layer.update()
+    R = Matrix.Rotation(math.radians(angle), 4, axis)
+    for o in objs:
+        o.matrix_world = R @ o.matrix_world
+    bpy.context.view_layer.update()
+    low = min((o.matrix_world @ Vector(c)).z for o in objs for c in o.bound_box)
+    for o in objs:
+        o.location.z += margin - low
+
+
+def lathe(profile, loc, color, verts=64):
+    """Un profil (rayon, hauteur) tourné autour de Z : coupe, vase, pied."""
+    me = bpy.data.meshes.new('lathe'); bm = bmesh.new()
+    rings = [[bm.verts.new((r * math.cos(2 * math.pi * i / verts), r * math.sin(2 * math.pi * i / verts), z)) for i in range(verts)] for r, z in profile]
+    for A, B in zip(rings, rings[1:]):
+        for i in range(verts):
+            j = (i + 1) % verts
+            bm.faces.new((A[i], A[j], B[j], B[i]))
+    bm.faces.new(rings[0][::-1]); bm.faces.new(rings[-1])
+    bm.to_mesh(me); bm.free()
+    o = link(bpy.data.objects.new('lathe', me)); o.location = loc
+    return finish(o, color)
+
+
+def lc_render(name):
+    # Moins de segments de biseau : les modèles restent sous la cible de poids, l'œil ne voit pas la différence.
+    for o in bpy.context.scene.objects:
+        for m in o.modifiers:
+            if m.type == 'BEVEL':
+                m.segments = min(m.segments, 2)
+    render(name)
+
+
+def lc_ball(loc, r=0.46):
+    sphere(r, loc, LC['ball'])
+    for rot in ((math.radians(62), math.radians(18), 0), (math.radians(-58), math.radians(-22), math.radians(90))):
+        torus(r * 0.99, r * 0.04, loc, LC['white'], rot=rot, arc=170, start=5)
+
+
+def lc_raquette():
+    # Jour de match : la raquette debout, cordée, et sa balle.
+    lc_scene(LC['green'], (0, -12.2, 3.3), (0.15, 0, 2.9), 50, 620)
+    X, cz, R, sx, sz = math.radians(90), 3.75, 1.18, 0.82, 1.12
+    a, b = R * sx, R * sz
+    head = torus(R, 0.11, (0, 0, cz), LC['white'], rot=(X, 0, 0)); head.scale = (sx, sz, 1)
+    for i in range(9):
+        x = -0.8 * a + i * 1.6 * a / 8
+        rbox(0.026, 0.026, 2 * b * math.sqrt(1 - (x / a) ** 2), (x, 0, cz), LC['pale'], bevel=0)
+    for i in range(11):
+        z = -0.82 * b + i * 1.64 * b / 10
+        rbox(2 * a * math.sqrt(1 - (z / b) ** 2), 0.026, 0.026, (0, 0, cz + z), LC['pale'], bevel=0)
+    dx, dz = 0.42, 0.95
+    ang, L = math.atan2(dx, dz), math.hypot(dx, dz) + 0.08
+    for s in (-1, 1):
+        rbox(0.12, 0.12, L, (s * 0.33, 0, 2.2), LC['white'], rot=(0, s * ang, 0), bevel=0.05)
+    rbox(0.78, 0.12, 0.11, (0, 0, 2.66), LC['white'], bevel=0.05)
+    rbox(0.26, 0.2, 0.42, (0, 0, 1.56), LC['red'], bevel=0.05)
+    rbox(0.3, 0.25, 1.32, (0, 0, 0.72), LC['ink'], bevel=0.08)
+    rbox(0.36, 0.3, 0.13, (0, 0, 0.07), LC['white'], bevel=0.05)
+    lean(-13)
+    lc_ball((1.5, -0.35, 0.48))
+    lc_render('raquette')
+
+
+def lc_one_polo(z, body, trim, badge=False):
+    rrect(3.0, 3.5, 0.28, 0.42, (0, 0, z), body, bevel=0.12)
+    if not badge:
+        return
+    for s in (-1, 1):
+        rrect(0.92, 3.3, 0.22, 0.09, (s * 1.0, -0.02, z + 0.24), body, bevel=0.04)
+    rrect(3.0, 0.9, 0.22, 0.1, (0, -1.28, z + 0.28), body, bevel=0.04)
+    t = z + 0.31
+    cyl(0.52, 0.06, (0, 1.32, t), LC['ink'], verts=48, bevel=0.01)
+    rbox(0.42, 1.16, 0.05, (0, 0.62, t), trim, bevel=0.02)
+    for k in range(3):
+        cyl(0.055, 0.06, (0, 0.98 - k * 0.32, t + 0.04), LC['white'], verts=20, bevel=0.012)
+    for s in (-1, 1):
+        extrude([(s * 0.02, 0.92), (s * 0.82, 1.08), (s * 0.82, 1.56), (s * 0.28, 1.72), (s * 0.05, 1.5)][::s], 0.12, (0, 0, t + 0.08), trim, bevel=0.05)
+    # À la place d'un écusson : mes initiales, brodées.
+    rrect(0.62, 0.5, 0.12, 0.05, (0.86, 0.5, t), LC['white'], bevel=0.015)
+    text3d('JT', 0.26, 0.03, (0.86, 0.46, t + 0.03), LC['red'], rot=(0, 0, 0))
+
+
+def lc_polo():
+    # Mon polo : une pile pliée, comme sur la table d'une boutique.
+    lc_scene(LC['paper'], (0, -9.6, 3.0), (0, 0, 1.7), 50, 380)
+    lc_one_polo(0.22, LC['white'], LC['pale'])
+    lc_one_polo(0.72, LC['red'], LC['white'])
+    lc_one_polo(1.22, LC['green'], LC['white'], badge=True)
+    stand(50)
+    lc_render('polo')
+
+
+def lc_cintre():
+    # La bonne taille : le cintre, le mètre ruban, l'étiquette.
+    lc_scene(LC['red'], (0, -12.4, 2.9), (0, 0, 2.95), 50, 560)
+    X = math.radians(90)
+    sh, zc = math.radians(17), 5.0
+    for s in (-1, 1):
+        rbox(2.05, 0.2, 0.26, (s * 0.98, 0, zc - 0.3), LC['wood'], rot=(0, s * sh, 0), bevel=0.1)
+    cyl(0.045, 0.5, (0, 0, zc + 0.14), LC['grey'], verts=20, bevel=0.01)
+    torus(0.27, 0.045, (0, 0, zc + 0.62), LC['grey'], rot=(X, 0, 0), arc=255, start=-75)
+    cyl(0.05, 3.3, (0, 0, zc - 1.12), LC['grey'], rot=(0, X, 0), verts=20, bevel=0.01)
+    for s, x, L, c in ((-1, -0.55, 3.9, LC['ball']), (1, -0.1, 2.5, LC['ball'])):
+        z = zc - 1.12 - L / 2
+        rbox(0.42, 0.035, L, (x, -0.07, z), c, bevel=0.012)
+        for k in range(int(L / 0.25)):
+            major = k % 4 == 0
+            rbox(0.2 if major else 0.11, 0.03, 0.022, (x - 0.21 + (0.1 if major else 0.055), -0.1, zc - 1.3 - k * 0.25), LC['ink'], bevel=0)
+    cyl(0.5, 0.42, (-0.55, -0.07, 0.5), LC['ink'], rot=(X, 0, 0), verts=48, bevel=0.06)
+    cyl(0.16, 0.44, (-0.55, -0.07, 0.5), LC['white'], rot=(X, 0, 0), verts=32, bevel=0.03)
+    rrect(0.95, 1.22, 0.14, 0.05, (1.15, -0.05, 2.25), LC['white'], rot=(X, 0, 0), bevel=0.02)
+    text3d('M', 0.55, 0.04, (1.15, -0.1, 2.1), LC['red'], rot=(X, 0, 0))
+    torus(0.12, 0.018, (1.15, -0.05, 3.0), LC['ink'], rot=(X, 0, 0))
+    rbox(0.022, 0.022, 0.86, (1.05, -0.05, 3.5), LC['ink'], rot=(0, math.radians(-33), 0), bevel=0)
+    lc_render('cintre')
+
+
+def lc_casier():
+    # Le vestiaire : le casier ouvert, un polo sur son cintre, le numéro sur la porte.
+    lc_scene(LC['pale'], (2.7, -11.8, 3.5), (0.35, 0, 2.55), 50, 400)
+    W, D, H, t = 2.3, 1.6, 4.9, 0.12
+    g, dk = LC['green'], LC['deep']
+    rbox(W, D, t, (0, 0, t / 2 + 0.25), g, bevel=0.03)
+    rbox(W, D, t, (0, 0, H - t / 2), g, bevel=0.03)
+    rbox(W, t, H - 0.25, (0, D / 2 - t / 2, (H + 0.25) / 2), dk, bevel=0.03)
+    for s in (-1, 1):
+        rbox(t, D, H - 0.25, (s * (W / 2 - t / 2), 0, (H + 0.25) / 2), g, bevel=0.03)
+        rbox(0.22, 0.22, 0.3, (s * (W / 2 - 0.22), -D / 2 + 0.22, 0.15), LC['ink'], bevel=0.05)
+    cyl(0.04, W - 0.25, (0, 0.15, H - 0.45), LC['grey'], rot=(0, math.radians(90), 0), verts=20, bevel=0.01)
+    torus(0.13, 0.025, (0, 0.15, H - 0.57), LC['grey'], rot=(math.radians(90), 0, 0), arc=210, start=-20)
+    for s in (-1, 1):
+        rbox(0.82, 0.12, 0.13, (s * 0.4, 0.15, H - 0.9), LC['wood'], rot=(0, s * math.radians(14), 0), bevel=0.05)
+    rrect(1.36, 2.3, 0.14, 0.2, (0, 0.12, 2.75), LC['white'], rot=(math.radians(90), 0, 0), bevel=0.07)
+    rbox(0.42, 0.06, 0.6, (0, -0.02, 3.45), LC['pale'], bevel=0.02)
+    for s in (-1, 1):
+        rbox(0.52, 0.14, 0.34, (s * 0.42, 0.0, 3.8), LC['pale'], rot=(0, s * math.radians(20), 0), bevel=0.05)
+    # La porte, ouverte autour de sa charnière gauche.
+    a = math.radians(50)
+    hx, hy, dw = -W / 2, -D / 2, W - 0.05
+    cx, cy = hx + math.cos(a) * dw / 2, hy - math.sin(a) * dw / 2
+    rz = -a
+    def on_door(u, n, z):
+        return (hx + math.cos(a) * (dw / 2 + u) - math.sin(a) * n * -1, hy - math.sin(a) * (dw / 2 + u) - math.cos(a) * n * -1, z)
+    rbox(dw, 0.1, H - 0.4, (cx, cy, (H + 0.25) / 2), g, rot=(0, 0, rz), bevel=0.04)
+    for k in range(4):
+        rbox(1.2, 0.03, 0.08, on_door(0, -0.055, 4.25 - k * 0.2), LC['ink'], rot=(0, 0, rz), bevel=0)
+    rrect(0.85, 0.62, 0.1, 0.05, on_door(0, -0.06, 3.05), LC['white'], rot=(math.radians(90), 0, rz), bevel=0.02)
+    text3d('12', 0.4, 0.03, on_door(0, -0.1, 2.9), LC['red'], rot=(math.radians(90), 0, rz))
+    rbox(0.1, 0.1, 0.6, on_door(dw / 2 - 0.2, -0.08, 2.4), LC['ink'], rot=(0, 0, rz), bevel=0.04)
+    lc_render('casier')
+
+
+def lc_club():
+    # Le Club : la coupe, la balle dedans, la carte de membre posée contre le socle.
+    lc_scene(LC['ink'], (0.3, -11.2, 3.0), (0, 0, 2.55), 50, 560)
+    X = math.radians(90)
+    cyl(1.32, 0.34, (0, 0, 0.17), LC['green'], verts=96, bevel=0.08)
+    cyl(1.05, 0.28, (0, 0, 0.48), LC['white'], verts=96, bevel=0.06)
+    lathe([(0.0, 0.62), (0.3, 0.62), (0.2, 0.86), (0.14, 1.25), (0.2, 1.62), (0.42, 1.86), (0.82, 2.14), (1.08, 2.6), (1.18, 3.15), (1.22, 3.7), (1.14, 3.72), (1.08, 3.2), (0.0, 3.2)], (0, 0, 0), LC['gold'])
+    for s in (-1, 1):
+        torus(0.62, 0.09, (s * 1.22, 0, 3.0), LC['gold'], rot=(X, 0, 0), arc=210, start=-105 if s > 0 else 75)
+    sphere(0.82, (0, 0, 3.72), LC['ball'])
+    torus(0.81, 0.032, (0, 0, 3.72), LC['white'], rot=(math.radians(68), math.radians(20), 0), arc=180, start=10)
+    torus(0.81, 0.032, (0, 0, 3.72), LC['white'], rot=(math.radians(-60), math.radians(-25), math.radians(90)), arc=180, start=10)
+    lc_render('coupe')
+
+
 SCENES = {
+    'apply/lacoste': {'raquette': lc_raquette, 'polo': lc_polo, 'cintre': lc_cintre, 'casier': lc_casier, 'coupe': lc_club},
     'vinyl-run': {'map': vr_map, 'chat': vr_chat, 'inventory': vr_inventory, 'player': vr_player, 'demande': vr_demande},
     'myfrenchtool': {'tool': mf_tool, 'quiz': mf_quiz, 'barometre': mf_barometre, 'cover': mf_cover, 'blog': mf_blog},
 }

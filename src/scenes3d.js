@@ -67,7 +67,7 @@ function fit(host, renderer, camera) {
 /* ------------------------------------------------------------------ */
 /* Le booster                                                           */
 /* ------------------------------------------------------------------ */
-export async function mountBooster(host, { root = './', onTear } = {}) {
+export async function mountBooster(host, { root = './', onTear, glb = '3d/booster.glb' } = {}) {
   const canvas = document.createElement('canvas');
   const renderer = makeRenderer(canvas);
   const scene = new THREE.Scene();
@@ -76,7 +76,7 @@ export async function mountBooster(host, { root = './', onTear } = {}) {
   camera.position.set(0, 0, 5.3);
   const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(-2, 3, 4); scene.add(key);
 
-  const gltf = await gltfLoader(root).loadAsync(`${root}3d/booster.glb`);
+  const gltf = await gltfLoader(root).loadAsync(`${root}${glb}`);
   const pack = new THREE.Group();
   gltf.scene.rotation.x = Math.PI / 2; // le paquet est modélisé à plat : on le met debout, face caméra
   pack.add(gltf.scene);

@@ -40,6 +40,17 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
   sélection finie), sélection rouge sang, coulures sous les mots, son `laugh` ; tout revient à la désélection.
 - Footer : « Johan Trigeard © 1993 – 202+ », LinkedIn, Mail (adresse jamais en clair, morceaux inversés dans `CONTACT.mail`).
 
+## Les candidatures (`/{slug}/`)
+
+La home habillée pour une entreprise, avec cinq projets imaginés, façon « Moi, avec vous. » (`/lacoste/`). Toujours en `noindex`, jamais listée sur le vrai portfolio, bandeau promotionnel en haut (LinkedIn ou mail), à gauche mon logo × le sien, « This could be us… » et le bouton vers le vrai book, mention « Projet imaginé » sur chaque carte. Pas de page derrière les cartes (Johan, 09/11) : au clic, la carte glitche et ses éclats filent vers le bouton du vrai book (`glitchCard`, `src/application.js`). Sur le vrai portfolio, `APP` (`src/application.js`) vaut `null` et rien ne change.
+
+Décliner pour une entreprise :
+1. `src/data/applications/{slug}.js` (copier `lacoste.js`) : nom, logos, couleurs, textes `ui`, paquet `booster.pack`, 5 cartes (nom, type, visuel). Le `slug` donne l'URL.
+2. Visuels dans `assets/apply/{slug}/` : `logo.svg`, `logo-dark.svg`, et pour la carte de chaque projet l'affiche 3D : une entrée `SCENES['apply/{slug}']` dans `scripts/blender/make-features.py`, puis `blender -b --factory-startup -P scripts/blender/make-features.py -- apply/{slug}` (seule l'affiche WebP sert).
+3. `node scripts/make-booster.mjs {slug}` (le paquet), `node scripts/make-cards.mjs apply:{slug}` (les cartes), `npm run pages` (la page, `scripts/make-applications.mjs`).
+
+Rester honnête : aucun chiffre ni résultat inventé présenté comme réel, des hypothèses à vérifier, pas de reproduction de créations de la marque. Lacoste : couleurs relevées dans le logo 2026 (Wikimedia Commons, « Logo Lacoste 2026.svg », source lacoste.com/fr ; marque déposée) ; la police de la marque est sur mesure, le site garde la sienne.
+
 ## Les pages projet
 
 - **Ajouter un projet** : une entrée dans `src/data/projects.js` (couleurs, logo, `card`, `shot`, polices, textes `{fr,en}`,

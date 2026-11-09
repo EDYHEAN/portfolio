@@ -1,11 +1,11 @@
 // Squelette HTML commun (home + pages projet). Le contenu est rendu en JS.
-export const shell = ({ title, desc, root, attrs, theme = "#EFE9DD", script, loader = true }) => `<!doctype html>
+export const shell = ({ title, desc, root, attrs, theme = "#EFE9DD", script, loader = true, noindex = false }) => `<!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${title}</title>
-  <meta name="description" content="${desc}">
+  <meta name="description" content="${desc}">${noindex ? '\n  <meta name="robots" content="noindex, nofollow">' : ''}
   <meta name="theme-color" content="${theme}">
   <link rel="icon" type="image/svg+xml" href="${root}brand/hyena-favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="${root}brand/favicon-32.png">

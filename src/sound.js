@@ -55,6 +55,8 @@ function noise(dur, peak, t, filter) {
 }
 
 const SOUNDS = {
+  // Glitch : des rafales carrées qui sautent d'un registre à l'autre, sur un grésillement.
+  glitch(t) { [0, 0.05, 0.11, 0.17, 0.26, 0.34].forEach((d, i) => { osc('square', vary(i % 2 ? 1500 : 170), i % 2 ? 320 : 900, 0.04, 0.04, t + d, 0.001); noise(0.03, 0.035, t + d, { type: 'bandpass', f: 3000, q: 2 }); }); },
   // Survol : tick feutré (triangle qui glisse + souffle aigu très court).
   tick(t) { osc('triangle', vary(1800), 1200, 0.03, 0.05, t); noise(0.008, 0.015, t, { type: 'highpass', f: 4000 }); },
   // Appui : clic de touche + petit "thump" grave.

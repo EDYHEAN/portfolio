@@ -1,6 +1,7 @@
 // Blocs des pages projet. Chaque bloc = render (HTML) + motion (dans un gsap.matchMedia).
 // Motion minimaliste : les visuels parlent, le mouvement guide la lecture.
 import { gsap, ScrollTrigger, $, $$, t, tx, asset, spawn, revealTitle, countUp, REDUCE, ROOT, lenis } from './core.js';
+import { heroStep } from './heroSnap.js';
 
 const img = (src, { cls = '', alt = '', eager = false, style = '' } = {}) =>
   `<img src="${asset(src)}" alt="${alt}" class="${cls}" ${eager ? '' : 'loading="lazy"'} decoding="async" ${style ? `style="${style}"` : ''}>`;
@@ -39,6 +40,7 @@ function tameFrame(frame) {
       }
       if (canScroll(w.document.scrollingElement, e.deltaY)) return;
       const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+      if (heroStep(dy)) return;
       if (lenis) lenis.scrollTo(lenis.targetScroll + dy); else scrollBy(0, dy);
     }, { passive: true });
   });

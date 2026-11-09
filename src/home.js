@@ -8,6 +8,10 @@ import { play } from './sound.js';
 import { mountLogo } from './logo.js';
 import { PROJECTS } from './data/projects.js';
 import { BRANDS, CONTACT } from './data/home.js';
+import { APP, mountReality, glitchCard } from './application.js';
+
+// Le tirage : les vrais projets, ou ceux imaginés pour une candidature (/{slug}/).
+const LIST = APP ? APP.projects : PROJECTS;
 
 /* ------------------------------------------------------------------ */
 /* Le tirage : uniquement des projets. Des cartes « à venir » comblent  */
@@ -17,21 +21,21 @@ const SLOTS = 5;
 const shuffle = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 function draw(prev) {
   let pull;
-  do { pull = shuffle(PROJECTS).slice(0, SLOTS); } while (prev && pull.length > 1 && pull[0] === prev[0]);
+  do { pull = shuffle(LIST).slice(0, SLOTS); } while (prev && pull.length > 1 && pull[0] === prev[0]);
   while (pull.length < SLOTS) pull.push(null); // emplacement « à venir »
   return pull;
 }
 let pull = draw();
 
 const card = (p, i) => p ? `
-  <a class="card" href="${pageUrl(p.id)}" data-sound data-cursor data-cursor-key="cursor.view" style="--bg:${p.colors.bg};--fg:${p.colors.fg}">
+  <a class="card" href="${p.fiction ? '#work' : pageUrl(p.id)}"${p.fiction ? ' role="button"' : ''} data-sound data-cursor data-cursor-key="cursor.view" style="--bg:${p.colors.bg};--fg:${p.colors.fg}">
     <span class="card-art"><img src="${asset(p.card || p.shot)}" alt="" decoding="async"></span>
     <span class="card-info">
       <span class="card-logo" style="--ls:${p.logo.markScale || 1}"><img src="${asset(p.logo.mark || p.logo.src)}" alt="" class="${p.logo.invert ? 'inv' : ''}"></span>
       <span class="card-txt"><b>${p.name}</b><span>${tx(p.type)}</span></span>
-      <span class="card-n mono">${String(PROJECTS.indexOf(p) + 1).padStart(2, '0')}</span>
+      <span class="card-n mono">${String(LIST.indexOf(p) + 1).padStart(2, '0')}</span>
     </span>
-    <span class="card-shine" aria-hidden="true"></span>
+    <span class="card-shine" aria-hidden="true"></span>${p.fiction ? `<span class="card-fiction mono">${t('app.fiction')}</span>` : ''}
   </a>` : `
   <div class="card is-soon">
     <span class="soon-hy" data-hyena></span>
@@ -44,13 +48,24 @@ function renderPull() {
 }
 
 function render() {
-  $('#app').innerHTML = `
-    <section class="home" id="top" data-theme="light">
-      <div class="who">
+  const LOCK = `
         <div class="who-lock">
           <div class="who-hy" role="button" tabindex="0" aria-label="${t('logo.aria')}" data-sound data-cursor data-cursor-key="cursor.spin"></div>
           <h1 class="who-name"><span class="line"><span class="line-in">Johan</span></span><span class="line"><span class="line-in">Trigeard</span></span></h1>
+        </div>`;
+  $('#app').innerHTML = `
+    <section class="home" id="top" data-theme="light">
+      <div class="who">
+        ${APP ? `
+        <div class="who-co">
+          ${LOCK}
+          <span class="who-x" aria-hidden="true">×</span>
+          <span class="who-co-logo"><img src="${asset(APP.logo)}" alt="${APP.company}"></span>
         </div>
+        <p class="who-us">${t('app.us')}</p>
+        <div class="who-real"><a class="key key-ink" href="${ROOT}" data-page data-sound>${t('app.real')}<span aria-hidden="true">→</span></a></div>
+        <p class="who-legal mono">${t('app.legal')}</p>` : `
+        ${LOCK}
         <p class="who-role mono">${t('hero.role')} · Bordeaux</p>
         <p class="who-line">${t('me.l1')}</p>
         <div class="who-actions">
@@ -59,11 +74,11 @@ function render() {
           <div class="brands-panel" id="brandsPanel" hidden>
             <ul>${BRANDS.map((b) => `<li><img src="${asset(b.src)}" alt="${b.name}" title="${b.name}" style="--s:${b.scale}" loading="lazy"></li>`).join('')}</ul>
           </div>
-        </div>
+        </div>`}
       </div>
       <div class="pull" id="work">
         <div class="pull-head">
-          <span class="mono">${t('pull.title')} · <b>${String(PROJECTS.length).padStart(2, '0')}</b> ${t('pull.count')}</span>
+          <span class="mono">${t('pull.title')} · <b>${String(LIST.length).padStart(2, '0')}</b> ${t('pull.count')}</span>
           <button type="button" class="key key-ink reroll" data-reroll data-sound><span class="reroll-ico" aria-hidden="true">↻</span>${t('pull.reroll')}</button>
         </div>
         <div class="pull-grid">${Array.from({ length: SLOTS }, (_, i) => `<div class="slot slot-${i}"></div>`).join('')}</div>
@@ -157,6 +172,7 @@ function bindInteractions() {
     }
     if (e.target.closest('[data-booster-again]')) return showBooster(true);
     const a = e.target.closest('.card[href]');
+    if (a && APP) { e.preventDefault(); return glitchCard(a); }
     if (a && !e.metaKey && !e.ctrlKey) { e.preventDefault(); play('needle'); navigate(a.href); }
   });
 
@@ -182,23 +198,24 @@ function bindInteractions() {
 /* ------------------------------------------------------------------ */
 function introLeft(delay = 0) {
   if (REDUCE) return;
-  gsap.timeline({ delay })
+  const tl = gsap.timeline({ delay })
     .from('.who-hy', { scale: 0.7, opacity: 0, duration: 1, ease: 'expo.out' }, 0)
     .from('.who-name .line-in', { yPercent: 115, duration: 0.9, stagger: 0.08, ease: 'expo.out' }, 0.1)
-    .from(['.who-role', '.who-line', '.who-actions', '.pull-head', '.bar', '#hdr > *'], { y: 16, opacity: 0, duration: 0.7, stagger: 0.05, ease: 'power3.out' }, 0.25)
-    .fromTo('.who-line em', { '--hl': '0%' }, { '--hl': '100%', duration: 0.6, stagger: 0.25, ease: 'power2.inOut' }, 0.8);
+    .from(['.who-x', '.who-co-logo', '.who-us', '.who-real', '.who-legal', '.who-role', '.who-line', '.who-actions', '.pull-head', '.bar', '#hdr > *'], { y: 16, opacity: 0, duration: 0.7, stagger: 0.05, ease: 'power3.out' }, 0.25);
+  if ($('.who-line em')) tl.fromTo('.who-line em', { '--hl': '0%' }, { '--hl': '100%', duration: 0.6, stagger: 0.25, ease: 'power2.inOut' }, 0.8);
 }
 /* ------------------------------------------------------------------ */
 /* Le booster (1re visite de la session, puis sur demande)             */
 /* ------------------------------------------------------------------ */
-const seen = () => { try { return sessionStorage.getItem('edy-booster') === '1'; } catch { return false; } };
-const markSeen = () => { try { sessionStorage.setItem('edy-booster', '1'); } catch { /* rien */ } };
+const BOOSTER_KEY = APP ? `edy-booster-${APP.slug}` : 'edy-booster'; // chaque candidature ouvre son propre paquet
+const seen = () => { try { return sessionStorage.getItem(BOOSTER_KEY) === '1'; } catch { return false; } };
+const markSeen = () => { try { sessionStorage.setItem(BOOSTER_KEY, '1'); } catch { /* rien */ } };
 
 async function showBooster(again = false) {
   const el = document.createElement('div');
   el.className = 'booster';
   el.innerHTML = `
-    <div class="booster-stage" role="button" tabindex="0" aria-label="${t('booster.hint')}"><img class="booster-img" src="${asset('3d/pack-front.webp')}" alt=""></div>
+    <div class="booster-stage" role="button" tabindex="0" aria-label="${t('booster.hint')}"><img class="booster-img" src="${asset(APP?.booster?.front || '3d/pack-front.webp')}" alt=""></div>
     <p class="booster-hint mono">${t('booster.hint')}</p>
     <button type="button" class="booster-skip mono" data-sound>${t('booster.skip')}</button>`;
   document.body.append(el);
@@ -219,6 +236,7 @@ async function showBooster(again = false) {
       const { mountBooster } = await import('./scenes3d.js');
       api = await mountBooster(stage, {
         root: ROOT,
+        ...(APP?.booster?.glb ? { glb: APP.booster.glb } : {}),
         onTear: (step, origin) => { if (step === 'tear') play('tear'); else close(origin); },
       });
       el.classList.add('is-ready', 'has-3d');
@@ -307,6 +325,7 @@ function bindLaugh() {
 
 /* ------------------------------------------------------------------ */
 boot();
+mountReality({ t });
 render();
 bindInteractions();
 bindLaugh();

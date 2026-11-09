@@ -50,6 +50,8 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
   générique d'un bloc `slides` ou `showcase` (« 8 versions avant la bonne »).
 - Rhinov Studio (06/11) : landings retail + immo + app agents. Versions du hero et écrans de l'app rendus depuis Figma (fichier
   « Studio Rhinov », équipe Rhinov), pleines pages capturées sur les prototypes codés (`sources/raw/vibecoded/Rhinov Studio`).
+- Système Rhinov (09/11) : fichier Figma « Design System » (équipe Rhinov). Aucune page de la charte PDF (mention « Document confidentiel »).
+  Bloc `foundations` (logos, co-brand, couleurs et typographie en vrai HTML). Options de bloc ajoutées : `features` : `tall` (rangées hautes), item `pad` (marge autour de l'image) ; `slides` : item `pos` ; `pages` : `title`.
 - **Features en 3D** (item `model`, Vinyl Run puis MFT) : des modèles pâte à modeler faits par `scripts/blender/make-features.py`
   (GLB Draco de 20 à 60 Ko + une affiche WebP transparente, `--glb-only` pour ne refaire que les modèles), animés en temps réel
   par `src/feature3d.js` : UN canvas fixe pour toute la page, chaque modèle dessiné dans le cadre de sa tuile (flottement,

@@ -83,7 +83,7 @@ export const BLOCKS = {
     render(b, p, n) {
       const shots = b.pages.map((pg, i) => img(pg.src, { cls: `pg-shot${i ? '' : ' is-on'}`, eager: i === 0, alt: tx(pg.label) })).join('');
       return `
-        ${head('b.pages', n)}
+        ${head(b.title || 'b.pages', n)}
         <div class="pg">
           <div class="pg-sticky">
             <div class="pg-main">${browser(shots, b.pages[0].url)}</div>
@@ -244,12 +244,44 @@ export const BLOCKS = {
     },
   },
 
+  /* Fondations d'une marque : logos et leurs déclinaisons, couleurs et typographie en vrai HTML (Système Rhinov). */
+  foundations: {
+    render(b, p, n) {
+      const label = (s) => `<p class="mono fd-label">${tx(s)}</p>`;
+      const logo = (l) => `<div class="fd-logo${l.span ? ` fd-${l.span}` : ''}" style="background-color:${l.bg}${l.photo ? `;background-image:linear-gradient(rgba(20,14,10,.42),rgba(20,14,10,.42)),url(${asset(l.photo)})` : ''};color:${l.fg}">${img(l.src, { alt: '', cls: 'fd-mark', style: `--w:${l.w || '62%'}` })}<span class="mono fd-cap">${tx(l.t)}</span></div>`;
+      const chip = (s) => `<div class="fd-chip"><i style="background:${s.c}"></i><b>${tx(s.n)}</b><code>${s.c}</code></div>`;
+      const ty = b.typo;
+      return `${head(b.title, n, b.note)}
+        <div class="fd-logos">${b.logos.map(logo).join('')}</div>
+        ${label(b.cobrandTitle)}
+        <div class="fd-co">${b.cobrands.map(logo).join('')}</div>
+        ${label(b.colorsNote)}
+        <div class="fd-main">${b.colors.map((c) => `<div class="fd-col" style="--g:${c.g};background:${c.c}"><b>${tx(c.n)}</b><code>${c.c}</code><span>${tx(c.r)}</span></div>`).join('')}</div>
+        <div class="fd-chips">${b.swatches.map(chip).join('')}</div>
+        <div class="fd-type">
+          <div class="fd-spec">
+            <p class="fd-big">${tx(ty.lead)} <em>${tx(ty.accent)}</em></p>
+            <div class="fd-pair"><p><b class="fd-p">Poppins</b>${tx(ty.poppins)}</p><p><b class="fd-b">Bodoni Moda</b>${tx(ty.bodoni)}</p></div>
+          </div>
+          <div class="fd-scale">${ty.scale.map((r) => `<div class="fd-row"><span class="fd-s" style="--s:${r.s};font-weight:${r.w};line-height:${r.l}px">${tx(ty.sample)}</span><code>${tx(r.n)} · ${r.s} / ${r.l}</code></div>`).join('')}</div>
+          <div class="fd-fig"><span>${ty.figure}</span><code>${tx(ty.figureLabel)}</code></div>
+        </div>`;
+    },
+    motion(el) {
+      spawn($$('.fd-logo', $('.fd-logos', el)), $('.fd-logos', el));
+      spawn($$('.fd-logo', $('.fd-co', el)), $('.fd-co', el));
+      spawn($$('.fd-col', el), $('.fd-main', el));
+      spawn($$('.fd-chip', el), $('.fd-chips', el), { stagger: 0.02, y: 24 });
+      spawn($$('.fd-type > *', el), $('.fd-type', el));
+    },
+  },
+
   features: {
     render(b, p, n) {
       return `${head(b.title || 'b.features', n)}
-        <div class="bento ft-bento">${b.items.map((f) => `
+        <div class="bento ft-bento${b.tall ? ' is-tall' : ''}">${b.items.map((f) => `
           <article class="b-tile ft ft-${f.size || 's'}">
-            <div class="ft-img"${f.model ? ` data-model="${asset(f.model)}"${b.soft ? ' data-soft' : ''}` : ''}>${img(f.img, { alt: '', style: `object-fit:${f.fit || 'cover'};object-position:${f.pos || 'top'}` })}</div>
+            <div class="ft-img"${f.model ? ` data-model="${asset(f.model)}"${b.soft ? ' data-soft' : ''}` : ''}>${img(f.img, { alt: '', style: `object-fit:${f.fit || 'cover'};object-position:${f.pos || 'top'}${f.pad ? `;padding:${f.pad};box-sizing:border-box` : ''}` })}</div>
             <div class="ft-txt"><h3>${tx(f.t)}</h3><p>${tx(f.d)}</p></div>
           </article>`).join('')}
         </div>`;
@@ -306,7 +338,7 @@ export const BLOCKS = {
       return `
         <div class="sl-pin">
           ${head(b.title || 'b.slides', n)}
-          <div class="sl-track">${b.items.map((s) => `<figure class="slide">${img(s.src, { alt: tx(s.t), eager: true })}<figcaption class="mono">${tx(s.t)}</figcaption></figure>`).join('')}</div>
+          <div class="sl-track">${b.items.map((s) => `<figure class="slide">${img(s.src, { alt: tx(s.t), eager: true, style: s.pos ? `object-position:${s.pos}` : '' })}<figcaption class="mono">${tx(s.t)}</figcaption></figure>`).join('')}</div>
         </div>`;
     },
     motion(el, b, p, { desktop }) {

@@ -72,6 +72,124 @@ export const PROJECTS = [
     ],
   },
   {
+    // Système Rhinov (09/11) : fichiers Figma « Design System » et « Site Web 2026 » (équipe Rhinov). Exports par l'API Figma.
+    // Pas de page de la charte PDF : elle porte la mention « Document confidentiel ».
+    id: 'systeme-rhinov',
+    card: 'systeme-rhinov/card.webp', // un nuancier sur le brun argile (scripts/make-cards.mjs)
+    name: 'Système Rhinov',
+    year: '2026',
+    theme: 'light',
+    colors: { bg: '#FAF9F7', fg: '#12151B', accent: '#8A6B55', line: 'rgba(18,21,27,.14)', tile: '#FFFFFF' },
+    logo: { src: 'systeme-rhinov/logo.svg', mark: 'systeme-rhinov/logo-mark.svg', markScale: 0.7, introScale: 0.55 },
+    shot: 'systeme-rhinov/modes/rhinov.webp',
+    fonts: ['Poppins:wght@400;500;600;700', 'Bodoni+Moda:ital,wght@0,600;1,700'],
+    type: T('Design system · Marque', 'Design system · Brand'),
+    role: T('Lead UI/UX', 'Lead UI/UX'),
+    tagline: T('Une variable, trois marques.', 'One variable, three brands.'),
+    context: T(
+      "Rhinov, Rhinov Studio et MDM Business partagent les mêmes écrans, mais pas la même couleur. J'ai dessiné le nouveau logo et construit dans Figma le système qui les tient ensemble : fondations, composants et sections de page.",
+      'Rhinov, Rhinov Studio and MDM Business share the same screens, but not the same colour. I drew the new logo and built the Figma system that holds them together: foundations, components and page sections.',
+    ),
+    blocks: [
+      {
+        // Logo, couleurs, typographie (Johan, 09/11 : plus de slider de planches). Les couleurs et les textes sont du vrai HTML.
+        type: 'foundations',
+        title: T('Les fondations', 'The foundations'),
+        note: T('Une signature manuscrite et le R. qui la résume.', 'A handwritten signature and the R. that sums it up.'),
+        logos: [
+          { src: 'systeme-rhinov/logo.svg', bg: '#FFFFFF', fg: '#12151B', w: '58%', span: 'lg', t: T('Complet', 'Full') },
+          { src: 'systeme-rhinov/logos/sign-white.svg', bg: '#3B2B1F', fg: '#FAF9F7', w: '56%', t: T('Signature', 'Signature') },
+          { src: 'systeme-rhinov/logos/mark-cacao.svg', bg: '#FFF6EC', fg: '#3B2B1F', w: '24%', t: T('Monogramme', 'Monogram') },
+          { src: 'systeme-rhinov/logos/logo-white.svg', photo: 'systeme-rhinov/logos/photo.webp', bg: '#8A6B55', fg: '#FAF9F7', w: '34%', span: 'wd', t: T('Sur photo, avec un voile', 'On a photo, with a veil') },
+        ],
+        cobrandTitle: T('Quatre langues, et Maisons du Monde à côté', 'Four languages, with Maisons du Monde alongside'),
+        cobrands: [
+          { src: 'systeme-rhinov/logos/co-fr.svg', bg: '#FFFFFF', fg: '#12151B', t: 'FR' },
+          { src: 'systeme-rhinov/logos/co-en.svg', bg: '#3B2B1F', fg: '#FAF9F7', t: 'EN' },
+          { src: 'systeme-rhinov/logos/co-it.svg', bg: '#FFF6EC', fg: '#12151B', t: 'IT' },
+          { src: 'systeme-rhinov/logos/co-es.svg', bg: '#46604E', fg: '#FAF9F7', t: 'ES' },
+          { src: 'systeme-rhinov/logos/co-biz.svg', bg: '#EFEBE7', fg: '#12151B', t: 'Business' },
+        ],
+        colorsNote: T('Le noir pour agir, le cacao pour signer. Chaque marque garde sa couleur.', 'Black to act, cocoa to sign. Each brand keeps its colour.'),
+        colors: [
+          { c: '#3B2B1F', g: 840, n: T('Cacao', 'Cocoa'), r: 'Rhinov' },
+          { c: '#8A6B55', g: 440, n: T('Brun argile', 'Clay brown'), r: 'Rhinov Studio' },
+          { c: '#46604E', g: 320, n: T('Pin', 'Pine'), r: 'MDM Business' },
+          { c: '#12151B', g: 320, n: T('Noir riche', 'Rich black'), r: T('Action', 'Action') },
+        ],
+        swatches: [
+          { c: '#3C3C3B', n: T('Anthracite', 'Anthracite') }, { c: '#6B6B6B', n: T('Gris texte', 'Text grey') },
+          { c: '#8A8A8A', n: T('Gris doux', 'Soft grey') }, { c: '#D2D2D2', n: T('Filet', 'Hairline') },
+          { c: '#EFEBE7', n: T('Lin', 'Linen') }, { c: '#FAF9F7', n: T('Ivoire', 'Ivory') },
+          { c: '#FFF6EC', n: T('Ivoire bis', 'Warm ivory') }, { c: '#FFFFFF', n: T('Blanc', 'White') },
+          { c: '#534439', n: T('Chocolat', 'Chocolate') }, { c: '#BAA89B', n: T('Sable', 'Sand') },
+          { c: '#A08E7E', n: T('Taupe', 'Taupe') }, { c: '#8AAD94', n: T('Sauge', 'Sage') },
+          { c: '#C76A31', n: T('Orange', 'Orange') }, { c: '#974E32', n: T('Brique', 'Brick') },
+          { c: '#E8EFEA', n: T('Vert tendre', 'Soft green') }, { c: '#F6F3F0', n: T('Crème', 'Cream') },
+        ],
+        typo: {
+          lead: T('Votre intérieur,', 'Votre intérieur,'),
+          accent: T('réinventé', 'réinventé'),
+          poppins: T('Poppins pour tout ce qui se lit, de Light à Bold.', 'Poppins for everything you read, Light to Bold.'),
+          bodoni: T("Bodoni Moda pour un mot qui porte l'émotion, jamais pour une phrase entière.", 'Bodoni Moda for one word that carries the emotion, never a whole sentence.'),
+          sample: T('Votre pièce', 'Votre pièce'),
+          scale: [
+            { n: 'Display', s: 64, l: 72, w: 600 }, { n: 'H1', s: 48, l: 56, w: 600 }, { n: 'H2', s: 32, l: 40, w: 700 },
+            { n: 'H3', s: 24, l: 32, w: 600 }, { n: T('Chapô', 'Lead'), s: 18, l: 28, w: 400 }, { n: T('Texte', 'Body'), s: 16, l: 26, w: 400 },
+          ],
+          figure: '45 000',
+          figureLabel: T('Chiffre clé, coupé par le format', 'Key figure, cropped by the format'),
+        },
+      },
+      {
+        type: 'showcase',
+        title: T('Une variable, trois marques', 'One variable, three brands'),
+        items: [
+          { img: 'systeme-rhinov/modes/rhinov.webp', size: 'third', url: 'Couleurs · Rôles / Rhinov', t: T('Rhinov', 'Rhinov'), d: T('Le cacao pour signer.', 'Cocoa to sign.') },
+          { img: 'systeme-rhinov/modes/studio.webp', size: 'third', url: 'Couleurs · Rôles / Studio', t: T('Rhinov Studio', 'Rhinov Studio'), d: T('Le brun argile, sur le même composant.', 'Clay brown, on the same component.') },
+          { img: 'systeme-rhinov/modes/mdm.webp', size: 'third', url: 'Couleurs · Rôles / Business', t: T('MDM Business', 'MDM Business'), d: T('Le pin : on change un mode, fonds, titres et boutons suivent.', 'Pine: switch one mode, backgrounds, titles and buttons follow.') },
+        ],
+      },
+      {
+        type: 'features',
+        title: T('Les composants', 'The components'),
+        tall: true,
+        items: [
+          { img: 'systeme-rhinov/composants/offre.webp', fit: 'contain', pos: 'center', pad: '4%', size: 'l', t: T("Carte d'offre", 'Offer card'), d: T('Normale, ou mise en avant.', 'Standard, or highlighted.') },
+          { img: 'systeme-rhinov/composants/pieces.webp', fit: 'contain', pos: 'center', pad: '4%', size: 'l', t: T('Cartes pièce et décoratrice', 'Room and decorator cards'), d: T("La photo d'abord.", 'The photo comes first.') },
+          { img: 'systeme-rhinov/composants/hero.webp', fit: 'cover', pos: 'center', size: 'w', t: T('Hero iA', 'iA hero'), d: T("On décrit sa pièce, l'iA répond.", 'Describe your room, the iA answers.') },
+          { img: 'systeme-rhinov/composants/menu.webp', fit: 'contain', pos: 'center', pad: '3%', size: 'w', t: T('Menu', 'Menu'), d: T('Toutes les pièces, à la recherche ou au clic.', 'Every room, by search or by click.') },
+          { img: 'systeme-rhinov/composants/bouton.webp', fit: 'contain', pos: 'center', pad: '5%', size: 's', t: T('Bouton', 'Button'), d: T('Quatre variantes, trois tailles, trois états.', 'Four variants, three sizes, three states.') },
+          { img: 'systeme-rhinov/composants/option.webp', fit: 'contain', pos: 'center', pad: '5%', size: 's', t: T('Options', 'Add-ons'), d: T('À cocher, avec leur prix.', 'Tick them, price included.') },
+          { img: 'systeme-rhinov/composants/avant-apres.webp', fit: 'contain', pos: 'center', pad: '4%', size: 's', t: T('Avant / après', 'Before / after'), d: T('Le curseur qui révèle la pièce.', 'The slider that reveals the room.') },
+          { img: 'systeme-rhinov/composants/popin.webp', fit: 'contain', pos: 'center', pad: '4%', size: 's', t: T('Pop-in de sortie', 'Exit pop-in'), d: T('Un avis déco offert, avant de partir.', 'A free decor opinion, before you leave.') },
+          { img: 'systeme-rhinov/composants/barre-ia.webp', fit: 'contain', pos: 'center', pad: '4%', size: 'w', t: T('Barre iA', 'iA bar'), d: T('Vide, puis remplie.', 'Empty, then filled.') },
+          { img: 'systeme-rhinov/composants/module.webp', fit: 'contain', pos: 'center', pad: '3%', size: 'w', t: T('Modules flottants', 'Floating modules'), d: T('Shopping-list, visio, 360°, direction déco, plan coté.', 'Shopping list, video call, 360°, decor direction, floor plan.') },
+          { img: 'systeme-rhinov/composants/comparatif.webp', fit: 'contain', pos: 'center', pad: '6%', size: 't', t: T('Comparatif mobile', 'Mobile comparison'), d: T('Une offre à la fois.', 'One offer at a time.') },
+          { img: 'systeme-rhinov/composants/drawer.webp', fit: 'contain', pos: 'center', pad: '6%', size: 't', t: T('Drawer', 'Drawer'), d: T('Les options, sans quitter la page.', 'Add-ons, without leaving the page.') },
+          { img: 'systeme-rhinov/composants/formulaire.webp', fit: 'contain', pos: 'center', pad: '6%', size: 't', t: T('Formulaire en étapes', 'Step form'), d: T('Deux étapes, puis la confirmation.', 'Two steps, then the confirmation.') },
+          { img: 'systeme-rhinov/composants/footer.webp', fit: 'contain', pos: 'center', pad: '6%', size: 't', t: T('Footer mobile', 'Mobile footer'), d: T('Le cacao pour finir.', 'Cocoa to finish.') },
+        ],
+      },
+      {
+        // Fichier Figma « Site Web 2026 », page Optimisations conversion 2026 : Homepage 2026 (Variante B) et la fiche produit mobile.
+        type: 'pages',
+        title: T('Assemblé, ça donne', 'Put together'),
+        pages: [{ src: 'systeme-rhinov/pages/homepage.webp', url: 'Homepage 2026', label: T('Homepage 2026', 'Homepage 2026') }],
+        mobile: 'systeme-rhinov/pages/m-fiche.webp',
+      },
+      {
+        type: 'outcome',
+        // Comptés dans le fichier Figma le 09/11/2026 : 24 UI + 5 signature + 3 marque + 6 sections ; styles publiés.
+        stats: [
+          { v: 3, l: T('marques sur les mêmes composants', 'brands on the same components') },
+          { v: 38, l: T('composants et sections', 'components and sections') },
+          { v: 61, l: T('styles publiés', 'published styles') },
+        ],
+      },
+    ],
+  },
+  {
     // Maisons du Monde · Labo (Johan, 06/11) : trois prototypes codés réunis en un projet (Pièce Rare, Catalogue Visite,
     // 24 h à la maison). Sources : sources/raw/vibecoded ; copies allégées par scripts/make-mdm-labo.mjs.
     // Décors générés avec Gemini (prompts dans les sources), heures et lumière de « 24 h » calculées dans le code.

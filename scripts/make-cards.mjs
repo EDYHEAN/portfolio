@@ -56,6 +56,22 @@ const CARDS = {
       <div class="photo"></div><div class="shade"></div>${logo}
       ${GRAIN}`;
   },
+  // Système Rhinov : un nuancier en éventail, les couleurs de ses trois marques, sur le brun argile et le R. en filigrane.
+  'systeme-rhinov'() {
+    const mark = svgInline(path.join(ROOT, 'assets/systeme-rhinov/logo-mark.svg')).replace('<svg ', '<svg class="mark" ');
+    const chips = [['#BAA89B', 'Sable', -30], ['#46604E', 'Pin', -15], ['#C76A31', 'Orange', 0], ['#12151B', 'Noir riche', 15], ['#3B2B1F', 'Cacao', 30]];
+    return `<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=block" rel="stylesheet"><style>${BASE}
+      body{background:#8A6B55}
+      .mark{position:absolute;left:50%;top:50%;width:1120px;height:auto;transform:translate(-52%,-50%)}
+      .mark *{fill:rgba(255,255,255,.08)}
+      .chip{position:absolute;left:50%;top:400px;width:300px;height:470px;margin-left:-150px;border-radius:18px;overflow:hidden;background:#FAF9F7;
+        transform-origin:50% 118%;box-shadow:0 26px 44px -16px rgba(40,26,16,.6)}
+      .chip i{position:absolute;inset:0 0 86px;background:var(--c)}
+      .chip b{position:absolute;left:24px;bottom:28px;font:500 25px Poppins,sans-serif;color:#12151B}
+      </style>${mark}
+      ${chips.map(([c, n, r]) => `<div class="chip" style="--c:${c};transform:rotate(${r}deg)"><i></i><b>${n}</b></div>`).join('')}
+      ${GRAIN}`;
+  },
   // Vinyl Run : une vraie photo de la boutique (la fresque des platines Technics, sources/cards/vinyl-run), assombrie,
   // le logo du disquaire en blanc par-dessus (Johan, 06/11).
   'vinyl-run'() {

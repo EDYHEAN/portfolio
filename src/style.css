@@ -206,6 +206,7 @@ html.came .curtain { visibility: visible; }
   .curtain, .bite-stage { inset: 0 0 auto 0; height: 100vh; }
   /* Pareil pour le contact, et pas 100svh : épinglé, il couvre tout l'écran, et la page reste assez longue pour finir l'épinglage. */
   .contact { min-height: 100vh; }
+  .hdr-logo { padding-block: 4px; } /* 44 px de cible, aussi quand le tactile a la mise en page du bureau */
 }
 
 /* Cibles de 44 px (téléphone, mais aussi tablette et grand téléphone à l'horizontale, qui ont la mise en page du bureau) ;

@@ -83,6 +83,20 @@ const CARDS = {
       <div class="photo"></div><div class="shade"></div>${logo}
       ${GRAIN}`;
   },
+  // iA Déco : le couloir bleu des tests de marque (image sans logo tirée du Figma), le logo du produit en blanc au centre.
+  'ia-deco'() {
+    const photo = dataUri(path.join(ROOT, 'sources/cards/ia-deco/couloir.webp'));
+    const logo = svgInline(path.join(ROOT, 'assets/ia-deco/logo.svg')).replace('<svg ', '<svg class="logo" ');
+    return `<style>${BASE}
+      body{background:#1C2553}
+      .photo{position:absolute;inset:0;background:url(${photo}) 50% 50% / cover}
+      .shade{position:absolute;inset:0;background:radial-gradient(62% 17% at 50% 50%, rgba(18,24,60,.78), rgba(18,24,60,0) 100%)}
+      .logo{position:absolute;left:50%;top:50%;width:560px;height:auto;transform:translate(-50%,-50%);filter:drop-shadow(0 8px 24px rgba(0,0,0,.4))}
+      .logo *{fill:#fff}
+      </style>
+      <div class="photo"></div><div class="shade"></div>${logo}
+      ${GRAIN}`;
+  },
   // Vinyl Run : une vraie photo de la boutique (la fresque des platines Technics, sources/cards/vinyl-run), assombrie,
   // le logo du disquaire en blanc par-dessus (Johan, 06/11).
   'vinyl-run'() {

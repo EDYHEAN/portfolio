@@ -28,6 +28,10 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
   (texture du booster, `npm run booster`). `src/hyena.js` est généré depuis
   `assets/brand/hyena.svg` (corps + 2 pupilles séparées pour le regard qui suit la souris).
 
+## Le scroll des pages projet
+
+`src/heroSnap.js` : depuis l'intro, le premier geste (molette, clavier, doigt) ancre en douceur sur le premier bloc, le geste inverse y ramène ; en remontant, on s'arrête d'abord sur le premier bloc. Ensuite, le scroll Lenis normal. Une intro plus haute que l'écran n'ancre pas (rien à sauter).
+
 ## La home « Booster »
 
 - À la 1re visite de la session, un booster 3D flotte (il fait office de loader) ; clic : la languette s'arrache, les cartes
@@ -49,6 +53,7 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
   Captures : WebP, 1200 px de large (pleine page ≤ 12000 px de haut), dans `assets/{id}/`. `title: T(…)` remplace le titre
   générique d'un bloc `slides` ou `showcase` (« 8 versions avant la bonne »).
 - rhinov.fr (09/11, id `rhinov-site`) : pages Dev Ready du fichier Figma « Site Web 2026 », tests de la page Optimisations conversion 2026 (bloc `variants` : pistes bureau + mobile au clic, `photos` en grille) + slides du deck. Le tunnel « Order V5 » a encore l'ancien logo : pas montré. Vitrine : `size: 'phone'` met un écran mobile dans un téléphone.
+- iA Déco (09/11, id `ia-deco`) : fichier Figma « iA Déco ». Écrans au nouveau logo seulement : sur les écrans du chat mobile de V9, l'en-tête est remplacé par celui de l'écran palette. Pas d'écran avec du texte de test (« Canapé trop sympa… ») ni les prototypes co-brandés Maisons du Monde. Carte = couloir bleu sans logo (`sources/cards/ia-deco`). Bloc `chat` : la conversation jouée en vrai HTML (scénario dans `steps`, choix cliquables, se joue seulement à l'écran, reboucle, pas de scroll capturé ; sans animation, tout est affiché et se lit dans le cadre). Bloc marque retiré à la demande de Johan. Mon Salon de Noël (fichier Figma « Diag de Noël », page VFinale, écrans dans `assets/ia-deco/noel`) : les 6 destinations en bloc `fan` (éventail de visuels distribué au scroll, pas d'onglets), le parcours en téléphones, la page de résultat en bloc `pages`.
 - Rhinov Studio (06/11) : landings retail + immo + app agents. Versions du hero et écrans de l'app rendus depuis Figma (fichier
   « Studio Rhinov », équipe Rhinov), pleines pages capturées sur les prototypes codés (`sources/raw/vibecoded/Rhinov Studio`).
 - Système Rhinov (09/11) : fichier Figma « Design System » (équipe Rhinov). Aucune page de la charte PDF (mention « Document confidentiel »).

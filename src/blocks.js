@@ -1,6 +1,7 @@
 // Blocs des pages projet. Chaque bloc = render (HTML) + motion (dans un gsap.matchMedia).
 // Motion minimaliste : les visuels parlent, le mouvement guide la lecture.
 import { gsap, ScrollTrigger, $, $$, t, tx, asset, spawn, revealTitle, countUp, REDUCE, ROOT, lenis } from './core.js';
+import { heroStep } from './heroSnap.js';
 
 const img = (src, { cls = '', alt = '', eager = false, style = '' } = {}) =>
   `<img src="${asset(src)}" alt="${alt}" class="${cls}" ${eager ? '' : 'loading="lazy"'} decoding="async" ${style ? `style="${style}"` : ''}>`;
@@ -39,6 +40,7 @@ function tameFrame(frame) {
       }
       if (canScroll(w.document.scrollingElement, e.deltaY)) return;
       const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+      if (heroStep(dy)) return;
       if (lenis) lenis.scrollTo(lenis.targetScroll + dy); else scrollBy(0, dy);
     }, { passive: true });
   });
@@ -244,6 +246,166 @@ export const BLOCKS = {
     },
   },
 
+  /* Conversation jouée en vrai HTML (iA Déco) : on écrit, l'assistant réfléchit, répond mot à mot, propose. Le visiteur peut
+     cliquer les choix, sinon ils se font seuls. Tourne seulement à l'écran, reboucle. Le CSS décrit l'état final : sans
+     animation (prefers-reduced-motion), toute la conversation est là et se lit en scrollant dans le cadre.
+     Pas de scroll capturé pendant la lecture : la molette reste à la page. */
+  chat: {
+    render(b, p, n) {
+      const picto = img(b.picto, { cls: 'cs-ic', alt: '' });
+      const bot = (s, i, body) => `<div class="cs-m cs-bot" data-m="${i}">${picto}<div class="cs-b"><p class="cs-t">${tx(s.text)}</p>${body}</div></div>`;
+      const user = (i, html, echo = false) => `<div class="cs-m cs-user"${echo ? ` data-echo="${i}"` : ` data-m="${i}"`}>${html}</div>`;
+      const msg = (s, i) => {
+        if (s.from === 'user') return user(i, `${s.photo ? img(s.photo, { cls: 'cs-photo', alt: '', eager: true }) : ''}<span class="cs-bubble">${tx(s.text)}</span>`);
+        if (s.choices) return bot(s, i, `<div class="cs-chips">${s.choices.map((c) => `<button type="button" class="cs-chip" data-pick data-sound>${tx(c)}</button>`).join('')}</div>`) + user(i, `<span class="cs-bubble">${tx(s.choices[s.pick])}</span>`, true);
+        if (s.rooms) return bot(s, i, `<div class="cs-rooms">${s.rooms.map((r) => `<button type="button" class="cs-room cs-in" data-pick data-sound>${img(r.img, { alt: '', eager: true })}</button>`).join('')}</div>`) + user(i, `${img(s.rooms[s.pick].img, { cls: 'cs-photo is-s', alt: '', eager: true })}<span class="cs-bubble">${tx(s.rooms[s.pick].echo)}</span>`, true);
+        if (s.palette) return bot(s, i, `${img(s.salon, { cls: 'cs-salon cs-in', alt: '', eager: true })}<div class="cs-pal">${s.palette.map((c) => `<span class="cs-sw${c.dark ? ' is-dark' : ''}" style="background:${c.c}"><b>${tx(c.n)}</b><code>${c.c}</code></span>`).join('')}</div>`);
+        return bot(s, i, `<div class="cs-prods">${s.products.map((x) => `<article class="cs-prod cs-in">${img(x.img, { alt: '', eager: true })}<small>${s.brand}</small><p>${x.name}</p><strong>${x.price}</strong><u>${tx(s.more)}</u></article>`).join('')}</div><div class="cs-rebounds cs-in">${s.rebounds.map((r) => `<span>${tx(r)}</span>`).join('')}</div>`);
+      };
+      const labelled = b.steps.filter((s) => s.label);
+      const app = `<div class="cs-app">
+        <aside class="cs-side" aria-hidden="true">${b.side.actions.map((a, i) => `<span class="cs-act${i ? '' : ' is-on'}">${tx(a)}</span>`).join('')}<small>${tx(b.side.day)}</small>${b.side.history.map((h) => `<p>${tx(h)}</p>`).join('')}</aside>
+        <div class="cs-main">
+          <div class="cs-top">${img(b.logo, { alt: 'iA Rhinov', eager: true })}</div>
+          <div class="cs-feed"><div class="cs-list">${b.steps.map(msg).join('')}</div></div>
+          <div class="cs-bar"><span class="cs-thumb" hidden></span><span class="cs-field"><span class="cs-ph">${tx(b.placeholder)}</span><span class="cs-typed"></span></span><i class="cs-send" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M3 11.5 21 3l-8.5 18-2-7.5z"/></svg></i></div>
+          <button type="button" class="cs-again mono" hidden data-sound>${tx(b.again)} ↻</button>
+        </div>
+      </div>`;
+      return `${head(b.title, n, b.note)}
+        <div class="cs">
+          <ol class="cs-rail">${labelled.map((s, i) => `<li><span class="mono">${String(i + 1).padStart(2, '0')}</span>${tx(s.label)}</li>`).join('')}</ol>
+          ${browser(app, b.url)}
+        </div>`;
+    },
+    motion(el, b) {
+      const root = $('.cs', el);
+      spawn([root], el, { y: 60 });
+      const feed = $('.cs-feed', el);
+      if (REDUCE) return;
+
+      const STOP = Symbol('stop');
+      const list = $('.cs-list', el), typed = $('.cs-typed', el), ph = $('.cs-ph', el), thumb = $('.cs-thumb', el), send = $('.cs-send', el), again = $('.cs-again', el);
+      const rail = $$('.cs-rail li', el);
+      const dots = document.createElement('div');
+      dots.className = 'cs-m cs-bot cs-dots';
+      dots.innerHTML = `${img(b.picto, { cls: 'cs-ic', alt: '' })}<span class="cs-think"><i></i><i></i><i></i></span>`;
+      let run = 0, visible = false;
+      const sleep = async (ms, id) => {
+        for (let left = ms; left > 0;) {
+          if (id !== run || !el.isConnected) throw STOP;
+          await new Promise((r) => setTimeout(r, 40));
+          if (visible) left -= 40;
+        }
+        if (id !== run || !el.isConnected) throw STOP;
+      };
+      const follow = () => gsap.to(feed, { scrollTop: feed.scrollHeight - feed.clientHeight, duration: 0.55, ease: 'power2.out', overwrite: true });
+      const setRail = (i) => rail.forEach((li, k) => { li.classList.toggle('is-on', k === i); li.classList.toggle('is-done', k < i); });
+
+      // Le texte d'un message, mot à mot (les balises <b> restent en place).
+      const wordsOf = (p) => {
+        if (!p.dataset.split) {
+          const walk = (n) => [...n.childNodes].forEach((c) => {
+            if (c.nodeType === 3) {
+              const f = document.createDocumentFragment();
+              c.textContent.split(/(\s+)/).forEach((w) => { if (!w) return; if (/^\s+$/.test(w)) f.append(w); else { const s = document.createElement('span'); s.className = 'cs-w'; s.textContent = w; f.append(s); } });
+              c.replaceWith(f);
+            } else walk(c);
+          });
+          walk(p); p.dataset.split = '1';
+        }
+        return $$('.cs-w', p);
+      };
+      const reset = () => {
+        gsap.killTweensOf(feed);
+        feed.scrollTop = 0;
+        dots.remove();
+        $$('.cs-m', list).forEach((m) => { m.hidden = true; });
+        $$('[data-pick]', el).forEach((x) => { x.disabled = false; x.classList.remove('is-on', 'is-off'); });
+        typed.textContent = ''; ph.hidden = false; thumb.hidden = true; thumb.innerHTML = ''; again.hidden = true;
+        setRail(-1);
+      };
+      const reveal = (m) => { m.hidden = false; follow(); };
+      const pop = (t) => gsap.fromTo(t, { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out', clearProps: 'transform' });
+
+      const typeIn = async (text, id) => {
+        ph.hidden = true;
+        for (let k = 1; k <= text.length; k++) { typed.textContent = text.slice(0, k); await sleep(30, id); }
+        await sleep(280, id);
+        gsap.fromTo(send, { scale: 0.8 }, { scale: 1, duration: 0.4, ease: 'back.out(3)' });
+        typed.textContent = ''; ph.hidden = false; thumb.hidden = true;
+      };
+      const choose = async (btns, auto, id) => {
+        let picked = -1;
+        const on = btns.map((x, i) => { const f = () => { if (picked < 0) picked = i; }; x.addEventListener('click', f); return f; });
+        try {
+          for (let left = 2300; picked < 0 && left > 0; left -= 40) await sleep(40, id);
+        } finally { btns.forEach((x, i) => x.removeEventListener('click', on[i])); }
+        const i = picked < 0 ? auto : picked;
+        btns.forEach((x, k) => { x.classList.toggle('is-on', k === i); x.classList.toggle('is-off', k !== i); x.disabled = true; });
+        await sleep(420, id);
+        return i;
+      };
+
+      const answer = async (s, i, id) => {
+        list.insertBefore(dots, $(`[data-m="${i}"]`, list));
+        follow(); pop(dots);
+        await sleep(950, id);
+        dots.remove();
+        const m = $(`[data-m="${i}"]`, list);
+        const ins = $$('.cs-in', m), sw = $$('.cs-sw', m), picks = $$('[data-pick]', m), chips = $('.cs-chips', m);
+        gsap.set([...ins, ...sw, ...(chips ? [chips] : [])], { opacity: 0 });
+        const words = wordsOf($('.cs-t', m));
+        gsap.set(words, { opacity: 0 });
+        reveal(m);
+        await gsap.to(words, { opacity: 1, duration: 0.2, stagger: 0.028, ease: 'none' });
+        await sleep(180, id);
+        if (ins.length) { gsap.fromTo(ins, { y: 22, opacity: 0, scale: 0.97 }, { y: 0, opacity: 1, scale: 1, duration: 0.55, stagger: 0.11, ease: 'power3.out', clearProps: 'transform' }); await sleep(450 + ins.length * 110, id); }
+        if (sw.length) { gsap.fromTo(sw, { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, transformOrigin: 'left center', duration: 0.5, stagger: 0.12, ease: 'power3.inOut', clearProps: 'transform' }); await sleep(900, id); }
+        if (chips) { pop(chips); await sleep(200, id); }
+        follow();
+        if (!picks.length) return;
+        const got = await choose(picks, s.pick, id);
+        const echo = $(`[data-echo="${i}"]`, list);
+        if (s.rooms) { $('img', echo).src = asset(s.rooms[got].img); $('.cs-bubble', echo).textContent = tx(s.rooms[got].echo); }
+        else $('.cs-bubble', echo).textContent = tx(s.choices[got]);
+        reveal(echo); pop(echo);
+        await sleep(520, id);
+      };
+
+      const play = async (id) => {
+        reset();
+        await sleep(600, id);
+        let label = -1;
+        for (const [i, s] of b.steps.entries()) {
+          if (s.label) setRail(++label);
+          if (s.from === 'user') {
+            if (s.photo) { thumb.innerHTML = img(s.photo, { alt: '', eager: true }); thumb.hidden = false; pop(thumb); await sleep(650, id); }
+            await typeIn(tx(s.text), id);
+            const m = $(`[data-m="${i}"]`, list);
+            reveal(m); pop(m);
+            await sleep(450, id);
+          } else await answer(s, i, id);
+          await sleep(320, id);
+        }
+        setRail(rail.length);
+        again.hidden = false; pop(again);
+        await sleep(9000, id);
+      };
+      const loop = async () => {
+        const id = ++run;
+        try { for (;;) await play(id); } catch (e) { if (e !== STOP) throw e; }
+      };
+      again.addEventListener('click', loop);
+      reset();
+      let started = false;
+      new IntersectionObserver(([e]) => {
+        visible = e.isIntersecting;
+        if (visible && !started) { started = true; loop(); }
+      }, { threshold: 0.3 }).observe($('.browser', root));
+    },
+  },
+
   /* Variantes : plusieurs pistes d'un même écran, bureau et mobile, à comparer au clic (les tests de rhinov.fr).
      Un item sans `mobile` garde la place du téléphone, pour que le cadre ne saute pas. `photos` : une grille d'essais en plus. */
   variants: {
@@ -278,6 +440,31 @@ export const BLOCKS = {
       spawn([$('.var-stage', el)], el, { y: 60 });
       const grid = $('.var-photos', el);
       if (grid) spawn($$('img', grid), grid, { stagger: 0.04, y: 40 });
+    },
+  },
+
+  /* Éventail : toutes les déclinaisons d'un coup, tenues comme une main de cartes et distribuées depuis le centre comme le
+     tirage de la home (Mon Salon de Noël). --k = la place par rapport au centre, --a = sa valeur absolue. */
+  fan: {
+    render(b, p, n) {
+      const mid = (b.items.length - 1) / 2;
+      return `${head(b.title, n, b.note)}
+        <div class="fan" style="--n:${b.items.length}">${b.items.map((it, i) => `
+          <figure class="fan-item" style="--k:${i - mid};--a:${Math.abs(i - mid)}">
+            <div class="fan-deal"><div class="fan-card">${img(it.img, { alt: tx(it.t) })}</div></div>
+            <figcaption><b>${tx(it.t)}</b><span>${tx(it.d)}</span></figcaption>
+          </figure>`).join('')}</div>`;
+    },
+    motion(el) {
+      const fan = $('.fan', el), deals = $$('.fan-deal', el), mid = (deals.length - 1) / 2;
+      // Vers le centre réel de l'éventail (toujours dans la largeur de la page, même sur deux colonnes au téléphone).
+      const toCenter = (i, d) => { const f = fan.getBoundingClientRect(), r = d.getBoundingClientRect(); return f.left + f.width / 2 - (r.left + r.width / 2); };
+      gsap.from(deals, {
+        x: toCenter, y: 70, rotation: (i) => (i - mid) * -7, scale: 0.86, opacity: 0,
+        duration: 1, ease: 'back.out(1.25)', stagger: { each: 0.06, from: 'center' },
+        scrollTrigger: { trigger: fan, start: 'top 78%' },
+      });
+      gsap.from($$('figcaption', el), { y: 14, opacity: 0, duration: 0.7, delay: 0.45, stagger: { each: 0.05, from: 'center' }, ease: 'power3.out', scrollTrigger: { trigger: fan, start: 'top 78%' } });
     },
   },
 

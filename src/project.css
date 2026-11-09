@@ -33,6 +33,7 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 [data-project='myfrenchtool'] .btn-accent { color: #0052CC; }
 [data-project='myfrenchtool'] .blk .btn-accent { background: #0052CC; color: #fff; border-color: #0052CC; }
 [data-project='nookdex'] .btn-accent, [data-project='mesk'] .btn-accent { color: #fff; }
+[data-project='rhinov-site'] .btn-accent { color: #3B2B1F; }
 
 /* ------------------------------------------------------------------ */
 /* Blocs                                                               */
@@ -164,6 +165,39 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .screen .browser { aspect-ratio: 16 / 11; }
 .screen .browser-view img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
 .screen figcaption { margin-top: 12px; opacity: 0.65; }
+
+/* --- Variantes (les pistes d'un écran, à comparer) ------------------ */
+.var-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.var-tab { display: inline-flex; align-items: baseline; gap: 8px; padding: 9px 15px; border: 1px solid var(--s-line); border-radius: 999px; background: none; color: inherit; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.25s, color 0.25s, border-color 0.25s; }
+.var-tab .mono { font-size: 11px; font-weight: 400; opacity: 0.6; }
+.var-tab:hover { border-color: var(--s-fg); }
+.var-tab[aria-selected='true'] { background: var(--s-fg); border-color: var(--s-fg); color: var(--s-bg); }
+.var-stage { display: grid; grid-template-columns: minmax(0, 1fr) clamp(170px, 16vw, 230px); gap: clamp(18px, 2.4vw, 36px); align-items: center; }
+.var-stage .browser-view { aspect-ratio: 1440 / 890; background: #fff; }
+.var-desk { display: block; width: 100%; height: 100%; object-fit: contain; object-position: top; }
+.var-phone { width: 100%; height: auto; max-height: none; aspect-ratio: 393 / 852; flex: none; align-self: center; }
+.var-mob { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.is-solo .var-phone { visibility: hidden; }
+.var-cap { margin-top: 16px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; }
+.var-cap h3 { margin: 0; font-size: clamp(18px, 1.5vw, 24px); font-weight: 750; letter-spacing: -0.015em; }
+.var-cap p { margin: 0; font-size: 15px; line-height: 1.4; opacity: 0.7; }
+.var-photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.var-photos img { display: block; width: 100%; aspect-ratio: 1920 / 964; object-fit: cover; border-radius: 12px; }
+@media (max-width: 860px) {
+  .var-stage { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .var-stage .browser { width: 100%; }
+  .var-phone { width: min(56vw, 220px); }
+  .is-solo .var-phone { display: none; }
+  .var-photos { gap: 6px; }
+}
+
+/* Écrans mobiles d'une vitrine : dans un téléphone, à taille de poche. */
+.shw-phone { grid-column: span 2; display: flex; flex-direction: column; align-items: center; }
+.shw-ph { width: clamp(180px, 16vw, 230px); height: auto; max-height: none; aspect-ratio: 430 / 932; flex: none; align-self: center; }
+.shw-ph img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.shw-phone .shw-cap { grid-template-columns: auto minmax(0, 1fr); max-width: 300px; }
+.shw-phone .shw-cap p { grid-column: 1 / -1; }
+@media (max-width: 860px) { .shw-phone { grid-column: 1 / -1; } }
 
 /* --- Fondations (logos, couleurs, typographie en vrai HTML) ---------- */
 .fd-label { margin: clamp(44px, 6vw, 80px) 0 16px; font-size: 13px; opacity: 0.7; }
@@ -316,6 +350,8 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
   .pg-side { order: -1; }
   .pg-list { grid-auto-flow: column; }
   .pg-list button { font-size: 15px; padding: 6px 0; }
+  .pg-list:has(li:nth-child(4)) { display: flex; flex-wrap: wrap; gap: 2px 16px; } /* au-delà de 3 pages, la colonne débordait de l'écran */
+  .pg-list:has(li:nth-child(4)) button { width: auto; border-bottom: 0; }
   .live-tab { padding: 10px 12px; }
   .live-tab b { font-size: 15px; }
   .live-tab-s { display: none; }

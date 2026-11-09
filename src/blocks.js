@@ -224,7 +224,7 @@ export const BLOCKS = {
       return `${head(b.title || 'b.features', n)}
         <div class="shw">${b.items.map((f, i) => `
           <figure class="shw-item shw-${f.size || 'full'}">
-            ${browser(f.video
+            ${f.size === 'phone' ? `<div class="phone shw-ph"><div class="phone-view">${img(f.img, { alt: tx(f.t) })}</div></div>` : browser(f.video
               ? `<video class="shw-video${f.pixel ? ' pix' : ''}" src="${asset(f.video)}" poster="${asset(f.img)}" muted loop playsinline autoplay preload="metadata" aria-label="${tx(f.t)}"></video>`
               : img(f.img, { alt: tx(f.t), cls: f.pixel ? 'pix' : '' }), f.url || '')}
             <figcaption class="shw-cap">
@@ -241,6 +241,43 @@ export const BLOCKS = {
       $$('.shw-video', el).forEach((v) => {
         new IntersectionObserver(([e]) => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }, { threshold: 0.1 }).observe(v);
       });
+    },
+  },
+
+  /* Variantes : plusieurs pistes d'un même écran, bureau et mobile, à comparer au clic (les tests de rhinov.fr).
+     Un item sans `mobile` garde la place du téléphone, pour que le cadre ne saute pas. `photos` : une grille d'essais en plus. */
+  variants: {
+    render(b, p, n) {
+      const f = b.items[0], num = (i) => String(i + 1).padStart(2, '0');
+      return `${head(b.title, n, b.note)}
+        <div class="var">
+          <div class="var-tabs" role="tablist">${b.items.map((it, i) => `<button type="button" role="tab" class="var-tab" aria-selected="${!i}" data-var="${i}" data-sound><span class="mono">${num(i)}</span>${tx(it.label)}</button>`).join('')}</div>
+          <div class="var-stage${f.mobile ? '' : ' is-solo'}">
+            ${browser(img(f.desk, { cls: 'var-desk', eager: true, alt: tx(f.t) }), tx(f.url))}
+            <div class="phone var-phone"><div class="phone-view">${img(f.mobile || f.desk, { cls: 'var-mob', alt: '' })}</div></div>
+          </div>
+          <div class="var-cap"><h3>${tx(f.t)}</h3><p>${tx(f.d)}</p></div>
+          ${b.photos ? `<p class="mono fd-label">${tx(b.photos.title)}</p><div class="var-photos">${b.photos.items.map((src) => img(src, { alt: '' })).join('')}</div>` : ''}
+        </div>`;
+    },
+    motion(el, b) {
+      const desk = $('.var-desk', el), mob = $('.var-mob', el), stage = $('.var-stage', el);
+      const preload = () => b.items.forEach((it) => [it.desk, it.mobile].filter(Boolean).forEach((s) => { new Image().src = asset(s); }));
+      new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); preload(); } }, { rootMargin: '60% 0px' }).observe(el);
+      $$('[data-var]', el).forEach((btn) => btn.addEventListener('click', () => {
+        const it = b.items[+btn.dataset.var];
+        $$('[data-var]', el).forEach((x) => x.setAttribute('aria-selected', String(x === btn)));
+        desk.src = asset(it.desk); desk.alt = tx(it.t);
+        if (it.mobile) mob.src = asset(it.mobile);
+        stage.classList.toggle('is-solo', !it.mobile);
+        $('.browser-url', el).textContent = tx(it.url);
+        $('.var-cap h3', el).textContent = tx(it.t);
+        $('.var-cap p', el).textContent = tx(it.d);
+        if (!REDUCE) gsap.fromTo([desk, mob, $('.var-cap', el)], { opacity: 0 }, { opacity: 1, duration: 0.35 });
+      }));
+      spawn([$('.var-stage', el)], el, { y: 60 });
+      const grid = $('.var-photos', el);
+      if (grid) spawn($$('img', grid), grid, { stagger: 0.04, y: 40 });
     },
   },
 

@@ -80,7 +80,7 @@ export const PROJECTS = [
     year: '2026',
     theme: 'light',
     colors: { bg: '#FAF9F7', fg: '#12151B', accent: '#8A6B55', line: 'rgba(18,21,27,.14)', tile: '#FFFFFF' },
-    logo: { src: 'systeme-rhinov/logo.svg', mark: 'systeme-rhinov/logo-mark.svg', markScale: 0.7, introScale: 0.55 },
+    logo: { src: 'systeme-rhinov/logo.svg', mark: 'systeme-rhinov/logo-mark-dark.svg', markScale: 0.7, introScale: 0.55 }, // la carte est sur fond ivoire : le R. en noir
     shot: 'systeme-rhinov/modes/rhinov.webp',
     fonts: ['Poppins:wght@400;500;600;700', 'Bodoni+Moda:ital,wght@0,600;1,700'],
     type: T('Design system · Marque', 'Design system · Brand'),
@@ -185,6 +185,86 @@ export const PROJECTS = [
           { v: 3, l: T('marques sur les mêmes composants', 'brands on the same components') },
           { v: 38, l: T('composants et sections', 'components and sections') },
           { v: 61, l: T('styles publiés', 'published styles') },
+        ],
+      },
+    ],
+  },
+  {
+    // rhinov.fr 2026 (09/11) : fichier Figma « Site Web 2026 » (pages Dev Ready) et le deck Rhinov Website 2026 (sources/raw/decks).
+    // Le tunnel « Order V5 » du fichier porte encore l'ancien logo : pas montré.
+    id: 'rhinov-site',
+    card: 'rhinov-site/card.webp', // les décoratrices du deck, logo blanc (scripts/make-cards.mjs)
+    name: 'rhinov.fr',
+    year: '2026',
+    url: 'https://www.rhinov.fr',
+    theme: 'dark',
+    colors: { bg: '#8A6B55', fg: '#FAF9F7', accent: '#FAF9F7', line: 'rgba(250,249,247,.22)', tile: '#FFFFFF', surface: '#FAF9F7', surfaceFg: '#12151B', surfaceLine: 'rgba(18,21,27,.14)' },
+    logo: { src: 'rhinov-site/logo.svg', invert: true, mark: 'rhinov-site/logo-mark.svg', markScale: 0.7, introScale: 0.55 },
+    shot: 'rhinov-site/deck/p02.webp',
+    fonts: ['Poppins:wght@400;600'],
+    type: T('Product design · E-commerce', 'Product design · E-commerce'),
+    role: T('Lead UI/UX', 'Lead UI/UX'),
+    tagline: T('Le site de Rhinov, de la première visite au panier.', "Rhinov's website, from first visit to checkout."),
+    context: T(
+      "Rhinov met une décoratrice au service de chaque pièce : une visio, des vues 3D, une shopping-list. En 2026, j'ai repensé son site de bout en bout : l'accueil, les offres, les réalisations, les profils des décoratrices, le blog et le panier.",
+      'Rhinov puts a decorator on every room: a video call, 3D views, a shopping list. In 2026 I redesigned its website end to end: home, offers, projects, decorator profiles, blog and cart.',
+    ),
+    blocks: [
+      {
+        type: 'pages',
+        pages: [
+          { src: 'rhinov-site/pages/accueil.webp', url: 'rhinov.fr', label: T('Accueil', 'Home') },
+          { src: 'rhinov-site/pages/relook.webp', url: 'rhinov.fr · ReLook Déco', label: T('Offre ReLook Déco', 'ReLook Déco offer') },
+          { src: 'rhinov-site/pages/realisations.webp', url: 'rhinov.fr · Nos réalisations', label: T('Réalisations', 'Projects') },
+          { src: 'rhinov-site/pages/profil.webp', url: 'rhinov.fr · Nos décoratrices', label: T('Profil de décoratrice', 'Decorator profile') },
+          { src: 'rhinov-site/pages/article.webp', url: 'rhinov.fr · Le blog déco', label: T('Article de blog', 'Blog article') },
+        ],
+        mobile: 'rhinov-site/pages/m-accueil.webp',
+      },
+      {
+        type: 'showcase',
+        title: T('Du choix au panier', 'From choice to cart'),
+        items: [
+          { img: 'rhinov-site/parcours/menu.webp', size: 'half', url: 'rhinov.fr · Menu', t: T('Le menu', 'The menu'), d: T("L'espace client, sans quitter la page.", 'The client area, without leaving the page.') },
+          { img: 'rhinov-site/parcours/sticky.webp', size: 'half', url: 'rhinov.fr · Nos offres', t: T('Le panier qui suit', 'The cart that follows'), d: T('La pièce et le prix restent à portée pendant toute la lecture.', 'The room and the price stay within reach all along the page.') },
+          { img: 'rhinov-site/parcours/m-menu.webp', size: 'phone', url: 'Mobile · Accueil', t: T('Accueil mobile', 'Mobile home'), d: T('La photo, la promesse, un seul bouton.', 'The photo, the promise, one button.') },
+          { img: 'rhinov-site/parcours/m-sticky.webp', size: 'phone', url: 'Mobile · Nos offres', t: T('Les offres', 'The offers'), d: T('Le choix de la pièce reste collé en bas.', 'The room picker stays stuck at the bottom.') },
+          { img: 'rhinov-site/parcours/m-piece.webp', size: 'phone', url: 'Mobile · Choix de la pièce', t: T('Le choix de la pièce', 'Picking the room'), d: T('Chaque pièce avec son prix, avant de décider.', 'Every room with its price, before deciding.') },
+        ],
+      },
+      {
+        // Page Figma « Optimisations conversion 2026 » : les pistes de hero, les essais de photo, la recherche.
+        type: 'variants',
+        title: T('Les tests et les explorations', 'Tests and explorations'),
+        note: T('Comment entrer dans le site : les pistes explorées pour le premier écran.', 'How to enter the site: the routes explored for the first screen.'),
+        items: [
+          { desk: 'rhinov-site/tests/d1.webp', mobile: 'rhinov-site/tests/m1.webp', url: T('Piste 1', 'Route 1'), label: T('Une phrase', 'A sentence'), t: T('Commencer par une phrase', 'Start with a sentence'), d: T("On écrit son envie, le site répond par l'offre qui va avec.", 'Write what you want, the site answers with the matching offer.') },
+          { desk: 'rhinov-site/tests/d2.webp', mobile: 'rhinov-site/tests/m2.webp', url: T('Piste 2', 'Route 2'), label: T('Avant / après', 'Before / after'), t: T('Le résultat d’abord', 'The result first'), d: T("Le curseur avant / après prend le hero, l'offre et le prix se posent dessus.", 'The before / after slider takes the hero, offer and price sit on top.') },
+          { desk: 'rhinov-site/tests/d3.webp', mobile: 'rhinov-site/tests/m3.webp', url: T('Piste 3', 'Route 3'), label: T('Formulaire', 'Form'), t: T('Tout décider au même endroit', 'Decide everything in one place'), d: T('La pièce, la formule et le prix, à côté de ce qu’on reçoit.', 'Room, plan and price, next to what you receive.') },
+          { desk: 'rhinov-site/tests/d4.webp', mobile: 'rhinov-site/tests/m4.webp', url: T('Piste 4', 'Route 4'), label: T('Deux formules', 'Two plans'), t: T('Deux formules côte à côte', 'Two plans side by side'), d: T('ReLook ou ReFresh, puis la pièce, directement dans le hero.', 'ReLook or ReFresh, then the room, right in the hero.') },
+          { desk: 'rhinov-site/tests/d5.webp', url: T('Piste 5', 'Route 5'), label: T('Photo pleine', 'Full photo'), t: T('La pièce en grand', 'The room, large'), d: T('Une photo plein format, et un titre qui parle de la chambre.', 'A full-size photo, and a headline about the bedroom.') },
+          { desk: 'rhinov-site/tests/d6.webp', mobile: 'rhinov-site/tests/m6.webp', url: T('Piste 6', 'Route 6'), label: T('Comparer', 'Compare'), t: T('Comparer sans quitter la page', 'Compare without leaving'), d: T('Le même formulaire, avec un lien pour comparer les offres.', 'The same form, with a link to compare offers.') },
+          { desk: 'rhinov-site/tests/d7.webp', mobile: 'rhinov-site/tests/m7.webp', url: T('Piste 7', 'Route 7'), label: T('Double barre', 'Double bar'), t: T('Formule et pièce dans une barre', 'Plan and room in one bar'), d: T('La piste qu’on retrouve sur la Homepage 2026.', 'The route that made it to the 2026 homepage.') },
+          { desk: 'rhinov-site/tests/d8.webp', mobile: 'rhinov-site/tests/m8.webp', url: T('Le menu', 'The menu'), label: T('Recherche', 'Search'), t: T('La recherche qui comprend', 'Search that understands'), d: T('« Voulez-vous dire : la chambre de ma fille ? », et les offres qui correspondent.', '“Did you mean: my daughter’s bedroom?”, and the matching offers.') },
+        ],
+        photos: {
+          title: T('Neuf photos pour le même hero', 'Nine photos for the same hero'),
+          items: [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `rhinov-site/tests/photo${n}.webp`),
+        },
+      },
+      {
+        // Slides du deck en 16:9 : le cadre est au même format, rien n'est coupé.
+        type: 'slides',
+        title: T('La présentation', 'The presentation'),
+        items: [
+          { src: 'rhinov-site/deck/p01.webp', t: T('Le nouveau site', 'The new website') },
+          { src: 'rhinov-site/deck/p02.webp', t: T('Les offres', 'The offers') },
+          { src: 'rhinov-site/deck/p03.webp', t: T('Les réalisations et la réassurance', 'Projects and reassurance') },
+          { src: 'rhinov-site/deck/p05.webp', t: T('Le menu, rubrique par rubrique', 'The menu, section by section') },
+          { src: 'rhinov-site/deck/p06.webp', t: T('Le mobile', 'Mobile') },
+          { src: 'rhinov-site/deck/p07.webp', t: T('Les tarifs et le panier', 'Pricing and cart') },
+          { src: 'rhinov-site/deck/p08.webp', t: T('Les décoratrices', 'The decorators') },
+          { src: 'rhinov-site/deck/p09.webp', t: T('Leurs profils', 'Their profiles') },
         ],
       },
     ],

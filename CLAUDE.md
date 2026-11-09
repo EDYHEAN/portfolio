@@ -48,6 +48,7 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
   `stack` (services + automatisations), `slides` (horizontal), `outcome` (chiffres). Intro et « projet suivant » automatiques.
   Captures : WebP, 1200 px de large (pleine page ≤ 12000 px de haut), dans `assets/{id}/`. `title: T(…)` remplace le titre
   générique d'un bloc `slides` ou `showcase` (« 8 versions avant la bonne »).
+- rhinov.fr (09/11, id `rhinov-site`) : pages Dev Ready du fichier Figma « Site Web 2026 », tests de la page Optimisations conversion 2026 (bloc `variants` : pistes bureau + mobile au clic, `photos` en grille) + slides du deck. Le tunnel « Order V5 » a encore l'ancien logo : pas montré. Vitrine : `size: 'phone'` met un écran mobile dans un téléphone.
 - Rhinov Studio (06/11) : landings retail + immo + app agents. Versions du hero et écrans de l'app rendus depuis Figma (fichier
   « Studio Rhinov », équipe Rhinov), pleines pages capturées sur les prototypes codés (`sources/raw/vibecoded/Rhinov Studio`).
 - Système Rhinov (09/11) : fichier Figma « Design System » (équipe Rhinov). Aucune page de la charte PDF (mention « Document confidentiel »).

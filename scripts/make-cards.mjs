@@ -56,20 +56,31 @@ const CARDS = {
       <div class="photo"></div><div class="shade"></div>${logo}
       ${GRAIN}`;
   },
-  // Système Rhinov : un nuancier en éventail, les couleurs de ses trois marques, sur le brun argile et le R. en filigrane.
+  // Système Rhinov : une pièce du design system (la carte « Pièce de vie »), sous un voile léger, le R. en grand (Johan, 09/11).
   'systeme-rhinov'() {
+    const photo = dataUri(path.join(ROOT, 'sources/cards/systeme-rhinov/interieur.webp'));
     const mark = svgInline(path.join(ROOT, 'assets/systeme-rhinov/logo-mark.svg')).replace('<svg ', '<svg class="mark" ');
-    const chips = [['#BAA89B', 'Sable', -30], ['#46604E', 'Pin', -15], ['#C76A31', 'Orange', 0], ['#12151B', 'Noir riche', 15], ['#3B2B1F', 'Cacao', 30]];
-    return `<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=block" rel="stylesheet"><style>${BASE}
-      body{background:#8A6B55}
-      .mark{position:absolute;left:50%;top:50%;width:1120px;height:auto;transform:translate(-52%,-50%)}
-      .mark *{fill:rgba(255,255,255,.08)}
-      .chip{position:absolute;left:50%;top:400px;width:300px;height:470px;margin-left:-150px;border-radius:18px;overflow:hidden;background:#FAF9F7;
-        transform-origin:50% 118%;box-shadow:0 26px 44px -16px rgba(40,26,16,.6)}
-      .chip i{position:absolute;inset:0 0 86px;background:var(--c)}
-      .chip b{position:absolute;left:24px;bottom:28px;font:500 25px Poppins,sans-serif;color:#12151B}
-      </style>${mark}
-      ${chips.map(([c, n, r]) => `<div class="chip" style="--c:${c};transform:rotate(${r}deg)"><i></i><b>${n}</b></div>`).join('')}
+    return `<style>${BASE}
+      body{background:#3B2B1F}
+      .photo{position:absolute;inset:0;background:url(${photo}) 50% 50% / cover}
+      .shade{position:absolute;inset:0;background:rgba(40,28,20,.34)}
+      .mark{position:absolute;left:50%;top:50%;width:300px;height:auto;transform:translate(-50%,-50%);filter:drop-shadow(0 10px 28px rgba(0,0,0,.4))}
+      </style>
+      <div class="photo"></div><div class="shade"></div>${mark}
+      ${GRAIN}`;
+  },
+  // rhinov.fr : les décoratrices du deck (la vraie page qu'elles présentent), sous un voile cacao, le logo blanc au centre.
+  'rhinov-site'() {
+    const photo = dataUri(path.join(ROOT, 'sources/cards/rhinov-site/decoratrices.webp'));
+    const logo = svgInline(path.join(ROOT, 'assets/rhinov-site/logo.svg')).replace('<svg ', '<svg class="logo" ');
+    return `<style>${BASE}
+      body{background:#3B2B1F}
+      .photo{position:absolute;inset:0;background:url(${photo}) 30% 42% / auto 104%}
+      .shade{position:absolute;inset:0;background:rgba(59,43,31,.64)}
+      .logo{position:absolute;left:50%;top:50%;width:440px;height:auto;transform:translate(-50%,-50%);filter:drop-shadow(0 8px 24px rgba(0,0,0,.35))}
+      .logo *{fill:#fff}
+      </style>
+      <div class="photo"></div><div class="shade"></div>${logo}
       ${GRAIN}`;
   },
   // Vinyl Run : une vraie photo de la boutique (la fresque des platines Technics, sources/cards/vinyl-run), assombrie,

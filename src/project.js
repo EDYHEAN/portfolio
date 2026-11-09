@@ -53,6 +53,8 @@ function render() {
       </a>
     </section>`;
   renderOutro();
+  // Les interactions d'un bloc (onglets…) : une fois par rendu, et même sans animation.
+  $$('.blk').forEach((el, i) => { const b = p.blocks[i]; if (b) BLOCKS[b.type].bind?.(el, b, p); });
 }
 
 let mm = null;

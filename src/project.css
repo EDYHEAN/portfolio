@@ -28,6 +28,22 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .intro-meta dd { margin: 0; }
 .intro-ctx { margin: 26px 0 0; max-width: 54ch; font-size: clamp(16px, 1.2vw, 19px); line-height: 1.5; opacity: 0.85; }
 .intro .btn { margin-top: 32px; }
+/* Au téléphone, l'intro tient sur l'écran autant que possible : logo plus petit, marges resserrées, retour à 44 px au doigt. */
+@media (max-width: 860px) {
+  .intro { padding: 118px var(--gutter) 40px; }
+  .intro .intro-back { top: 66px; left: 0; display: inline-flex; align-items: center; gap: 0.6em; min-height: 44px; padding: 0 var(--gutter); }
+  .intro-logo { height: calc(min(20svh, 190px) * var(--logo-k, 1)); }
+  .intro-name { margin-top: 2.4svh; font-size: clamp(38px, 10.5vw, 64px); }
+  .intro-tag { margin-top: 8px; font-size: 17px; line-height: 1.3; }
+  .intro-meta { margin-top: 18px; gap: 4px 22px; }
+  .intro-ctx { margin-top: 16px; font-size: 15px; line-height: 1.45; }
+  .intro .btn { margin-top: 20px; }
+}
+/* Paysage sur téléphone : très peu de hauteur, le logo ne doit pas tout prendre. */
+@media (max-width: 860px) and (max-height: 500px) {
+  .intro-logo { height: calc(30svh * var(--logo-k, 1)); }
+  .intro-ctx { max-width: 72ch; }
+}
 .btn-accent { background: var(--p-accent); color: var(--p-bg); border-color: var(--p-accent); }
 .btn-accent:hover { background: var(--p-fg); color: var(--p-bg); }
 [data-project='myfrenchtool'] .btn-accent { color: #0052CC; }
@@ -56,7 +72,11 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
   .fan { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 12px; }
   .fan-card { transform: rotate(calc(var(--k) * 0.5deg)); transform-origin: 50% 50%; box-shadow: 0 14px 28px rgba(18, 21, 27, 0.22); }
   .fan-item figcaption { margin-top: 14px; padding-right: 0; }
+  /* Pas de survol au doigt : un toucher ne doit pas laisser une carte relevée. */
+  .fan-item:hover .fan-card { transform: rotate(calc(var(--k) * 0.5deg)); box-shadow: 0 14px 28px rgba(18, 21, 27, 0.22); }
 }
+@media (min-width: 600px) and (max-width: 860px) { .fan { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px 16px; } } /* tablette : trois par ligne */
+@media (min-width: 600px) and (max-width: 860px) and (max-height: 500px) { .fan { grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 10px; } } /* paysage : toute la main sur l'écran, comme au bureau */
 
 /* ------------------------------------------------------------------ */
 /* Blocs                                                               */
@@ -140,6 +160,57 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 }
 .phone-view { position: relative; width: 100%; height: 100%; border-radius: 23px; overflow: hidden; background: #000; }
 .pg-phone-shot { display: block; width: 100%; height: auto; }
+.pg-h-touch { display: none; }
+/* Au doigt : le cadre ne capture rien, la capture suit le scroll de la page (blocks.js, .is-follow). */
+.pg.is-follow .browser-view, .pg.is-follow .phone-view { overflow: hidden; }
+.pg.is-follow .pg-shot, .pg.is-follow .pg-phone-shot { will-change: transform; }
+@media (max-width: 860px) {
+  .pg { --pg-h: clamp(320px, 62svh, 560px); }
+  .pg .browser-view, .pg .phone-view { overflow: hidden; } /* même sans animation : un toucher ouvre la capture en grand */
+  .pg-sticky { height: auto; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .pg-side { display: contents; } /* ses enfants se rangent dans la grille : téléphone, puces, navigateur, indice */
+  .pg .phone { display: block; order: 1; justify-self: center; align-self: start; flex: none; width: min(260px, 66vw); height: auto; max-height: none; aspect-ratio: 9 / 19.5; margin-bottom: 18px; }
+  .pg-list { order: 2; min-width: 0; }
+  .pg-main { order: 3; height: var(--pg-h); min-width: 0; }
+  .pg-hint { order: 4; }
+  /* Les pages en puces : une seule rangée qui défile au doigt, bord à bord. */
+  .pg-list { display: flex; gap: 8px; margin: 0 calc(-1 * var(--gutter)); padding: 0 var(--gutter); overflow-x: auto; scrollbar-width: none; }
+  .pg-list::-webkit-scrollbar { display: none; }
+  .pg-list li { flex: none; }
+  .pg-list button { width: auto; min-height: 44px; align-items: center; gap: 8px; padding: 0 15px; border: 1px solid var(--s-line); border-radius: 999px; font-size: 14px; font-weight: 600; white-space: nowrap; opacity: 1; transition: background 0.25s, color 0.25s, border-color 0.25s; }
+  .pg-list button .mono { font-size: 11px; opacity: 0.6; }
+  .pg-list button.is-on { background: var(--s-fg); border-color: var(--s-fg); color: var(--s-bg); }
+}
+/* Tablette et paysage : le navigateur et le téléphone côte à côte, à la même hauteur. */
+@media (min-width: 600px) and (max-width: 860px) {
+  .pg-sticky { grid-template-columns: minmax(0, 1fr) auto; }
+  .pg-list { order: 1; grid-column: 1 / -1; }
+  .pg-main { order: 2; }
+  .pg .phone { order: 3; height: var(--pg-h); width: auto; margin: 0; }
+  .pg-hint { order: 4; grid-column: 1 / -1; }
+}
+
+/* Agrandir au doigt : le bouton des cadres, puis la visionneuse (viewer.js). Rien de tout ça au bureau. */
+.zm-btn { display: none; }
+@media (max-width: 860px), (pointer: coarse) {
+  [data-zoom] { cursor: zoom-in; }
+  .pg-h-desk { display: none; }
+  .pg-h-touch { display: inline; }
+  /* 44 px au doigt, 32 px à l'œil : la pastille ne doit pas manger l'écran qu'elle agrandit. */
+  .zm-btn { position: absolute; right: 2px; bottom: 2px; z-index: 1; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; background: none; color: #fff; cursor: pointer; }
+  .zm-btn::before { content: ''; position: absolute; inset: 6px; border-radius: 50%; background: rgba(11, 11, 11, 0.55); }
+  .zm-btn svg { position: relative; width: 14px; height: 14px; }
+}
+.zv { position: fixed; inset: 0; z-index: 80; display: flex; flex-direction: column; background: #0B0B0B; color: #EFE9DD; touch-action: pinch-zoom; }
+.zv-bar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: max(6px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) 6px max(16px, env(safe-area-inset-left)); }
+.zv-title { min-width: 0; font-size: 11px; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.zv-close { flex: none; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: rgba(239, 233, 221, 0.14); color: inherit; cursor: pointer; }
+.zv-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; touch-action: pan-x pan-y pinch-zoom; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.zv-scroll::-webkit-scrollbar { display: none; }
+.zv-fit { display: flex; width: max-content; min-width: 100%; min-height: 100%; }
+.zv-img { display: block; margin: auto; height: auto; max-width: none; }
+.zv-img.is-wide { width: max(100vw, 980px); }
+.zv-img.is-phone { width: min(100vw, 480px); }
 
 /* --- Écrans fixes -------------------------------------------------- */
 /* Vitrine : une image entière par cadre (le ratio de la capture), la légende dessous sur une ligne. */
@@ -188,6 +259,7 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .screen .browser { aspect-ratio: 16 / 11; }
 .screen .browser-view img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
 .screen figcaption { margin-top: 12px; opacity: 0.65; }
+@media (min-width: 600px) and (max-width: 860px) { .blk .screens { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
 /* --- Variantes (les pistes d'un écran, à comparer) ------------------ */
 .var-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
@@ -207,11 +279,27 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .var-photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .var-photos img { display: block; width: 100%; aspect-ratio: 1920 / 964; object-fit: cover; border-radius: 12px; }
 @media (max-width: 860px) {
-  .var-stage { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  /* Au doigt : les puces sur une rangée, le texte de la piste juste dessous, puis les deux écrans : ce qu'on vient de toucher reste à l'écran. */
+  .var { display: flex; flex-direction: column; }
+  .var > * { min-width: 0; }
+  .var-tabs { flex-wrap: nowrap; margin: 0 calc(-1 * var(--gutter)) 16px; padding: 0 var(--gutter); overflow-x: auto; scrollbar-width: none; }
+  .var-tabs::-webkit-scrollbar { display: none; }
+  .var-tab { flex: none; align-items: center; min-height: 44px; white-space: nowrap; }
+  .var-cap { order: 1; margin: 0 0 16px; min-height: 66px; align-content: flex-start; }
+  .var-stage { order: 2; grid-template-columns: minmax(0, 1fr); justify-items: center; }
   .var-stage .browser { width: 100%; }
-  .var-phone { width: min(56vw, 220px); }
+  .var-phone { width: min(52vw, 210px); }
+  .var-stage:not(.is-solo) .var-phone { display: block; } /* le .phone générique est masqué au téléphone, ici c'est la moitié de la comparaison */
   .is-solo .var-phone { display: none; }
-  .var-photos { gap: 6px; }
+  .var .fd-label { order: 3; }
+  .var-photos { order: 4; gap: 6px; }
+  .var-photos img { aspect-ratio: 1; border-radius: 8px; object-position: 74% center; } /* neuf carrés, cadrés sur la photo du hero : en bandes de 118 × 59 px, on ne la voyait plus */
+}
+@media (min-width: 600px) and (max-width: 860px) {
+  .var-stage { grid-template-columns: minmax(0, 1fr) clamp(150px, 24vw, 200px); align-items: center; }
+  .var-stage.is-solo { grid-template-columns: minmax(0, 1fr); }
+  .var-phone { width: 100%; }
+  .var-photos img { aspect-ratio: 1920 / 964; object-position: center; } /* assez de place pour les montrer entières */
 }
 
 /* Conversation jouée (iA Déco) : l'interface du chat en vrai HTML, dans un navigateur, les étapes à côté. */
@@ -304,6 +392,23 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .shw-phone .shw-cap { grid-template-columns: auto minmax(0, 1fr); max-width: 300px; }
 .shw-phone .shw-cap p { grid-column: 1 / -1; }
 @media (max-width: 860px) { .shw-phone { grid-column: 1 / -1; } }
+/* Une suite d'écrans mobiles : pas de rôle au bureau, une rangée à balayer au téléphone. */
+.shw-rail { display: contents; }
+@media (max-width: 599px) {
+  .blk .shw-rail { grid-column: 1 / -1; display: flex; gap: 14px; margin: 0 calc(-1 * var(--gutter)); padding: 4px var(--gutter) 8px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); scrollbar-width: none; }
+  .shw-rail::-webkit-scrollbar { display: none; }
+  .shw-rail .shw-item { flex: 0 0 min(64vw, 250px); min-width: 0; scroll-snap-align: start; }
+  .blk .shw-rail .shw-ph { display: block; width: 100%; box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22); }
+  .shw-rail .shw-cap { width: 100%; max-width: none; }
+}
+/* Tablette et paysage : trois par ligne, le téléphone entier à l'écran. */
+@media (min-width: 600px) and (max-width: 860px) {
+  .blk .shw { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .blk .shw-phone, .blk .shw-third { grid-column: span 2; }
+  .blk .shw-half { grid-column: span 3; }
+  .blk .shw-full { grid-column: 1 / -1; }
+  .blk .shw-ph { display: block; width: min(100%, calc(84svh * 0.46)); }
+}
 
 /* --- Fondations (logos, couleurs, typographie en vrai HTML) ---------- */
 .fd-label { margin: clamp(44px, 6vw, 80px) 0 16px; font-size: 13px; opacity: 0.7; }
@@ -352,7 +457,8 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
   .fd-co { grid-template-columns: minmax(0, 1fr); grid-auto-rows: 110px; }
   .fd-co .fd-logo, .fd-co .fd-logo:nth-child(n+4) { grid-column: span 1; }
   .fd-main { flex-wrap: wrap; height: auto; }
-  .fd-col { flex: 1 0 50%; height: 130px; padding: 16px; }
+  .fd-col, .fd-col:hover { flex: 1 0 50%; } /* pas de survol au doigt : un toucher ne doit pas élargir une couleur */
+  .fd-col { height: 130px; padding: 16px; }
   .fd-chips { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 10px; }
   .fd-spec, .fd-scale, .fd-fig { grid-column: 1 / -1; grid-row: auto; }
   .fd-pair { grid-template-columns: minmax(0, 1fr); }
@@ -439,12 +545,26 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .nxt-shot { position: absolute; right: -4%; bottom: -16%; width: 52%; aspect-ratio: 16 / 10; border-radius: 14px; overflow: hidden; rotate: -4deg; box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35); transition: transform 0.7s var(--ease-out); }
 .nxt-shot img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
 .nxt:hover .nxt-shot { transform: translate(-12px, -20px) rotate(2deg); }
+/* Tablette et paysage : le nom garde sa moitié de carte, la capture l'autre. */
+@media (max-width: 860px) {
+  .nxt-logo { width: 42%; }
+  .nxt-name { max-width: 50%; }
+  .nxt-shot { width: 48%; right: -4%; }
+}
+/* Téléphone : tout s'empile. Le logo, le nom en entier, puis la capture qui dépasse en bas (elle mangeait le nom). */
+@media (max-width: 599px) {
+  .blk-next { padding-bottom: 10vh; }
+  .nxt { height: clamp(390px, 56svh, 480px); border-radius: 22px; }
+  .nxt-k { left: 20px; top: 20px; }
+  .nxt-logo { left: 20px; top: 52px; width: 62%; height: 84px; }
+  .nxt-name { left: 20px; right: 20px; top: 150px; bottom: auto; max-width: none; font-size: clamp(36px, 10.5vw, 48px); line-height: 0.95; }
+  .nxt-shot { width: 86%; right: -8%; bottom: -10%; rotate: -3deg; }
+}
 
 /* ------------------------------------------------------------------ */
 /* Mobile                                                              */
 /* ------------------------------------------------------------------ */
 @media (max-width: 860px) {
-  .intro-back { top: 76px; }
   .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 160px; }
   .id-bento { grid-auto-rows: minmax(160px, auto); }
   .b-logo, .b-logo-alt, .b-palette, .has-signs .b-sign, .has-signs .b-palette { grid-column: span 2; }
@@ -452,12 +572,7 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
   .b-palette { grid-row: span 2; }
   .has-signs .b-sign { grid-row: span 2; }
   .font-aa { font-size: calc(56px * var(--fs, 1)); }
-  .pg-sticky { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); height: 80svh; }
-  .pg-side { order: -1; }
-  .pg-list { grid-auto-flow: column; }
-  .pg-list button { font-size: 15px; padding: 6px 0; }
-  .pg-list:has(li:nth-child(4)) { display: flex; flex-wrap: wrap; gap: 2px 16px; } /* au-delà de 3 pages, la colonne débordait de l'écran */
-  .pg-list:has(li:nth-child(4)) button { width: auto; border-bottom: 0; }
+  .b-font b { font-size: 18px; line-height: 1.15; }
   .live-tab { padding: 10px 12px; }
   .live-tab b { font-size: 15px; }
   .live-tab-s { display: none; }
@@ -489,6 +604,4 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
   .sl-track { flex-direction: column; width: auto; }
   .slide { width: auto; }
   .out-row { grid-template-columns: minmax(0, 1fr); }
-  .nxt-logo { width: 60%; }
-  .nxt-shot { width: 70%; right: -14%; }
 }

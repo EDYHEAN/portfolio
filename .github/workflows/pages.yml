@@ -1,8 +1,12 @@
-# Publie le portfolio (Vite) sur GitHub Pages à chaque push sur main.
+# Le site est sur Vercel (johantrigeard.com). GitHub Pages ne sert plus qu'à rediriger l'ancienne adresse,
+# en gardant le chemin de la page : la même page en index.html et en 404.html.
 name: Pages
 on:
   push:
     branches: [main]
+    paths:
+      - .github/workflows/pages.yml
+      - .github/redirect/**
   workflow_dispatch:
 permissions:
   contents: read
@@ -16,19 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: package-lock.json
-      # Playwright ne sert qu'aux scripts de génération en local : pas de navigateur à télécharger ici.
-      - run: npm ci
-        env:
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
-      - run: npm run build
+      - run: |
+          mkdir _site
+          cp .github/redirect/index.html _site/index.html
+          cp .github/redirect/index.html _site/404.html
       - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
   deploy:
     needs: build
     runs-on: ubuntu-latest

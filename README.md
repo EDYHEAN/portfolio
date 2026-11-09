@@ -2,7 +2,7 @@
 
 Portfolio de **Johan Trigeard**, Lead UI/UX & Product Designer basé à Bordeaux.
 
-→ **[edyhean.github.io/portfolio](https://edyhean.github.io/portfolio/)**
+→ **[johantrigeard.com](https://johantrigeard.com/)**
 
 Vite, GSAP, Lenis et three.js. Pour le lancer en local :
 
@@ -11,4 +11,4 @@ npm i
 npm run dev
 ```
 
-Chaque push sur `main` est publié sur GitHub Pages par une Action.
+Chaque push sur `main` est publié sur Vercel.

@@ -1,15 +1,15 @@
 # CLAUDE.md — Portfolio Johan Trigeard
 
 Le portfolio de Johan (Lead UI/UX & Product Designer, Bordeaux), **FR / EN**, pour candidater sur des postes Lead UI/UX /
-Product Designer. En ligne sur https://edyhean.github.io/portfolio/ (repo `EDYHEAN/portfolio`). La V1 (bento HTML vanilla)
+Product Designer. En ligne sur https://johantrigeard.com/ (repo `EDYHEAN/portfolio`). La V1 (bento HTML vanilla)
 a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le commit « Bascule sur la V2 ») et en local chez Johan.
 
 ## Travailler
 
 - Stack : **Vite (multi-pages) + JS vanilla + GSAP (ScrollTrigger, SplitText) + Lenis + three.js** (en différé).
 - `npm i` puis `npm run dev -- --port 5180` → http://127.0.0.1:5180/ (tout se teste en local avant de pousser).
-- **Déploiement** : chaque push sur `main` lance l'Action `.github/workflows/pages.yml` (build → GitHub Pages, ~1 min,
-  le CDN suit en quelques minutes). La source Pages est « GitHub Actions » (plus de Jekyll : il avait écrasé la V2 une fois).
+- **Déploiement** : Vercel (équipe EDYHEAN, projet `portfolio`), chaque push sur `main` part en production, les autres branches en prévisualisation (protégées : lien de partage pour les montrer). Domaine johantrigeard.com acheté chez Namecheap (DNS là-bas, `www` redirige vers la racine). `vercel.json` : slash final des URL (les chemins relatifs des pages en dépendent) et cache des fichiers.
+- `edyhean.github.io/portfolio` ne sert plus qu'à rediriger vers le domaine en gardant le chemin (`.github/redirect/index.html`, publié par l'Action `pages.yml`).
 - Commits en français, courts et descriptifs.
 - Avant de pousser du visuel : le regarder (Playwright + Chromium, bureau 1400×900 et téléphone 390×800).
 

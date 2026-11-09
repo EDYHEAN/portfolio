@@ -60,6 +60,98 @@ function tameFrame(frame) {
 // L'indice sous un prototype live : celui de l'onglet (on ne scrolle pas un jeu, on le clique), sinon celui du bloc.
 const liveHint = (it, b) => tx(it.hint || b.hint || { fr: 'Scrolle dans le cadre : c’est le vrai prototype.', en: 'Scroll inside the frame: it’s the real prototype.' });
 
+// Au téléphone et au doigt : pas de prototype dans la page (lourd, et un cadre qui capte le doigt est un piège à scroll).
+// Chacun est une carte (son vrai premier écran, en image) ; le tap l'ouvre en plein écran, à sa vraie taille (voir openLive).
+const TAP_LIVE = '(max-width: 860px), (pointer: coarse)';
+
+/* Le prototype ouvert par-dessus la page : la carte grandit jusqu'à l'écran, le prototype se charge derrière son affiche, et
+   Fermer (ou le retour du navigateur, ou Échap) ramène à la même place dans la page. Un seul à la fois, et il est détruit à
+   la fermeture : rien ne reste en mémoire sur un téléphone. */
+let closeLive = null;
+function openLive(card, it, b) {
+  if (closeLive) return;
+  const from = card.querySelector('.live-card-ph').getBoundingClientRect();
+  const src = asset(it.src);
+  const sheet = document.createElement('div');
+  sheet.className = 'lv-sheet';
+  sheet.setAttribute('role', 'dialog');
+  sheet.setAttribute('aria-modal', 'true');
+  sheet.setAttribute('aria-label', tx(it.label));
+  sheet.innerHTML = `
+    <div class="lv-bar">
+      <button type="button" class="lv-close" data-sound><span aria-hidden="true">←</span> ${tx({ fr: 'Fermer', en: 'Close' })}</button>
+      <b class="lv-name">${tx(it.label)}</b>
+      <a class="live-open mono" href="${src}" target="_blank" rel="noopener" data-sound>${tx({ fr: 'Ouvrir dans un onglet', en: 'Open in a new tab' })} <span aria-hidden="true">↗</span></a>
+    </div>
+    <div class="lv-view">
+      ${it.poster ? `<img class="lv-poster" src="${asset(it.poster)}" alt="">` : ''}
+      <div class="live-wait"><span class="live-spin"></span><span class="mono">${tx({ fr: 'Chargement du prototype', en: 'Loading the prototype' })}</span><p class="lv-hint">${liveHint(it, b)}</p></div>
+    </div>`;
+  document.body.append(sheet);
+  document.body.classList.add('live-open');
+  lenis?.stop();
+  history.pushState({ liveSheet: true }, '');
+
+  const view = $('.lv-view', sheet), wait = $('.live-wait', sheet), close = $('.lv-close', sheet);
+  close.focus({ preventScroll: true });
+
+  // Rendu 1:1 (pas de réduction). Le src est posé avant d'entrer dans le document : pas d'entrée parasite dans l'historique.
+  let frame = null, shown = false;
+  const reveal = () => { if (frame && !shown) { shown = true; frame.classList.add('is-on'); wait.classList.add('is-ready'); } };
+  const load = () => {
+    frame = document.createElement('iframe');
+    frame.className = 'lv-frame';
+    frame.title = tx(it.label);
+    frame.src = src;
+    frame.addEventListener('load', () => {
+      let w; try { w = frame.contentWindow; if (!w.document.body) return reveal(); } catch { return reveal(); }
+      const st = w.document.createElement('style');
+      st.textContent = 'html,body{scrollbar-width:none;overscroll-behavior:none}::-webkit-scrollbar{display:none}';
+      w.document.head.append(st);
+      // Comme au bureau : le voile se lève quand le prototype tourne fluide, ou au bout de 6 s quoi qu'il arrive.
+      let last = 0, good = 0;
+      setTimeout(reveal, 6000);
+      const tick = (t) => {
+        if (shown || !frame) return;
+        if (last) good = t - last < 34 ? good + 1 : 0;
+        last = t;
+        if (good >= 24) reveal(); else w.requestAnimationFrame(tick);
+      };
+      w.requestAnimationFrame(tick);
+    });
+    view.prepend(frame);
+  };
+
+  // La carte devient l'écran.
+  const rect = () => ({ x: from.left, y: from.top, scaleX: from.width / innerWidth, scaleY: from.height / sheet.offsetHeight });
+  gsap.set($('.lv-bar', sheet), { autoAlpha: 0 });
+  gsap.fromTo(sheet, { ...rect(), borderRadius: 40, transformOrigin: '0 0' }, { x: 0, y: 0, scaleX: 1, scaleY: 1, borderRadius: 0, duration: 0.55, ease: 'expo.out', clearProps: 'transform,borderRadius', onComplete: load });
+  gsap.to($('.lv-bar', sheet), { autoAlpha: 1, duration: 0.3, delay: 0.3 });
+
+  const onKey = (e) => { if (e.key === 'Escape') history.back(); };
+  const shut = () => {
+    closeLive = null;
+    removeEventListener('popstate', shut);
+    removeEventListener('keydown', onKey);
+    // Rendre la mémoire tout de suite : les contextes WebGL du prototype, puis le cadre.
+    if (frame) {
+      try { frame.contentDocument.querySelectorAll('canvas').forEach((c) => (c.getContext('webgl2') || c.getContext('webgl'))?.getExtension('WEBGL_lose_context')?.loseContext()); } catch {}
+      frame.src = 'about:blank'; frame.remove(); frame = null;
+    }
+    document.body.classList.remove('live-open');
+    lenis?.start();
+    const off = card.querySelector('.live-card-ph').getBoundingClientRect().top - from.top; // images chargées au-dessus entre-temps
+    if (Math.abs(off) > 1) scrollBy(0, off);
+    card.focus({ preventScroll: true });
+    gsap.killTweensOf(sheet);
+    gsap.to(sheet, { ...rect(), borderRadius: 40, transformOrigin: '0 0', opacity: 0.4, duration: 0.42, ease: 'power3.inOut', onComplete: () => sheet.remove() });
+  };
+  closeLive = shut;
+  addEventListener('popstate', shut);
+  addEventListener('keydown', onKey);
+  close.addEventListener('click', () => history.back());
+}
+
 /* ------------------------------------------------------------------ */
 export const BLOCKS = {
   identity: {
@@ -195,6 +287,12 @@ export const BLOCKS = {
             <div class="phone live-phone"><div class="phone-view"><iframe class="live-frame-m" data-src="${asset(first.src)}" title="${tx(first.label)} (mobile)" loading="lazy"></iframe>${wait}</div></div>
           </div>
           <p class="mono live-hint">${liveHint(first, b)}</p>
+          <div class="live-reel">${b.items.map((it, i) => `
+            <a class="live-card" href="${asset(it.src)}" target="_blank" rel="noopener" data-launch="${i}" data-sound>
+              <span class="live-card-ph">${it.poster ? img(it.poster, { alt: '' }) : ''}<span class="live-go"><i aria-hidden="true"></i>${tx({ fr: 'Lancer le prototype', en: 'Launch the prototype' })}</span></span>
+              <span class="live-card-t"><b>${tx(it.label)}</b>${it.sum ? `<span>${tx(it.sum)}</span>` : ''}</span>
+            </a>`).join('')}
+          </div>
         </div>`;
     },
     motion(el, b) {
@@ -260,6 +358,13 @@ export const BLOCKS = {
         sync();
       }));
       spawn([$('.live-stage', el)], el, { y: 60 });
+      // Au téléphone : les cartes. Un clic modifié (ou sans JS) ouvre l'onglet ; le tap ouvre le prototype par-dessus la page.
+      $$('[data-launch]', el).forEach((c) => c.addEventListener('click', (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        openLive(c, b.items[+c.dataset.launch], b);
+      }));
+      if (matchMedia(TAP_LIVE).matches) spawn($$('.live-card', el), $('.live-reel', el), { y: 50, stagger: 0.1 });
     },
   },
 
@@ -388,7 +493,8 @@ export const BLOCKS = {
         let picked = -1;
         const on = btns.map((x, i) => { const f = () => { if (picked < 0) picked = i; }; x.addEventListener('click', f); return f; });
         try {
-          for (let left = 2300; picked < 0 && left > 0; left -= 40) await sleep(40, id);
+          // Au doigt, le temps de lire et d'atteindre le choix : plus long qu'à la souris.
+          for (let left = matchMedia('(hover: none)').matches ? 4200 : 2300; picked < 0 && left > 0; left -= 40) await sleep(40, id);
         } finally { btns.forEach((x, i) => x.removeEventListener('click', on[i])); }
         const i = picked < 0 ? auto : picked;
         btns.forEach((x, k) => { x.classList.toggle('is-on', k === i); x.classList.toggle('is-off', k !== i); x.disabled = true; });
@@ -614,15 +720,33 @@ export const BLOCKS = {
   /* Déclinaisons en défilement horizontal (desktop), en pile (mobile). */
   slides: {
     render(b, p, n) {
+      // Au bureau, tout est chargé d'avance (la piste épinglée se calcule dessus) ; au téléphone, chaque image attend son tour.
+      const eager = !matchMedia('(max-width: 860px)').matches, k = String(b.items.length).padStart(2, '0');
       return `
         <div class="sl-pin">
           ${head(b.title || 'b.slides', n)}
-          <div class="sl-track">${b.items.map((s) => `<figure class="slide">${img(s.src, { alt: tx(s.t), eager: true, style: s.pos ? `object-position:${s.pos}` : '' })}<figcaption class="mono">${tx(s.t)}</figcaption></figure>`).join('')}</div>
+          <div class="sl-track">${b.items.map((s) => `<figure class="slide">${img(s.src, { alt: tx(s.t), eager, style: s.pos ? `object-position:${s.pos}` : '' })}<figcaption class="mono">${tx(s.t)}</figcaption></figure>`).join('')}</div>
+          <div class="sl-count mono" aria-hidden="true"><span class="sl-at">01</span> / ${k}<i class="sl-bar"><i></i></i></div>
         </div>`;
     },
     motion(el, b, p, { desktop }) {
       const track = $('.sl-track', el);
-      if (!desktop) { spawn($$('.slide', el), track, { stagger: 0.06, y: 50 }); return; }
+      if (!desktop) {
+        // Au doigt : une piste horizontale native, aimantée à chaque slide. Le navigateur tranche seul entre balayage et scroll
+        // vertical. Le compteur et la barre suivent la piste.
+        spawn($$('.slide', el).slice(0, 2), track, { stagger: 0.08, y: 40 });
+        const at = $('.sl-at', el), bar = $('.sl-bar i', el), n = b.items.length;
+        let queued = false;
+        const update = () => {
+          queued = false;
+          const max = track.scrollWidth - track.clientWidth, x = max > 0 ? track.scrollLeft / max : 0;
+          at.textContent = String(Math.round(x * (n - 1)) + 1).padStart(2, '0');
+          bar.style.transform = `scaleX(${(1 + x * (n - 1)) / n})`;
+        };
+        track.addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
+        update();
+        return;
+      }
       // La piste arrive au bout à 85 % de la course : la dernière slide reste un temps entière à l'écran avant que la
       // section se libère (sans cette marge, le lissage la laissait coupée à droite au moment de la sortie).
       const dist = () => Math.max(0, track.scrollWidth - innerWidth);

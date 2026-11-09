@@ -1,6 +1,6 @@
 // Le logo du hero : la hyène SVG (regard qui suit la souris), légère inclinaison 3D vers le curseur,
 // et au clic elle se retourne comme une carte et change de rendu.
-import { gsap, REDUCE, FINE, hyenaSVG, lang } from './core.js';
+import { gsap, REDUCE, FINE, PLAIN, hyenaSVG, lang } from './core.js';
 import { play } from './sound.js';
 import { HYENA_PUPILS } from './hyena.js';
 
@@ -73,7 +73,7 @@ export function mountLogo(host) {
   ensureDefs();
   host.innerHTML = `
     <div class="lg-float"><div class="lg-tilt"><div class="lg-flip" data-style="${STYLES[index].id}">${markup(STYLES[index].id)}</div></div></div>
-    <span class="lg-label mono" aria-live="polite">${label()}</span>`;
+    ${PLAIN ? '' : `<span class="lg-label mono" aria-live="polite">${label()}</span>`}`;
   const tilt = host.querySelector('.lg-tilt');
   const flip = host.querySelector('.lg-flip');
   const lab = host.querySelector('.lg-label');
@@ -83,7 +83,7 @@ export function mountLogo(host) {
     tiltTo = { host, rx: gsap.quickTo(tilt, 'rotationX', { duration: 0.6, ease: 'power3' }), ry: gsap.quickTo(tilt, 'rotationY', { duration: 0.6, ease: 'power3' }) };
     // Sans souris : elle se balance doucement toute seule, sinon le rendu Relief n'aurait jamais d'épaisseur.
     sway?.kill();
-    if (!FINE) sway = gsap.fromTo(tilt, { rotationY: -14, rotationX: 5 }, { rotationY: 14, rotationX: -5, duration: 3.4, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+    if (!FINE && !PLAIN) sway = gsap.fromTo(tilt, { rotationY: -14, rotationX: 5 }, { rotationY: 14, rotationX: -5, duration: 3.4, ease: 'sine.inOut', yoyo: true, repeat: -1 });
     else if (!listening) {
       listening = true;
       addEventListener('pointermove', (e) => {
@@ -99,6 +99,7 @@ export function mountLogo(host) {
 
   host.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); host.click(); } });
   const swap = () => {
+    if (PLAIN) return; // au doigt, elle tourne sans changer de rendu
     index = (index + 1) % STYLES.length;
     const s = STYLES[index];
     flip.dataset.style = s.id; flip.innerHTML = markup(s.id); lab.innerHTML = label();

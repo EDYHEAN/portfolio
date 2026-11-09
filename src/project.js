@@ -85,7 +85,7 @@ boot();
 render();
 motion();
 onLang(() => { mm.revert(); render(); motion(); });
-heroSnap();
+if (!matchMedia('(max-width: 599px), (max-height: 500px)').matches) heroSnap(); // au téléphone : le scroll du téléphone, rien d'autre
 const came = curtainIn();
 runLoader(came).then((played) => intro(came || played ? 0.35 : 0.05));
 refreshOnImages();

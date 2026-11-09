@@ -1,6 +1,6 @@
 // Blocs des pages projet. Chaque bloc = render (HTML) + motion (dans un gsap.matchMedia).
 // Motion minimaliste : les visuels parlent, le mouvement guide la lecture.
-import { gsap, ScrollTrigger, $, $$, t, tx, asset, spawn, revealTitle, countUp, REDUCE, ROOT, lenis, MOBILE } from './core.js';
+import { gsap, ScrollTrigger, $, $$, t, tx, asset, spawn, revealTitle, countUp, formatCount, REDUCE, ROOT, lenis, MOBILE } from './core.js';
 import { heroStep } from './heroSnap.js';
 import './viewer.js';
 
@@ -60,97 +60,13 @@ function tameFrame(frame) {
 // L'indice sous un prototype live : celui de l'onglet (on ne scrolle pas un jeu, on le clique), sinon celui du bloc.
 const liveHint = (it, b) => tx(it.hint || b.hint || { fr: 'Scrolle dans le cadre : c’est le vrai prototype.', en: 'Scroll inside the frame: it’s the real prototype.' });
 
-// Au téléphone et au doigt : pas de prototype dans la page (lourd, et un cadre qui capte le doigt est un piège à scroll).
-// Chacun est une carte (son vrai premier écran, en image) ; le tap l'ouvre en plein écran, à sa vraie taille (voir openLive).
-const TAP_LIVE = '(max-width: 860px), (pointer: coarse)';
-
-/* Le prototype ouvert par-dessus la page : la carte grandit jusqu'à l'écran, le prototype se charge derrière son affiche, et
-   Fermer (ou le retour du navigateur, ou Échap) ramène à la même place dans la page. Un seul à la fois, et il est détruit à
-   la fermeture : rien ne reste en mémoire sur un téléphone. */
-let closeLive = null;
-function openLive(card, it, b) {
-  if (closeLive) return;
-  const from = card.querySelector('.live-card-ph').getBoundingClientRect();
-  const src = asset(it.src);
-  const sheet = document.createElement('div');
-  sheet.className = 'lv-sheet';
-  sheet.setAttribute('role', 'dialog');
-  sheet.setAttribute('aria-modal', 'true');
-  sheet.setAttribute('aria-label', tx(it.label));
-  sheet.innerHTML = `
-    <div class="lv-bar">
-      <button type="button" class="lv-close" data-sound><span aria-hidden="true">←</span> ${tx({ fr: 'Fermer', en: 'Close' })}</button>
-      <b class="lv-name">${tx(it.label)}</b>
-      <a class="live-open mono" href="${src}" target="_blank" rel="noopener" data-sound>${tx({ fr: 'Ouvrir dans un onglet', en: 'Open in a new tab' })} <span aria-hidden="true">↗</span></a>
-    </div>
-    <div class="lv-view">
-      ${it.poster ? `<img class="lv-poster" src="${asset(it.poster)}" alt="">` : ''}
-      <div class="live-wait"><span class="live-spin"></span><span class="mono">${tx({ fr: 'Chargement du prototype', en: 'Loading the prototype' })}</span><p class="lv-hint">${liveHint(it, b)}</p></div>
-    </div>`;
-  document.body.append(sheet);
-  document.body.classList.add('live-open');
-  lenis?.stop();
-  history.pushState({ liveSheet: true }, '');
-
-  const view = $('.lv-view', sheet), wait = $('.live-wait', sheet), close = $('.lv-close', sheet);
-  close.focus({ preventScroll: true });
-
-  // Rendu 1:1 (pas de réduction). Le src est posé avant d'entrer dans le document : pas d'entrée parasite dans l'historique.
-  let frame = null, shown = false;
-  const reveal = () => { if (frame && !shown) { shown = true; frame.classList.add('is-on'); wait.classList.add('is-ready'); } };
-  const load = () => {
-    frame = document.createElement('iframe');
-    frame.className = 'lv-frame';
-    frame.title = tx(it.label);
-    frame.src = src;
-    frame.addEventListener('load', () => {
-      let w; try { w = frame.contentWindow; if (!w.document.body) return reveal(); } catch { return reveal(); }
-      const st = w.document.createElement('style');
-      st.textContent = 'html,body{scrollbar-width:none;overscroll-behavior:none}::-webkit-scrollbar{display:none}';
-      w.document.head.append(st);
-      // Comme au bureau : le voile se lève quand le prototype tourne fluide, ou au bout de 6 s quoi qu'il arrive.
-      let last = 0, good = 0;
-      setTimeout(reveal, 6000);
-      const tick = (t) => {
-        if (shown || !frame) return;
-        if (last) good = t - last < 34 ? good + 1 : 0;
-        last = t;
-        if (good >= 24) reveal(); else w.requestAnimationFrame(tick);
-      };
-      w.requestAnimationFrame(tick);
-    });
-    view.prepend(frame);
-  };
-
-  // La carte devient l'écran.
-  const rect = () => ({ x: from.left, y: from.top, scaleX: from.width / innerWidth, scaleY: from.height / sheet.offsetHeight });
-  gsap.set($('.lv-bar', sheet), { autoAlpha: 0 });
-  gsap.fromTo(sheet, { ...rect(), borderRadius: 40, transformOrigin: '0 0' }, { x: 0, y: 0, scaleX: 1, scaleY: 1, borderRadius: 0, duration: 0.55, ease: 'expo.out', clearProps: 'transform,borderRadius', onComplete: load });
-  gsap.to($('.lv-bar', sheet), { autoAlpha: 1, duration: 0.3, delay: 0.3 });
-
-  const onKey = (e) => { if (e.key === 'Escape') history.back(); };
-  const shut = () => {
-    closeLive = null;
-    removeEventListener('popstate', shut);
-    removeEventListener('keydown', onKey);
-    // Rendre la mémoire tout de suite : les contextes WebGL du prototype, puis le cadre.
-    if (frame) {
-      try { frame.contentDocument.querySelectorAll('canvas').forEach((c) => (c.getContext('webgl2') || c.getContext('webgl'))?.getExtension('WEBGL_lose_context')?.loseContext()); } catch {}
-      frame.src = 'about:blank'; frame.remove(); frame = null;
-    }
-    document.body.classList.remove('live-open');
-    lenis?.start();
-    const off = card.querySelector('.live-card-ph').getBoundingClientRect().top - from.top; // images chargées au-dessus entre-temps
-    if (Math.abs(off) > 1) scrollBy(0, off);
-    card.focus({ preventScroll: true });
-    gsap.killTweensOf(sheet);
-    gsap.to(sheet, { ...rect(), borderRadius: 40, transformOrigin: '0 0', opacity: 0.4, duration: 0.42, ease: 'power3.inOut', onComplete: () => sheet.remove() });
-  };
-  closeLive = shut;
-  addEventListener('popstate', shut);
-  addEventListener('keydown', onKey);
-  close.addEventListener('click', () => history.back());
-}
+// Au téléphone et à la tablette : rien d'interactif dans les cadres. Pas de prototype (ils font planter l'onglet, Johan 09/11),
+// et aucune capture qui bouge avec le scroll de la page : les visuels sont fixes, un tap les ouvre en grand (viewer.js).
+const STILL = '(max-width: 860px), (pointer: coarse)';
+// Le téléphone (debout ou couché) : on y retire les maquettes de bureau, sauf s'il n'y a rien d'autre à montrer.
+const PHONE = '(max-width: 599px), (max-height: 500px)';
+// b.titleStill : le titre quand le bloc est montré en images (« Trois prototypes, en vrai » n'y serait plus vrai).
+const blockTitle = (b) => (matchMedia(STILL).matches && b.titleStill) || b.title;
 
 /* ------------------------------------------------------------------ */
 export const BLOCKS = {
@@ -184,9 +100,8 @@ export const BLOCKS = {
   /* Pages : les captures pleine page dans un navigateur (+ le mobile). Plus d'épinglage (Johan, 07/11 : devoir dérouler
      toute la capture pour voir la suite était frustrant) : la molette sur un cadre fait défiler la capture dedans, partout
      ailleurs elle fait défiler la page. On change de page au clic dans la liste.
-     Au doigt : un cadre qui défile piégerait le pouce (il prend presque tout l'écran). Le cadre ne capture donc rien, la
-     capture suit le scroll de la page, et un toucher l'ouvre en grand (viewer.js). Au téléphone, le mobile passe devant :
-     c'est lui qui se lit à cette taille. */
+     Au doigt : un cadre qui défile piégerait le pouce. Le cadre reste fixe, sur le haut de la capture, et un toucher l'ouvre en
+     grand (viewer.js). Au téléphone, il ne reste que la maquette mobile : c'est elle qui se lit à cette taille. */
   pages: {
     render(b, p, n) {
       const phoneFirst = matchMedia(MOBILE).matches; // au téléphone, la longue capture de bureau n'est plus la première image à charger
@@ -214,39 +129,14 @@ export const BLOCKS = {
         url.textContent = b.pages[i].url;
         view.scrollTop = 0;
         centerChip(btn);
-        el._pgFollow?.();
         if (!REDUCE) gsap.fromTo(shots[i], { opacity: 0 }, { opacity: 1, duration: 0.4 });
       }));
-      $$('img', el).forEach((s) => s.addEventListener('load', () => el._pgFollow?.()));
     },
-    motion(el, b, p, { mobile }) {
-      const view = $('.browser-view', el), pview = $('.phone-view', el), pg = $('.pg', el);
-      const follow = mobile || matchMedia('(pointer: coarse)').matches;
-      pg.classList.toggle('is-follow', follow);
-      if (follow) {
-        // Pas de cadre à part pour Lenis : le doigt reste à la page.
-        [view, pview].forEach((f) => f?.removeAttribute('data-lenis-prevent'));
-        const frames = [[view, () => $('.pg-shot.is-on', el)], ...(pview ? [[pview, () => $('.pg-phone-shot', el)]] : [])].map(([box, shot]) => {
-          const o = { v: 0 };
-          let tw = null; // onRefresh peut tomber pendant la création de la tween
-          const apply = () => {
-            const s = shot(), st = tw?.scrollTrigger;
-            if (!s || !st) return;
-            // Une capture très longue ne doit pas filer à toute allure : au plus 3,4 fois le scroll. Le reste se lit en grand.
-            const d = Math.min(Math.max(0, s.offsetHeight - box.clientHeight), (st.end - st.start) * 3.4);
-            s.style.transform = `translate3d(0, ${(-o.v * d).toFixed(1)}px, 0)`;
-          };
-          tw = gsap.to(o, { v: 1, ease: 'none', onUpdate: apply, scrollTrigger: { trigger: box, start: 'top 88%', end: 'bottom 12%', scrub: 0.3, onRefresh: apply } });
-          return apply;
-        });
-        el._pgFollow = () => frames.forEach((f) => f());
-      } else {
-        // Le cadre défile en natif (data-lenis-prevent : Lenis laisse la molette au cadre) ; arrivé au bout, la page reprend.
-        view.setAttribute('data-lenis-prevent', '');
-        pview?.setAttribute('data-lenis-prevent', '');
-        el._pgFollow = null;
-        $$('.pg-shot, .pg-phone-shot', el).forEach((s) => { s.style.transform = ''; });
-      }
+    motion(el) {
+      const still = matchMedia(STILL).matches;
+      $('.pg', el).classList.toggle('is-still', still);
+      // À la souris, le cadre défile en natif (data-lenis-prevent : Lenis laisse la molette au cadre) ; arrivé au bout, la page reprend.
+      [$('.browser-view', el), $('.phone-view', el)].forEach((f) => f?.toggleAttribute('data-lenis-prevent', !still));
       spawn([$('.pg-sticky', el)], el, { y: 60 });
     },
   },
@@ -275,7 +165,7 @@ export const BLOCKS = {
         </button>`).join('')}</div>` : '';
       const first = b.items[0];
       const wait = `<div class="live-wait" aria-hidden="true"><span class="live-spin"></span><span class="mono">${tx({ fr: 'Chargement du prototype', en: 'Loading the prototype' })}</span></div>`;
-      return `${head(b.title || 'b.pages', n)}
+      return `${head(blockTitle(b) || 'b.pages', n)}
         <div class="live">
           ${tabs}
           <div class="live-stage${first.mobile === false ? ' is-solo' : ''}">
@@ -288,14 +178,15 @@ export const BLOCKS = {
           </div>
           <p class="mono live-hint">${liveHint(first, b)}</p>
           <div class="live-reel">${b.items.map((it, i) => `
-            <a class="live-card" href="${asset(it.src)}" target="_blank" rel="noopener" data-launch="${i}" data-sound>
-              <span class="live-card-ph">${it.poster ? img(it.poster, { alt: '' }) : ''}<span class="live-go"><i aria-hidden="true"></i>${tx({ fr: 'Lancer le prototype', en: 'Launch the prototype' })}</span></span>
+            <figure class="live-card">
+              <span class="live-card-ph">${it.poster ? img(it.poster, { alt: tx(it.label) }) : ''}</span>
               <span class="live-card-t"><b>${tx(it.label)}</b>${it.sum ? `<span>${tx(it.sum)}</span>` : ''}</span>
-            </a>`).join('')}
+            </figure>`).join('')}
           </div>
         </div>`;
     },
     motion(el, b) {
+      if (matchMedia(STILL).matches) { spawn($$('.live-card', el), $('.live-reel', el), { y: 50, stagger: 0.1 }); return; } // des images : aucune iframe ne se charge
       const desk = $('.live-frame', el), mob = $('.live-frame-m', el), view = $('.live-desk .browser-view', el), pview = $('.live-phone .phone-view', el);
       // Le site est rendu à sa vraie largeur (1440 / 390 px), puis réduit au cadre : il se comporte comme sur un vrai écran.
       const fit = () => { // un cadre masqué (largeur 0) garde sa dernière échelle
@@ -358,13 +249,6 @@ export const BLOCKS = {
         sync();
       }));
       spawn([$('.live-stage', el)], el, { y: 60 });
-      // Au téléphone : les cartes. Un clic modifié (ou sans JS) ouvre l'onglet ; le tap ouvre le prototype par-dessus la page.
-      $$('[data-launch]', el).forEach((c) => c.addEventListener('click', (e) => {
-        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
-        e.preventDefault();
-        openLive(c, b.items[+c.dataset.launch], b);
-      }));
-      if (matchMedia(TAP_LIVE).matches) spawn($$('.live-card', el), $('.live-reel', el), { y: 50, stagger: 0.1 });
     },
   },
 
@@ -570,7 +454,7 @@ export const BLOCKS = {
         <div class="var">
           <div class="var-tabs" role="tablist">${b.items.map((it, i) => `<button type="button" role="tab" class="var-tab" aria-selected="${!i}" data-var="${i}" data-sound><span class="mono">${num(i)}</span>${tx(it.label)}</button>`).join('')}</div>
           <div class="var-stage${f.mobile ? '' : ' is-solo'}">
-            ${browser(img(f.desk, { cls: 'var-desk', eager: true, alt: tx(f.t) }), tx(f.url), 'wide')}
+            ${browser(img(f.desk, { cls: 'var-desk', eager: !matchMedia(PHONE).matches, alt: tx(f.t) }), tx(f.url), 'wide')}
             <div class="phone var-phone"><div class="phone-view" data-zoom="phone">${img(f.mobile || f.desk, { cls: 'var-mob', alt: '' })}${zoomBtn()}</div></div>
           </div>
           <div class="var-cap"><h3>${tx(f.t)}</h3><p>${tx(f.d)}</p></div>
@@ -596,7 +480,7 @@ export const BLOCKS = {
       }));
     },
     motion(el, b) {
-      const preload = () => b.items.forEach((it) => [it.desk, it.mobile].filter(Boolean).forEach((s) => { new Image().src = asset(s); }));
+      const preload = () => b.items.forEach((it) => (matchMedia(PHONE).matches ? [it.mobile || it.desk] : [it.desk, it.mobile].filter(Boolean)).forEach((s) => { new Image().src = asset(s); }));
       new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); preload(); } }, { rootMargin: '60% 0px' }).observe(el);
       spawn([$('.var-stage', el)], el, { y: 60 });
       const grid = $('.var-photos', el);
@@ -663,10 +547,10 @@ export const BLOCKS = {
 
   features: {
     render(b, p, n) {
-      return `${head(b.title || 'b.features', n)}
+      return `${head(blockTitle(b) || 'b.features', n)}
         <div class="bento ft-bento${b.tall ? ' is-tall' : ''}">${b.items.map((f) => `
           <article class="b-tile ft ft-${f.size || 's'}">
-            <div class="ft-img"${f.model ? ` data-model="${asset(f.model)}"${b.soft ? ' data-soft' : ''}` : ''}>${img(f.img, { alt: '', style: `object-fit:${f.fit || 'cover'};object-position:${f.pos || 'top'}${f.pad ? `;padding:${f.pad};box-sizing:border-box` : ''}` })}</div>
+            <div class="ft-img"${f.model && !(b.flatOnTouch && matchMedia(STILL).matches) ? ` data-model="${asset(f.model)}"${b.soft ? ' data-soft' : ''}` : ''}>${img(f.img, { alt: '', style: `object-fit:${f.fit || 'cover'};object-position:${f.pos || 'top'}${f.pad ? `;padding:${f.pad};box-sizing:border-box` : ''}` })}</div>
             <div class="ft-txt"><h3>${tx(f.t)}</h3><p>${tx(f.d)}</p></div>
           </article>`).join('')}
         </div>`;
@@ -761,7 +645,7 @@ export const BLOCKS = {
       return `${head('b.outcome', n)}
         <div class="out-row">${b.stats.map((s) => `
           <div class="out-stat">
-            <span class="out-num" data-count="${s.v}" data-suffix="${s.suffix || ''}" ${s.sep ? 'data-sep="1"' : ''}>0</span>
+            <span class="out-num" data-count="${s.v}" data-suffix="${s.suffix || ''}" ${s.sep ? 'data-sep="1"' : ''}>${formatCount(s.v, s.sep, s.suffix || '')}</span>
             <span class="out-lbl">${tx(s.l)}</span>
           </div>`).join('')}
         </div>

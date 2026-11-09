@@ -54,7 +54,7 @@ export const PROJECTS = [
       {
         // Les vrais prototypes codés, à scroller dans le cadre (assets/rhinov-studio/live, copiés des sources de Johan).
         type: 'live',
-        title: T('Les landings, en vrai', 'The landing pages, live'),
+        title: T('Les landings, en vrai', 'The landing pages, live'), titleStill: T('Les landings', 'The landing pages'),
         items: [
           { src: 'rhinov-studio/live/retail/index.html', poster: 'rhinov-studio/posters/retail.webp', url: T('Rhinov Studio · retail', 'Rhinov Studio · retail'), label: T('Retail', 'Retail') },
           { src: 'rhinov-studio/live/immo/index.html', poster: 'rhinov-studio/posters/immo.webp', url: T('Rhinov Studio · immo', 'Rhinov Studio · real estate'), label: T('Immo', 'Real estate') },
@@ -422,7 +422,7 @@ export const PROJECTS = [
       {
         // Les trois prototypes en vrai (assets/mdm-labo/live), un onglet chacun.
         type: 'live',
-        title: T('Trois prototypes, en vrai', 'Three prototypes, live'),
+        title: T('Trois prototypes, en vrai', 'Three prototypes, live'), titleStill: T('Trois prototypes', 'Three prototypes'),
         items: [
           {
             src: 'mdm-labo/live/24h/index.html', poster: 'mdm-labo/posters/24h.webp', url: T('Catalogue · 24 h à la maison', 'Catalogue · 24 hours at home'), label: T('24 h à la maison', '24 hours at home'), sum: T('Une pièce, une journée : chaque heure éclaire d’autres meubles.', 'One room, one day: every hour lights other pieces.'),
@@ -463,7 +463,7 @@ export const PROJECTS = [
         // Les meubles 3D de Pièce Rare (ceux qu'on pose dans « Ma pièce »), un par rareté, animés par feature3d.js ;
         // l'affiche le temps du chargement = le détourage de la carte.
         type: 'features',
-        title: T('La collection, en 3D', 'The collection, in 3D'),
+        title: T('La collection, en 3D', 'The collection, in 3D'), titleStill: T('La collection', 'The collection'), flatOnTouch: true,
         items: [
           { img: 'mdm-labo/live/piece-rare/cut/mdm-223563.webp', model: 'mdm-labo/live/piece-rare/models/mdm-223563.glb', fit: 'contain', pos: 'center', t: T('Lin lavé', 'Lin lavé'), d: T('Commune · Maisons du Monde. Le coussin en lin.', 'Common · Maisons du Monde. The linen cushion.') },
           { img: 'mdm-labo/live/piece-rare/cut/mdm-214553.webp', model: 'mdm-labo/live/piece-rare/models/mdm-214553.glb', fit: 'contain', pos: 'center', t: T('Kalinda', 'Kalinda'), d: T('Rare · Maisons du Monde. Le tapis rond motif jungle.', 'Rare · Maisons du Monde. The round jungle print rug.') },

@@ -96,7 +96,7 @@ function render() {
       </div>
       <div class="ab-right">
         <p class="ab-kicker mono">${t('hero.role')} · Bordeaux</p>
-        <h1 class="ab-title">${t('about.title')}</h1>
+        <h1 class="ab-title">${t('about.title').replace(/\S+\u00A0\?/, (m) => `<span class="ab-nb">${m}</span>`)}</h1>
         <p class="ab-bio">${t('about.bio')}</p>
         <p class="ab-bio ab-bio2">${t('about.bio2')}</p>
         <div class="ab-cta">

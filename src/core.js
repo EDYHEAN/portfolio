@@ -18,6 +18,7 @@ export const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
 export const FINE = matchMedia('(pointer: fine)').matches;
 export const DESKTOP = '(min-width: 861px)';
 export const MOBILE = '(max-width: 860px)';
+export const PLAIN = matchMedia('(hover: none), (max-width: 860px)').matches; // au doigt : la hyène sans son contour animé ni ses rendus
 
 /* Chemins : les pages projet vivent dans /projets/{id}/, d'où une racine relative. */
 export const ROOT = document.body.dataset.root || './';
@@ -72,7 +73,7 @@ export const hyenaSVG = (boil, { fill = 'currentColor', pupil = 'currentColor', 
   const f = filter || (boil ? 'boil' : null);
   return `
   <svg class="hy" viewBox="0 0 1200 1200" aria-hidden="true" focusable="false">
-    <g${f && !REDUCE ? ` filter="url(#${f})"` : ''}>
+    <g${f && !REDUCE && !(PLAIN && f === 'boil') ? ` filter="url(#${f})"` : ''}>
       <use href="#hy-body" fill="${fill}"/>
       ${HYENA_PUPILS.map((p) => `<path class="hy-pupil" fill="${pupil}" d="${p.d}"/>`).join('')}
     </g>
@@ -352,11 +353,13 @@ export function revealTitle(el, trigger = el) {
   gsap.from(split.chars, { yPercent: 110, duration: 0.9, stagger: 0.02, ease: 'expo.out', scrollTrigger: { trigger, start: 'top 85%' } });
 }
 /** Compteurs : 0 -> valeur à l'arrivée à l'écran. */
+export const formatCount = (v, sep, suffix = '') => (sep ? Math.round(v).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US') : Math.round(v)) + suffix;
 export function countUp(root) {
   $$('[data-count]', root).forEach((el) => {
     const end = +el.dataset.count;
-    const fmt = (v) => (el.dataset.sep ? Math.round(v).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US') : Math.round(v)) + (el.dataset.suffix || '');
+    const fmt = (v) => formatCount(v, el.dataset.sep, el.dataset.suffix || '');
     const o = { v: 0 };
+    el.textContent = fmt(0); // le HTML porte la vraie valeur : sans animation, c'est elle qu'on lit
     gsap.to(o, { v: end, duration: 1.6, ease: 'power2.out', onUpdate: () => { el.textContent = fmt(o.v); }, scrollTrigger: { trigger: el, start: 'top 88%' } });
   });
 }

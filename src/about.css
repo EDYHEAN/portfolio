@@ -57,6 +57,7 @@ body[data-page='about'] .hdr-nav a[href='#contact'] { display: none; }
   margin: clamp(4px, 1vh, 12px) 0 0; font-weight: 800; font-size: clamp(40px, min(5.2vw, 9vh), 100px);
   line-height: 0.95; letter-spacing: -0.045em; font-variation-settings: 'opsz' 96;
 }
+.ab-nb { white-space: nowrap; }
 .ab-bio { margin: clamp(8px, 1.7vh, 20px) 0 0; max-width: 62ch; font-size: clamp(15px, min(1.4vw, 2.15vh), 23px); line-height: 1.32; }
 .ab-bio2 { margin-top: clamp(4px, 1vh, 12px); }
 .ab-bio em {
@@ -109,7 +110,7 @@ body[data-page='about'] .hdr-nav a[href='#contact'] { display: none; }
   .ab-card .card-logo { width: 32px; height: 32px; }
   .ab-card .card-txt b { font-size: clamp(16px, 5vw, 22px); white-space: nowrap; }
   .ab-card .card-txt span { white-space: normal; line-height: 1.2; font-size: 12px; }
-  .ab-title { font-size: clamp(42px, 13vw, 76px); }
+  .ab-title { font-size: clamp(40px, 11.4vw, 76px); }
   .ab-bio { font-size: 18px; line-height: 1.4; }
   .ab-bio2 { margin-top: 12px; }
   .ab-cta { margin-top: 18px; }

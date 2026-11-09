@@ -161,9 +161,7 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
 .phone-view { position: relative; width: 100%; height: 100%; border-radius: 23px; overflow: hidden; background: #000; }
 .pg-phone-shot { display: block; width: 100%; height: auto; }
 .pg-h-touch { display: none; }
-/* Au doigt : le cadre ne capture rien, la capture suit le scroll de la page (blocks.js, .is-follow). */
-.pg.is-follow .browser-view, .pg.is-follow .phone-view { overflow: hidden; }
-.pg.is-follow .pg-shot, .pg.is-follow .pg-phone-shot { will-change: transform; }
+.pg.is-still .browser-view, .pg.is-still .phone-view { overflow: hidden; }
 @media (max-width: 860px) {
   .pg { --pg-h: clamp(320px, 62svh, 560px); }
   .pg .browser-view, .pg .phone-view { overflow: hidden; } /* même sans animation : un toucher ouvre la capture en grand */
@@ -261,10 +259,7 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
   .live-reel::-webkit-scrollbar { display: none; }
   .live-card { flex: none; display: flex; flex-direction: column; gap: 12px; width: min(72vw, 300px, calc(68svh * 9 / 19.5)); color: inherit; text-decoration: none; scroll-snap-align: center; -webkit-tap-highlight-color: transparent; }
   .live-card-ph { position: relative; display: block; aspect-ratio: 9 / 19.5; border-radius: 28px; padding: 7px; background: #111; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3); transition: transform 0.25s var(--ease-out); }
-  .live-card:active .live-card-ph { transform: scale(0.97); }
   .live-card-ph img { display: block; width: 100%; height: 100%; border-radius: 22px; object-fit: cover; background: var(--s-line); }
-  .live-go { position: absolute; left: 50%; bottom: 22px; translate: -50% 0; display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 20px 0 16px; border-radius: 999px; background: #fff; color: #111; font-weight: 700; font-size: 14px; white-space: nowrap; box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32); }
-  .live-go i { width: 0; height: 0; border-style: solid; border-width: 7px 0 7px 11px; border-color: transparent transparent transparent currentColor; }
   .live-card-t { display: grid; gap: 3px; padding: 0 4px; }
   .live-card-t b { font-size: 18px; font-weight: 750; letter-spacing: -0.015em; }
   .live-card-t span { font-size: 14px; line-height: 1.35; opacity: 0.7; }
@@ -274,23 +269,8 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
   .live-card { flex-direction: row; align-items: center; width: min(62vw, 400px); gap: 16px; }
   .live-card-ph { flex: none; height: 76svh; aspect-ratio: 9 / 19.5; border-radius: 20px; padding: 5px; }
   .live-card-ph img { border-radius: 15px; }
-  .live-go { left: calc(100% + 16px); bottom: 0; translate: 0 0; box-shadow: none; background: var(--s-fg); color: var(--s-bg); }
   .live-card-t { padding: 0 0 60px; }
 }
-/* Le prototype ouvert : tout l'écran, une barre fine pour en sortir (elle ne recouvre jamais le prototype). */
-.lv-sheet { position: fixed; inset: 0; z-index: 80; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: var(--p-tile); color: var(--s-fg); }
-@supports (height: 100dvh) { .lv-sheet { bottom: auto; height: 100dvh; } }
-.lv-bar { flex: none; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: env(safe-area-inset-top) 8px 0; }
-.lv-close { flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: none; color: inherit; font: inherit; font-weight: 700; font-size: 15px; cursor: pointer; }
-.lv-name { flex: 1; min-width: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.75; }
-.lv-bar .live-open { flex: none; display: inline-flex; align-items: center; min-height: 44px; margin: 0; padding: 0 12px; border: 0; }
-.lv-view { position: relative; flex: 1; min-height: 0; overflow: hidden; background: #000; }
-.lv-frame { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; border: 0; opacity: 0; background: #fff; transition: opacity 0.4s; }
-.lv-frame.is-on { opacity: 1; }
-.lv-poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.lv-view .live-wait { grid-template-columns: minmax(0, 1fr); justify-content: stretch; background: rgba(10, 10, 10, 0.55); color: #fff; padding: 24px; text-align: center; backdrop-filter: blur(3px); }
-.lv-view .live-spin { border-color: rgba(255, 255, 255, 0.3); border-top-color: #fff; }
-.lv-hint { margin: 2px 0 0; max-width: 30ch; font-size: 15px; line-height: 1.4; }
 .shw-item .browser-view img, .shw-video { display: block; width: 100%; height: auto; }
 .shw-item .pix { image-rendering: pixelated; } /* pixel art agrandi : des pixels nets, pas de flou */
 .shw-cap { display: grid; grid-template-columns: auto auto minmax(0, 1fr); align-items: baseline; gap: 6px 16px; margin-top: 16px; }
@@ -706,4 +686,29 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
   .sl-track { flex-direction: column; width: auto; }
   .slide { width: auto; }
   .out-row { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Le téléphone, façon galerie (Johan, 09/11, réf. tomdimajo.com) : une pile de grands visuels en tuiles arrondies, peu de texte,
+   pas de faux navigateur, pas de maquette de bureau. Debout ou couché. */
+@media (max-width: 599px), (max-height: 500px) {
+  .pg-main, .pg-list, .pg-hint { display: none; }
+  .pg-sticky { display: block; }
+  .pg .phone { width: min(300px, 76vw); margin: 0 auto; }
+  .var-stage:not(.is-solo) .browser { display: none; }
+  .var-stage:not(.is-solo) .var-phone { width: min(300px, 76vw); }
+}
+@media (max-width: 599px) {
+  .blk-n, .shw-n, .blk-note, .blk-stack { display: none; }
+  .intro { min-height: 0; padding: 104px var(--gutter) 0; }
+  .blk { padding-top: 64px; }
+  .blk-next { padding-bottom: 64px; }
+  .blk-head { display: block; margin-bottom: 16px; }
+  .blk-title { font-size: 26px; line-height: 1.08; letter-spacing: -0.03em; }
+  .shw .browser, .screen .browser, .var-stage .browser { border: 0; border-radius: 20px; box-shadow: none; overflow: hidden; }
+  .shw .browser-bar, .screen .browser-bar, .var-stage .browser-bar { display: none; }
+  .shw .zm-btn, .screen .zm-btn { display: none; }
+  .shw-cap { display: block; margin-top: 10px; }
+  .shw-cap h3 { font-size: 15px; font-weight: 600; letter-spacing: 0; }
+  .shw-cap p { display: none; }
+  .screen figcaption { font-size: 12px; }
 }

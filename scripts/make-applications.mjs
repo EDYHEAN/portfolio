@@ -7,7 +7,7 @@ import { shell } from './shell.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dir = path.join(root, 'src/data/applications');
-const RESERVED = new Set(['assets', 'projets', 'src', 'scripts', 'sources', 'node_modules', 'dist', 'brand', 'apply', '3d']);
+const RESERVED = new Set(['assets', 'a-propos', 'projets', 'src', 'scripts', 'sources', 'node_modules', 'dist', 'brand', 'apply', '3d']);
 
 export async function loadApplications() {
   if (!fs.existsSync(dir)) return [];

@@ -15,3 +15,14 @@ fs.writeFileSync(path.join(root, 'index.html'), shell({
 
 }));
 console.log('page index.html');
+
+fs.mkdirSync(path.join(root, 'a-propos'), { recursive: true });
+fs.writeFileSync(path.join(root, 'a-propos', 'index.html'), shell({
+  title: "C'est qui celui-là ? · Johan Trigeard",
+  desc: 'Johan Trigeard, Lead UI/UX et Product Designer à Bordeaux : parcours, outils, marques.',
+  root: '../',
+  attrs: 'data-page="about"',
+  script: '/src/about.js',
+  loader: false,
+}));
+console.log('page a-propos/index.html');

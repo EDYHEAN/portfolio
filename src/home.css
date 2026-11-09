@@ -5,6 +5,11 @@
 
 /* Le header ne garde que son + langue : l'identité est dans le hero. */
 body[data-page='home'] .hdr-logo, body[data-page='home'] .hdr-nav { visibility: hidden; }
+/* Au téléphone, le logo masqué ne prend plus de place : le lien « C'est qui celui-là ? » tient à côté du son et de la langue. */
+@media (max-width: 860px) {
+  body[data-page='home'] .hdr-logo { display: none; }
+  body[data-page='home'] .hdr-end { grid-column: 1 / -1; }
+}
 
 /* ------------------------------------------------------------------ */
 /* Le booster (overlay)                                                */
@@ -110,15 +115,10 @@ body[data-page='home'] .hdr-logo, body[data-page='home'] .hdr-nav { visibility: 
   font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase;
   transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.12s;
 }
+.who-cv { color: inherit; text-decoration: none; }
 .chip:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .chip:active { transform: translateY(1px) scale(0.98); }
 .chip i { font-style: normal; transition: transform 0.3s var(--ease-out); }
-.chip[aria-expanded='true'] i { transform: rotate(45deg); }
-/* En surimpression sous les boutons : ouvrir la liste ne pousse plus rien (le bloc collait au bas, les cartes rétrécissaient). */
-.brands-panel { position: absolute; left: 0; top: calc(100% + 12px); z-index: 6; width: min(460px, 100%); }
-.brands-panel ul { list-style: none; margin: 0; padding: 8px 12px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 10px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); }
-.brands-panel li { height: 34px; display: grid; place-items: center; }
-.brands-panel img { height: calc(17px * var(--s, 1)); width: auto; max-width: 100%; object-fit: contain; filter: brightness(0); opacity: 0.75; }
 
 /* Touche (bouton reroll) */
 .key {
@@ -231,3 +231,12 @@ body[data-page='home'] .hdr-logo, body[data-page='home'] .hdr-nav { visibility: 
 @keyframes drip { 70% { height: calc(var(--h, 20px) * 0.8); } to { height: var(--h, 20px); } }
 @keyframes drop { to { scale: 1; } }
 @media (prefers-reduced-motion: reduce) { .drip { animation: none; height: var(--h, 20px); } .drip::after { animation: none; scale: 1; } }
+
+/* Le showreel (reel.js) : aperçu dans la carte, puis 16:9 dans la zone du tirage. */
+.reel-art { position: relative; background: #000; }
+.reel-art video, .reel-frame { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0; object-fit: cover; }
+.reel-frame { opacity: 0; }
+.reel-card.is-open { box-shadow: 0 30px 70px rgba(40, 30, 10, 0.3); cursor: default; }
+.home.is-reel { overflow: clip; } /* les cartes qui s'écartent ne font pas apparaître de barre de défilement */
+.home.is-reel .slot:not(.slot-4) { pointer-events: none; }
+.reel-close { position: absolute; z-index: 21; transform: translateX(-100%); color: var(--ink); background: var(--paper); cursor: pointer; white-space: nowrap; }

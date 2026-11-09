@@ -2,6 +2,7 @@ const T = (fr, en) => ({ fr, en });
 
 // Contact. Le mail n'est jamais écrit en clair dans la page (anti robots) : morceaux inversés, assemblés au clic.
 export const CONTACT = { mail: ['draegirt.nahoj','moc.liamg'], linkedin: 'https://www.linkedin.com/in/hyrule-hero/' };
+export const mailAddress = () => CONTACT.mail.map((p) => [...p].reverse().join('')).join('@'); // assemblée au clic
 
 // Parcours : le poste et la boîte d'abord, la date en second.
 // photo : déposer les photos dans assets/me/ (nom = clé `photo`). Sans fichier, un cadre vide s'affiche.

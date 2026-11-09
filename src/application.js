@@ -2,7 +2,7 @@
 // Sur le vrai portfolio (pas de data-application sur <body>), APP vaut null et rien de ce fichier ne s'applique :
 // les configs et le CSS sont des morceaux à part, chargés seulement sur une page de candidature.
 import { UI } from './i18n.js';
-import { CONTACT } from './data/home.js';
+import { CONTACT, mailAddress } from './data/home.js';
 import { gsap, REDUCE, lenis, $ } from './core.js';
 import { play } from './sound.js';
 
@@ -55,7 +55,7 @@ export function mountReality({ t }) {
     <button type="button" class="reality-mail" data-sound>${both('app.mail')}</button>`;
   document.body.append(el);
   el.querySelector('.reality-mail').addEventListener('click', () => {
-    location.href = `mailto:${CONTACT.mail.map((p) => [...p].reverse().join('')).join('@')}`; // assemblée au clic (anti robots)
+    location.href = `mailto:${mailAddress()}`;
   });
 }
 

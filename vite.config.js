@@ -13,5 +13,5 @@ export default defineConfig({
   base: './',
   // assets/ est servi tel quel à la racine du site : assets/vinyl-run/x.webp -> ./vinyl-run/x.webp
   publicDir: 'assets',
-  build: { outDir: 'dist', emptyOutDir: true, rollupOptions: { input: [path.resolve('index.html'), ...projets, ...candidatures] } },
+  build: { outDir: 'dist', emptyOutDir: true, rollupOptions: { input: [path.resolve('index.html'), path.resolve('a-propos/index.html'), ...projets, ...candidatures] } },
 });

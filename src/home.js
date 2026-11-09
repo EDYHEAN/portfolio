@@ -7,8 +7,9 @@ import {
 import { play } from './sound.js';
 import { mountLogo } from './logo.js';
 import { PROJECTS } from './data/projects.js';
-import { BRANDS, CONTACT } from './data/home.js';
+import { CONTACT, mailAddress } from './data/home.js';
 import { APP, mountReality, glitchCard } from './application.js';
+import { reelCard, openReel, closeReel, isReelOpen, isReelBusy, bindReel } from './reel.js';
 
 // Le tirage : les vrais projets, ou ceux imaginés pour une candidature (/{slug}/).
 const LIST = APP ? APP.projects : PROJECTS;
@@ -18,10 +19,15 @@ const LIST = APP ? APP.projects : PROJECTS;
 /* les places tant qu'il n'y a pas assez de projets (MDM, Rhinov…).     */
 /* ------------------------------------------------------------------ */
 const SLOTS = 5;
+const REEL = 'reel'; // le showreel se tire comme une carte, mais sort toujours à la dernière place : il s'ouvre toujours pareil
 const shuffle = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 function draw(prev) {
   let pull;
-  do { pull = shuffle(LIST).slice(0, SLOTS); } while (prev && pull.length > 1 && pull[0] === prev[0]);
+  do {
+    pull = shuffle(APP ? LIST : [...LIST, REEL]).slice(0, SLOTS);
+    const k = pull.indexOf(REEL);
+    if (k >= 0) [pull[k], pull[SLOTS - 1]] = [pull[SLOTS - 1], pull[k]];
+  } while (prev && pull.length > 1 && pull[0] === prev[0]);
   while (pull.length < SLOTS) pull.push(null); // emplacement « à venir »
   return pull;
 }
@@ -43,7 +49,7 @@ const card = (p, i) => p ? `
   </div>`;
 
 function renderPull() {
-  $$('.slot').forEach((s, i) => { s.innerHTML = card(pull[i], i); });
+  $$('.slot').forEach((s, i) => { s.innerHTML = pull[i] === REEL ? reelCard() : card(pull[i], i); });
   fillHyenas($('.pull-grid'));
 }
 
@@ -69,11 +75,8 @@ function render() {
         <p class="who-role mono">${t('hero.role')} · Bordeaux</p>
         <p class="who-line">${t('me.l1')}</p>
         <div class="who-actions">
-          <button type="button" class="chip" data-brands aria-expanded="false" aria-controls="brandsPanel" data-sound>${t('brands.toggle')} <i aria-hidden="true">+</i></button>
+          <a class="chip who-cv" href="${asset('cv-johan-trigeard.pdf')}" download="Johan-Trigeard-CV.pdf" data-sound>${t('contact.cv')} <i aria-hidden="true">↓</i></a>
           <button type="button" class="chip" data-booster-again data-sound>${t('booster.again')}</button>
-          <div class="brands-panel" id="brandsPanel" hidden>
-            <ul>${BRANDS.map((b) => `<li><img src="${asset(b.src)}" alt="${b.name}" title="${b.name}" style="--s:${b.scale}" loading="lazy"></li>`).join('')}</ul>
-          </div>
         </div>`}
       </div>
       <div class="pull" id="work">
@@ -127,7 +130,7 @@ function deal(from, { delay = 0 } = {}) {
 
 let busy = false;
 function reroll() {
-  if (busy) return;
+  if (busy || isReelBusy()) return;
   busy = true;
   const grid = $('.pull-grid').getBoundingClientRect();
   const c = { x: grid.left + grid.width / 2, y: grid.top + grid.height / 2 };
@@ -150,26 +153,19 @@ function reroll() {
 }
 
 function mail() {
-  const addr = CONTACT.mail.map((p) => [...p].reverse().join('')).join('@'); // assemblée au clic (anti robots)
+  const addr = mailAddress();
   navigator.clipboard?.writeText(addr).then(() => { play('ding'); showToast(t('bar.copied')); }).catch(() => {});
   location.href = `mailto:${addr}`;
 }
 
 function bindInteractions() {
+  bindReel();
   document.addEventListener('click', (e) => {
+    if (isReelOpen()) { if (!e.target.closest('.reel-card')) closeReel(); return; }
+    const film = e.target.closest('.reel-card[href]');
+    if (film && !e.metaKey && !e.ctrlKey) { e.preventDefault(); return openReel(film); }
     if (e.target.closest('[data-reroll]')) return reroll();
     if (e.target.closest('[data-mail]')) return mail();
-    const tb = e.target.closest('[data-brands]');
-    if (tb) {
-      const open = tb.getAttribute('aria-expanded') !== 'true';
-      tb.setAttribute('aria-expanded', String(open));
-      const panel = $('#brandsPanel');
-      if (open) {
-        panel.hidden = false;
-        if (!REDUCE) gsap.from($$('li', panel), { y: 14, opacity: 0, scale: 0.9, duration: 0.45, stagger: 0.04, ease: 'back.out(2)' });
-      } else panel.hidden = true;
-      return;
-    }
     if (e.target.closest('[data-booster-again]')) return showBooster(true);
     const a = e.target.closest('.card[href]');
     if (a && APP) { e.preventDefault(); return glitchCard(a); }

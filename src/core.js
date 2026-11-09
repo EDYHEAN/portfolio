@@ -130,13 +130,17 @@ function initBoil() {
 /* ------------------------------------------------------------------ */
 export function renderHeader() {
   const home = document.body.dataset.page === 'home';
+  const about = document.body.dataset.page === 'about'
+    ? `<span class="hdr-about is-here" aria-current="page" data-i18n="nav.about">${t('nav.about')}</span>`
+    : `<a class="hdr-about" href="${ROOT}a-propos/" data-page data-sound data-i18n="nav.about">${t('nav.about')}</a>`;
   const link = (hash, key) => `<a href="${home ? '' : ROOT}${hash}" ${home ? 'data-scroll' : 'data-page'} data-sound data-i18n="${key}">${t(key)}</a>`;
   $('#hdr').innerHTML = `
     <a href="${home ? '#top' : ROOT}" class="hdr-logo" ${home ? 'data-scroll' : 'data-page'} data-i18n-aria="a11y.home" aria-label="${t('a11y.home')}">
       <span class="hdr-mark" data-hyena></span>${wordmarkSVG('hdr-word')}
     </a>
-    <nav class="hdr-nav">${link('#work', 'nav.work')}<a href="#contact" data-scroll data-sound data-i18n="nav.contact">${t('nav.contact')}</a></nav>
+    <nav class="hdr-nav">${link('#work', 'nav.work')}${home ? '' : about}<a href="#contact" data-scroll data-sound data-i18n="nav.contact">${t('nav.contact')}</a></nav>
     <div class="hdr-end">
+      ${home && !document.body.dataset.application ? about : ''}
       <button type="button" class="hdr-sound mono" data-sound-toggle data-sound aria-pressed="${isSoundOn()}"><i aria-hidden="true"></i><span data-i18n="sound.label">${t('sound.label')}</span></button>
       <div class="hdr-lang" role="group" aria-label="Langue / Language">
         <button type="button" data-lang="fr" data-sound>FR</button><span aria-hidden="true">/</span><button type="button" data-lang="en" data-sound>EN</button>
@@ -168,6 +172,17 @@ function initHeaderBehaviour() {
 /* Scroll fluide + liens                                               */
 /* ------------------------------------------------------------------ */
 export let lenis = null;
+// Une section épinglée ne se révèle qu'à la fin de son épinglage (le contact, derrière le crâne) : c'est là qu'on atterrit.
+// Les images chargées pendant la descente allongent la page : à l'arrivée, on rattrape la nouvelle fin (sauf si on a scrollé entre-temps).
+function landOnPinEnd(pin, tries = 4) {
+  const y = pin.end;
+  lenis.scrollTo(y, {
+    duration: tries === 4 ? 1.5 : 0.7,
+    onComplete: () => gsap.delayedCall(0.3, () => {
+      if (tries && Math.abs(scrollY - y) < 3 && Math.abs(pin.end - y) > 2) landOnPinEnd(pin, tries - 1);
+    }),
+  });
+}
 function initScroll() {
   if (!REDUCE) {
     // Quand la page rame (3D, prototypes live), on ne voit rien bouger, on scrolle encore, et chaque coup de molette
@@ -195,7 +210,10 @@ function initScroll() {
       const target = $(a.getAttribute('href'));
       if (!target) return;
       e.preventDefault();
-      if (lenis) lenis.scrollTo(target, { duration: 1.5 }); else target.scrollIntoView();
+      const pin = ScrollTrigger.getAll().find((s) => s.pin === target);
+      if (lenis && pin) landOnPinEnd(pin);
+      else if (lenis) lenis.scrollTo(target, { duration: 1.5 });
+      else target.scrollIntoView();
     } else if (a.hasAttribute('data-page')) {
       e.preventDefault();
       navigate(a.href);

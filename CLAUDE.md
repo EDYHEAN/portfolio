@@ -39,10 +39,15 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
 - À gauche, une colonne calée en haut (à hauteur de « Ton tirage ») : la hyène SVG (`logo.js` : chaque clic = un tour
   complet sans attente, le rendu change à chaque passage de profil ; 4 tours en 1,6 s = tournis 3,5 s : étoiles, yeux qui
   tournent, son `dizzy`), le nom sur 2 lignes aussi large que son encre (`.who-lock`), poste, phrase (mots-clés en `<em>`,
-  surligneur tracé à l'arrivée), boutons « Avec qui j'ai bossé » (logos en surimpression, sans ombre) et « Ouvrir un booster ».
+  surligneur tracé à l'arrivée), boutons « Télécharger le CV » (`assets/cv-johan-trigeard.pdf`) et « Ouvrir un booster ».
 - Le rire de la hyène (`bindLaugh`, home.js) : sélectionner du texte du bloc de gauche le change en « hihihi » (une fois la
   sélection finie), sélection rouge sang, coulures sous les mots, son `laugh` ; tout revient à la désélection.
+- Showreel (`src/reel.js`, Vimeo 591673847) : une carte tirée au hasard comme les autres, toujours à la dernière place (en bas à droite), aperçu muet (`assets/reel/preview.mp4`). Au clic, la carte passe en 16:9 dans la zone du tirage, les autres cartes s'écartent, le film se charge ; Fermer, Échap ou un clic ailleurs ramène l'état neutre.
 - Footer : « Johan Trigeard © 1993 – 202+ », LinkedIn, Mail (adresse jamais en clair, morceaux inversés dans `CONTACT.mail`).
+
+## « C'est qui celui-là ? » (`/a-propos/`, 09/11)
+
+La page « qui suis-je », tout sur un écran au bureau (`src/about.js` + `about.css`) : ma carte « hors tirage » (mêmes inclinaison et reflet que le tirage ; au clic elle tourne et passe à la suivante, liste `SLIDES` dans about.js : moi, puis Warwick ; photos dans `assets/about/`), le texte, le parcours (`PATH`, data/home.js), les outils, les marques. Lien dans le header sur toutes les pages (sur la home, à droite avec le son et la langue, au téléphone aussi). Faits vérifiés uniquement.
 
 ## Les candidatures (`/{slug}/`)
 

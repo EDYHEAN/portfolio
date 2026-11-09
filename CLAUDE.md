@@ -45,6 +45,12 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
 - Showreel (`src/reel.js`, Vimeo 591673847) : une carte tirée au hasard comme les autres, toujours à la dernière place (en bas à droite), aperçu muet (`assets/reel/preview.mp4`). Au clic, la carte passe en 16:9 dans la zone du tirage, les autres cartes s'écartent, le film se charge ; Fermer, Échap ou un clic ailleurs ramène l'état neutre.
 - Footer : « Johan Trigeard © 1993 – 202+ », LinkedIn, Mail (adresse jamais en clair, morceaux inversés dans `CONTACT.mail`).
 
+## Le CV
+
+Variante deux colonnes gardée en option : `node scripts/make-cv-aere.mjs` (`sources/cv-aere/`).
+
+`npm run cv` (`scripts/make-cv.mjs`) : une page web (`sources/cv/index.html`) exportée en PDF A4 dans `assets/cv-johan-trigeard.pdf`, parti pris « carte tirée » (photo en gravure, nom énorme, talon à découper), en vrai texte (le HTML suit l'ordre de lecture, tous les blocs sont positionnés), QR vers johantrigeard.com (constante `SITE`).
+
 ## « C'est qui celui-là ? » (`/a-propos/`, 09/11)
 
 La page « qui suis-je », tout sur un écran au bureau (`src/about.js` + `about.css`) : ma carte « hors tirage » (mêmes inclinaison et reflet que le tirage ; au clic elle tourne et passe à la suivante, liste `SLIDES` dans about.js : moi, puis Warwick ; photos dans `assets/about/`), le texte, le parcours (`PATH`, data/home.js), les outils, les marques. Lien dans le header sur toutes les pages (sur la home, à droite avec le son et la langue, au téléphone aussi). Faits vérifiés uniquement.

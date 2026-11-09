@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "pages": "node scripts/make-home.mjs && node scripts/make-pages.mjs && node scripts/make-applications.mjs",
+    "cv": "node scripts/make-cv.mjs",
     "predev": "npm run pages",
     "dev": "vite",
     "prebuild": "npm run pages",
@@ -26,6 +27,7 @@
     "draco3dgltf": "^1.5.9",
     "opentype.js": "^1.3.4",
     "playwright": "^1.48.2",
+    "qrcode": "^1.5.4",
     "vite": "^8.3.5"
   }
 }

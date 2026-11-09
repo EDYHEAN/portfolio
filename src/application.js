@@ -67,7 +67,8 @@ export function glitchCard(card) {
   const box = $('.who-real'), link = $('a', box);
   link.focus({ preventScroll: true });
   const r = link.getBoundingClientRect();
-  const hidden = r.bottom < 60 || r.top > innerHeight; // au téléphone, le bouton est au-dessus des cartes : on y remonte
+  const hidden = r.bottom < 60 || r.top > innerHeight; // bouton hors écran : on y remonte
+  const docked = getComputedStyle(box).position === 'fixed'; // au téléphone il est calé en bas : pleine largeur, il ne doit pas déborder en encaissant
   if (REDUCE) { if (hidden) box.scrollIntoView({ block: 'center' }); return; }
   if (glitching) return;
   glitching = true;
@@ -109,7 +110,7 @@ export function glitchCard(card) {
     void box.offsetWidth; // relance l'anneau
     box.classList.add('is-called');
     gsap.timeline({ onComplete: () => { gsap.set(box, { clearProps: 'transform' }); glitching = false; } })
-      .to(box, { scale: 1.16, duration: 0.2, ease: 'back.out(4)' })
+      .to(box, { scale: docked ? 1.04 : 1.16, duration: 0.2, ease: 'back.out(4)' })
       .to(box, { x: -4, duration: 0.05 }).to(box, { x: 4, duration: 0.05 }).to(box, { x: -2, duration: 0.05 }).to(box, { x: 0, duration: 0.05 })
       .to(box, { scale: 1, duration: 0.7, ease: 'elastic.out(1, 0.45)' });
     gsap.delayedCall(1.6, () => box.classList.remove('is-called'));

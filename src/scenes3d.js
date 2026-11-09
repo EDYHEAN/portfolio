@@ -37,6 +37,8 @@ function blobShadow() {
 }
 const pointer = { x: 0, y: 0 };
 addEventListener('pointermove', (e) => { pointer.x = e.clientX / innerWidth - 0.5; pointer.y = e.clientY / innerHeight - 0.5; }, { passive: true });
+// Au doigt, l'objet suit le glissé puis revient de face : le pointeur n'a pas de position une fois le doigt levé.
+['pointerup', 'pointercancel'].forEach((ev) => addEventListener(ev, (e) => { if (e.pointerType === 'touch') pointer.x = pointer.y = 0; }, { passive: true }));
 
 /** Boucle de rendu qui se met en pause hors écran / onglet caché. */
 function loop(host, fn) {
@@ -135,7 +137,9 @@ export async function mountBooster(host, { root = './', onTear, glb = '3d/booste
         .to(shadow.material, { opacity: 0, duration: 0.4 }, '<');
     });
   }
-  return { open, mouth };
+  /** Libère le contexte WebGL (paquet passé sans l'ouvrir) : sur téléphone, la mémoire compte. */
+  function dispose() { stop(); unfit(); renderer.dispose(); renderer.forceContextLoss(); }
+  return { open, mouth, dispose };
 }
 
 /* ------------------------------------------------------------------ */

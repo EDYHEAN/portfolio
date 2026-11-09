@@ -171,3 +171,5 @@ for (const { id, html, out } of jobs) {
   console.log(id, `${(webp.length / 1024).toFixed(0)} Ko`);
 }
 await browser.close();
+
+await import('./make-card-sizes.mjs');

@@ -6,6 +6,7 @@ import { shell } from './shell.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 fs.writeFileSync(path.join(root, 'index.html'), shell({
+  preload: '3d/pack-front.webp',
   title: 'Johan Trigeard · Lead UI/UX & Product Designer',
   desc: 'Portfolio de Johan Trigeard, Lead UI/UX et Product Designer à Bordeaux.',
   root: './',

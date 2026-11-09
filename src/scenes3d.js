@@ -41,14 +41,15 @@ addEventListener('pointermove', (e) => { pointer.x = e.clientX / innerWidth - 0.
 ['pointerup', 'pointercancel'].forEach((ev) => addEventListener(ev, (e) => { if (e.pointerType === 'touch') pointer.x = pointer.y = 0; }, { passive: true }));
 
 /** Boucle de rendu qui se met en pause hors écran / onglet caché. */
-function loop(host, fn) {
-  let visible = true, alive = true;
+function loop(host, fn, maxFps = 0) {
+  let visible = true, alive = true, last = 0;
   const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; });
   io.observe(host);
   const t0 = performance.now();
-  const tick = () => {
+  const gap = maxFps ? 1000 / maxFps - 3 : 0; // 3 ms de marge : sinon une image sur deux saute sur un écran 60 Hz
+  const tick = (now = performance.now()) => {
     if (!alive) return;
-    if (visible && !document.hidden) fn((performance.now() - t0) / 1000);
+    if (visible && !document.hidden && now - last >= gap) { last = now; fn((performance.now() - t0) / 1000); }
     requestAnimationFrame(tick);
   };
   tick();
@@ -69,11 +70,16 @@ function fit(host, renderer, camera) {
 /* ------------------------------------------------------------------ */
 /* Le booster                                                           */
 /* ------------------------------------------------------------------ */
+// L'installation de la 3D est lourde (lumière de studio, shaders, texture) : on rend la main au navigateur entre chaque étape.
+const breathe = () => new Promise((r) => setTimeout(r));
+
 export async function mountBooster(host, { root = './', onTear, glb = '3d/booster.glb' } = {}) {
   const canvas = document.createElement('canvas');
   const renderer = makeRenderer(canvas);
   const scene = new THREE.Scene();
+  await breathe();
   scene.environment = studio(renderer);
+  await breathe();
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
   camera.position.set(0, 0, 5.3);
   const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(-2, 3, 4); scene.add(key);
@@ -93,10 +99,19 @@ export async function mountBooster(host, { root = './', onTear, glb = '3d/booste
   shadow.scale.set(1.5, 0.32, 1); shadow.position.set(0, -1.18, -0.3);
   scene.add(shadow);
 
+  await breathe();
+  await renderer.compileAsync(scene, camera); // sinon la compilation des shaders fige la page au premier rendu
+  await breathe();
+  renderer.initTexture(body.material.map);
+  await breathe();
+
   const unfit = fit(host, renderer, camera);
   host.append(canvas);
   const cur = { rx: 0, ry: 0 };
   let opening = false;
+  // Au doigt, 30 images/s suffisent à un paquet qui flotte. Si l'appareil peine quand même, on baisse la définition, une fois.
+  const touch = matchMedia('(hover: none)').matches, budget = touch ? 44 : 26;
+  let frames = 0, since = performance.now(), warm = false, lowered = false;
   const stop = loop(host, (t) => {
     if (!opening) {
       cur.ry += ((pointer.x * 0.7) - cur.ry) * 0.06;
@@ -108,7 +123,14 @@ export async function mountBooster(host, { root = './', onTear, glb = '3d/booste
       shadow.scale.x = 1.5 - Math.sin(t * 1.1) * 0.08;
     }
     renderer.render(scene, camera);
-  });
+    if (!lowered && ++frames === 40) {
+      const now = performance.now(), avg = (now - since) / 40;
+      frames = 0; since = now;
+      // Les 40 premières images comptent la compilation des shaders ; au-delà de 200 ms, l'onglet était caché.
+      if (warm && avg > budget && avg < 200) { lowered = true; renderer.setPixelRatio(1); }
+      warm = true;
+    }
+  }, touch ? 30 : 0);
 
   /** Position écran (px) du haut du paquet : là d'où sortent les cartes. */
   const mouth = () => {

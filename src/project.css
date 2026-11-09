@@ -45,12 +45,12 @@ body[data-page='project'] { background: var(--s-bg); color: var(--s-fg); --line:
   .intro-ctx { max-width: 72ch; }
 }
 .btn-accent { background: var(--p-accent); color: var(--p-bg); border-color: var(--p-accent); }
-.btn-accent:hover { background: var(--p-fg); color: var(--p-bg); }
+@media (hover: hover) { .btn-accent:hover { background: var(--p-fg); color: var(--p-bg); } }
 [data-project='myfrenchtool'] .btn-accent { color: #0052CC; }
 [data-project='myfrenchtool'] .blk .btn-accent { background: #0052CC; color: #fff; border-color: #0052CC; }
 [data-project='nookdex'] .btn-accent, [data-project='mesk'] .btn-accent { color: #fff; }
 [data-project='rhinov-site'] .btn-accent { color: #3B2B1F; }
-[data-project='ia-deco'] .btn-accent:hover { background: #fff; border-color: #fff; }
+@media (hover: hover) { [data-project='ia-deco'] .btn-accent:hover { background: #fff; border-color: #fff; } }
 
 /* --- Éventail (toutes les déclinaisons d'un coup) ------------------- */
 .fan { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: clamp(8px, 1.1vw, 18px); padding-top: 12px; }

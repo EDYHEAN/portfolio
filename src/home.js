@@ -13,6 +13,26 @@ import { UI } from './i18n.js';
 import { reelCard, openReel, closeReel, isReelOpen, isReelBusy, bindReel } from './reel.js';
 
 const TOUCH = matchMedia('(hover: none)').matches; // au doigt : pas de survol, d'autres gestes
+// Le booster 3D fige l'appareil s'il n'a pas de vrai processeur graphique ou peu de mémoire : le paquet reste alors en image.
+function canRun3D() {
+  if (navigator.connection?.saveData || (navigator.deviceMemory && navigator.deviceMemory < 3)) return false;
+  try {
+    const c = document.createElement('canvas'), opts = { failIfMajorPerformanceCaveat: true };
+    const gl = c.getContext('webgl2', opts) || c.getContext('webgl', opts);
+    if (!gl) return false;
+    const info = gl.getExtension('WEBGL_debug_renderer_info');
+    const name = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+    return !/swiftshader|llvmpipe|software|basic render/i.test(name);
+  } catch { return false; }
+}
+// Carte : 480 px suffisent aux petites cases (make-card-sizes.mjs), la grande case et les écrans denses prennent les 900 px.
+const cardImg = (p, i) => {
+  const src = p.card || p.shot;
+  if (!p.card?.endsWith('.webp')) return `src="${asset(src)}"`;
+  const sizes = i === 0 ? '(max-width: 700px) 92vw, 42vw' : '(max-width: 700px) 46vw, 24vw';
+  return `src="${asset(src)}" srcset="${asset(src.replace(/\.webp$/, '-480.webp'))} 480w, ${asset(src)} 900w" sizes="${sizes}"`;
+};
 // Au doigt, on touche : même sens que « booster.hint » (une candidature peut le redéfinir dans sa config).
 UI.fr['booster.tap'] ??= 'Touche pour ouvrir le booster';
 UI.en['booster.tap'] ??= 'Tap to open the pack';
@@ -41,7 +61,7 @@ let pull = draw();
 
 const card = (p, i) => p ? `
   <a class="card" href="${p.fiction ? '#work' : pageUrl(p.id)}"${p.fiction ? ' role="button"' : ''} data-sound data-cursor data-cursor-key="cursor.view" style="--bg:${p.colors.bg};--fg:${p.colors.fg}">
-    <span class="card-art"><img src="${asset(p.card || p.shot)}" alt="" decoding="async"></span>
+    <span class="card-art"><img ${cardImg(p, i)} alt="" decoding="async"></span>
     <span class="card-info">
       <span class="card-logo" style="--ls:${p.logo.markScale || 1}"><img src="${asset(p.logo.mark || p.logo.src)}" alt="" class="${p.logo.invert ? 'inv' : ''}"></span>
       <span class="card-txt"><b>${p.name}</b><span>${tx(p.type)}</span></span>
@@ -260,7 +280,8 @@ async function showBooster(again = false) {
     <button type="button" class="booster-skip mono" data-sound>${t('booster.skip')}</button>`;
   document.body.append(el);
   const stage = $('.booster-stage', el);
-  let api = null, loading = !REDUCE, opened = false, closed = false, waiting = 0;
+  const flat = REDUCE || !canRun3D();
+  let api = null, loading = !flat, opened = false, closed = false, waiting = 0;
   const close = (origin) => {
     closed = true;
     markSeen();
@@ -290,9 +311,12 @@ async function showBooster(again = false) {
   };
   // Au doigt, on peut toucher tout l'écran et dès l'affichage du paquet ; à la souris, c'est le paquet, une fois la 3D prête.
   if (TOUCH) { el.classList.add('is-ready'); arm(); }
-  if (REDUCE) fallback();
+  if (flat) fallback();
   else {
     try {
+      // L'image du paquet s'affiche d'abord : three.js ne se charge qu'une fois la page au calme.
+      await $('.booster-img', el).decode().catch(() => {});
+      await new Promise((r) => (window.requestIdleCallback ? requestIdleCallback(r, { timeout: 1200 }) : setTimeout(r, 200)));
       const { mountBooster } = await import('./scenes3d.js');
       api = await mountBooster(stage, {
         root: ROOT,

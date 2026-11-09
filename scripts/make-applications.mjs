@@ -20,7 +20,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     if (RESERVED.has(app.slug)) throw new Error(`slug réservé : ${app.slug}`);
     fs.mkdirSync(path.join(root, app.slug), { recursive: true });
     fs.writeFileSync(path.join(root, app.slug, 'index.html'), shell({
-      title: app.title, desc: app.desc, root: '../', noindex: true,
+      title: app.title, desc: app.desc, root: '../', noindex: true, preload: app.booster?.front,
       attrs: `data-page="home" data-application="${app.slug}"`,
       script: '/src/home.js', loader: false, theme: app.theme.paper,
     }));

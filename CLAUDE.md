@@ -32,6 +32,16 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
 
 `src/heroSnap.js` : depuis l'intro, le premier geste (molette, clavier, doigt) ancre en douceur sur le premier bloc, le geste inverse y ramène ; en remontant, on s'arrête d'abord sur le premier bloc. Ensuite, le scroll Lenis normal. Une intro plus haute que l'écran n'ancre pas (rien à sauter).
 
+## Le responsive et les performances (09/11)
+
+Au téléphone, chaque fonctionnalité est repensée pour le doigt, le bureau ne bouge pas (media queries et `(hover: none)`).
+- Home : hyène et nom côte à côte, tirage en 2 colonnes, tout l'écran tactile sur le paquet, rire = appui long sur le bloc touché, film sur fond sombre.
+- Pages projet : `src/viewer.js` (un tap ouvre une capture en plein écran), bloc `pages` où le doigt fait défiler la page et la capture suit, écrans mobiles en rangée à balayer, `live` en cartes (affiche `poster`, `assets/*/posters`) et prototype en plein écran derrière un tap, 3D à 30 images/s avec repli sur l'affiche.
+- Socle : langue en une touche sous 480 px, nav complète dès 720 px, regard de la hyène guidé par le toucher et le scroll, contact direct si pas de WebGL.
+- Booster : l'image du paquet s'affiche d'abord (préchargée, option `preload` de `scripts/shell.mjs`), three.js arrive une fois la page au calme, et l'installation rend la main entre chaque étape (`breathe`, `compileAsync`). Reste un gel d'environ 0,8 s (`PMREMGenerator`, derrière le paquet en image qui flotte en CSS).
+- `canRun3D` (home.js) : sans vrai processeur graphique, avec peu de mémoire ou en économie de données, le paquet reste en image. Donc un Chrome sans GPU (serveur, PageSpeed) ne voit pas le paquet 3D : c'est voulu.
+- Cartes : `xxx-480.webp` à côté de chaque `xxx.webp` (`srcset`), faite par `scripts/make-card-sizes.mjs`, lancé à la fin de `make-cards.mjs`. Une carte sans sa version 480 s'affiche mal dans les petites cases.
+
 ## La home « Booster »
 
 - À la 1re visite de la session, un booster 3D flotte (il fait office de loader) ; clic : la languette s'arrache, les cartes

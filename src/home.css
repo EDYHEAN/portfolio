@@ -36,7 +36,7 @@ body[data-page='home'] .hdr-logo, body[data-page='home'] .hdr-nav { visibility: 
 }
 .booster.is-ready .booster-hint { opacity: 0.65; animation: hint 2.2s ease-in-out infinite; }
 @keyframes hint { 50% { opacity: 0.3; } }
-.booster-skip { position: absolute; right: var(--gutter); bottom: 22px; opacity: 0.45; font-size: 11px; letter-spacing: 0.08em; }
+.booster-skip { position: absolute; right: var(--gutter); bottom: 18px; min-height: 24px; padding: 4px 0; opacity: 0.45; font-size: 11px; letter-spacing: 0.08em; }
 @media (hover: hover) { .booster-skip:hover { opacity: 0.9; } }
 .booster.is-opening .booster-hint, .booster.is-opening .booster-skip { opacity: 0; animation: none; }
 
@@ -81,8 +81,8 @@ body[data-page='home'] .hdr-logo, body[data-page='home'] .hdr-nav { visibility: 
 @keyframes gl-c { 0% { transform: translate(2.2%, 0); } 22% { transform: translate(1%, -0.6%); clip-path: inset(40% 0 30% 0); } 30% { clip-path: none; transform: translate(2.8%, 0.4%); } 64% { transform: translate(1.6%, 0); } 70% { clip-path: inset(15% 0 70% 0); transform: translate(-2.4%, 0); } 76% { clip-path: none; } }
 @keyframes gl-k { 0%, 100% { transform: none; clip-path: none; } 22% { transform: translate(1.2%, 0); clip-path: inset(28% 0 48% 0); } 26% { transform: none; clip-path: none; } 70% { transform: translate(-1.6%, 0); clip-path: inset(70% 0 12% 0); } 74% { transform: none; clip-path: none; } }
 /* À droite du poitrail : la légende ne s'intercale pas entre la hyène et le nom. */
-.lg-label { position: absolute; left: calc(100% + 4px); bottom: 7%; font-size: 10px; letter-spacing: 0.08em; opacity: 0.45; white-space: nowrap; pointer-events: none; transition: opacity 0.3s; }
-.lg-label span { opacity: 0.6; margin-left: 4px; }
+.lg-label { position: absolute; left: calc(100% + 4px); bottom: 7%; font-size: 10px; letter-spacing: 0.08em; opacity: 0.62; white-space: nowrap; pointer-events: none; transition: opacity 0.3s; }
+.lg-label span { margin-left: 4px; }
 @media (hover: hover) { .who-hy:hover .lg-label { opacity: 0.85; } }
 /* Tournis (logo.js) : la tête tangue, 4 étoiles en orbite autour du crâne. L'orbite = deux mouvements sinusoïdaux
    décalés d'un quart de tour (X sur <i>, Y + profondeur sur <b>) : une ellipse sans calcul. */

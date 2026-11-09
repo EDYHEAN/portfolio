@@ -3,8 +3,8 @@
 #   blender -b --factory-startup -P scripts/blender/make-features.py -- vinyl-run [nom…] [--glb-only]
 # Écrit assets/<projet>/features3d/<nom>.glb (le modèle, animé en temps réel dans la tuile : src/feature3d.js) et
 # <nom>.webp (l'affiche transparente : avant le chargement, et sans WebGL). Modélisation 100 % procédurale.
-import bpy, bmesh, math, os, sys
-from mathutils import Vector
+import bpy, bmesh, math, os, re, sys
+from mathutils import Vector, Matrix
 
 ARGS = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
 GLB_ONLY = '--glb-only' in ARGS          # exporter les modèles sans refaire les rendus (affiches)
@@ -83,13 +83,13 @@ def sphere(r, loc, color, scale=(1, 1, 1)):
     return finish(o, color)
 
 
-def torus(R, r, loc, color, rot=(0, 0, 0), arc=360.0):
+def torus(R, r, loc, color, rot=(0, 0, 0), arc=360.0, start=0.0):
     me = bpy.data.meshes.new('tor'); bm = bmesh.new()
     n, m = 96, 24
     rings = []
     steps = n if arc >= 360 else n + 1
     for i in range(steps):
-        a = math.radians(arc) * i / n
+        a = math.radians(start) + math.radians(arc) * i / n
         ring = []
         for j in range(m):
             b = 2 * math.pi * j / m
@@ -122,7 +122,7 @@ def blob(radius, depth, loc, color, wobble, seed=0, bevel=0.03):
     return finish(o, color, bevel=bevel, seg=3)
 
 
-def scene(bg, size, cam_loc, target, lens=50, key=(-4, -5, 7), key_power=900):
+def scene(bg, size, cam_loc, target, lens=50, key=(-4, -5, 7), key_power=900, ambient=0.55, back=0.35):
     """Vide la scène, pose le sol (couleur de la tuile), la lumière de studio et la caméra."""
     for o in list(bpy.data.objects):
         bpy.data.objects.remove(o, do_unlink=True)
@@ -142,12 +142,14 @@ def scene(bg, size, cam_loc, target, lens=50, key=(-4, -5, 7), key_power=900):
     world = sc.world or bpy.data.worlds.new('w'); sc.world = world
     world.use_nodes = True
     bgn = next(n for n in world.node_tree.nodes if n.type == 'BACKGROUND')
-    bgn.inputs['Color'].default_value = lin(bg); bgn.inputs['Strength'].default_value = 0.55
+    bgn.inputs['Color'].default_value = lin(bg); bgn.inputs['Strength'].default_value = ambient
     ground = rbox(80, 80, 0.2, (0, 0, -0.1), bg, bevel=0)
     ground.data.materials[0] = clay(bg, rough=0.9, coat=0)
     ground.is_shadow_catcher = True
     ground.name = 'ground'
-    for loc, power, size_l in ((key, key_power, 5), ((6, -3, 4), key_power * 0.28, 6), ((0, 6, 5), key_power * 0.35, 5)):
+    for loc, power, size_l in ((key, key_power, 5), ((6, -3, 4), key_power * 0.28, 6), ((0, 6, 5), key_power * back, 5)):
+        if power <= 0:
+            continue
         ld = bpy.data.lights.new('l', 'AREA'); ld.energy = power; ld.size = size_l
         lo = link(bpy.data.objects.new('l', ld)); lo.location = loc
         lo.rotation_euler = (Vector(loc) - Vector(target)).to_track_quat('Z', 'Y').to_euler()
@@ -259,7 +261,244 @@ def vr_demande():
     render('demande')
 
 
-SCENES = {'vinyl-run': {'map': vr_map, 'chat': vr_chat, 'inventory': vr_inventory, 'player': vr_player, 'demande': vr_demande}}
+# --------------------------------------------------------------------------------------------------------------------
+# Formes à plat extrudées (tuiles aux coins vraiment ronds, étoile, coq, texte) : le biseau de rbox reste limité par l'épaisseur.
+def rrect_pts(w, h, r, n=12):
+    r = min(r, min(w, h) * 0.499)
+    pts = []
+    for cx, cy, a0 in ((w / 2 - r, h / 2 - r, 0), (-w / 2 + r, h / 2 - r, 90), (-w / 2 + r, -h / 2 + r, 180), (w / 2 - r, -h / 2 + r, 270)):
+        for i in range(n + 1):
+            a = math.radians(a0 + 90 * i / n)
+            pts.append((cx + r * math.cos(a), cy + r * math.sin(a)))
+    return pts
+
+
+def star_pts(rout, rin, k=5):
+    return [((rout if i % 2 == 0 else rin) * math.cos(math.radians(90 + i * 180 / k)),
+             (rout if i % 2 == 0 else rin) * math.sin(math.radians(90 + i * 180 / k))) for i in range(2 * k)]
+
+
+def extrude(pts, depth, loc, color, rot=(0, 0, 0), bevel=0.03):
+    """Un contour (sens trigo) extrudé le long de Z, centré sur loc ; les faces planes restent plates, le biseau arrondi."""
+    me = bpy.data.meshes.new('ext'); bm = bmesh.new()
+    bot = [bm.verts.new((x, y, -depth / 2)) for x, y in pts]
+    top = [bm.verts.new((x, y, depth / 2)) for x, y in pts]
+    bm.faces.new(top); bm.faces.new(bot[::-1])
+    for i in range(len(pts)):
+        j = (i + 1) % len(pts)
+        bm.faces.new((bot[i], bot[j], top[j], top[i]))
+    bm.to_mesh(me); bm.free()
+    o = link(bpy.data.objects.new('ext', me)); o.location = loc; o.rotation_euler = rot
+    finish(o, color, bevel=min(bevel, depth * 0.45))
+    for poly in o.data.polygons:
+        if abs(poly.normal.z) > 0.99:
+            poly.use_smooth = False
+    return o
+
+
+def rrect(w, h, r, depth, loc, color, rot=(0, 0, 0), bevel=0.03):
+    return extrude(rrect_pts(w, h, r), depth, loc, color, rot, bevel)
+
+
+def from_curve(cu, loc, color, rot):
+    tmp = link(bpy.data.objects.new('tmp', cu))
+    bpy.context.view_layer.update()
+    me = bpy.data.meshes.new_from_object(tmp.evaluated_get(bpy.context.evaluated_depsgraph_get()))
+    bpy.data.objects.remove(tmp, do_unlink=True)
+    o = link(bpy.data.objects.new('flat', me)); o.location = loc; o.rotation_euler = rot
+    return finish(o, color)
+
+
+FONT = r'C:\Windows\Fonts\arialbd.ttf'
+def text3d(s, size, depth, loc, color, rot=(0, 0, 0), bevel=0.012):
+    cu = bpy.data.curves.new('t', 'FONT')
+    cu.body = s; cu.size = size; cu.extrude = depth; cu.bevel_depth = bevel; cu.bevel_resolution = 3
+    cu.align_x = 'CENTER'; cu.align_y = 'CENTER'
+    if os.path.exists(FONT):
+        cu.font = bpy.data.fonts.load(FONT, check_existing=True)
+    return from_curve(cu, loc, color, rot)
+
+
+def svg_mark(path, height, depth, loc, color, rot=(0, 0, 0), bevel=0.015, steps=8):
+    """Un SVG à tracés absolus (M C L H V Z) extrudé ; les sous-tracés imbriqués font les trous."""
+    src = open(os.path.join(ROOT, path), encoding='utf8').read()
+    vw, vh = [float(v) for v in re.search(r'viewBox="0 0 ([\d.]+) ([\d.]+)"', src).groups()]
+    tokens = re.findall(r'[MCLHVZ]|-?\d*\.?\d+(?:e-?\d+)?', re.search(r'\sd="([^"]+)"', src).group(1))
+    k = height / vh
+    subs, cur, x, y, i, cmd = [], [], 0.0, 0.0, 0, 'M'
+    num = lambda n: float(tokens[n])
+    while i < len(tokens):
+        if tokens[i] in 'MCLHVZ':
+            cmd = tokens[i]; i += 1
+            if cmd == 'Z':
+                subs.append(cur); cur = []
+                continue
+        if cmd == 'M':
+            x, y = num(i), num(i + 1); i += 2; cur = [(x, y)]; cmd = 'L'
+        elif cmd == 'L':
+            x, y = num(i), num(i + 1); i += 2; cur.append((x, y))
+        elif cmd == 'H':
+            x = num(i); i += 1; cur.append((x, y))
+        elif cmd == 'V':
+            y = num(i); i += 1; cur.append((x, y))
+        elif cmd == 'C':
+            p = [num(i + j) for j in range(6)]; i += 6
+            x0, y0 = x, y
+            for s in range(1, steps + 1):
+                t = s / steps; u = 1 - t
+                cur.append((u ** 3 * x0 + 3 * u * u * t * p[0] + 3 * u * t * t * p[2] + t ** 3 * p[4],
+                            u ** 3 * y0 + 3 * u * u * t * p[1] + 3 * u * t * t * p[3] + t ** 3 * p[5]))
+            x, y = p[4], p[5]
+    cu = bpy.data.curves.new('mark', 'CURVE')
+    cu.dimensions = '2D'; cu.fill_mode = 'BOTH'; cu.extrude = depth; cu.bevel_depth = bevel; cu.bevel_resolution = 3
+    for sub in subs:
+        if len(sub) > 1 and abs(sub[0][0] - sub[-1][0]) + abs(sub[0][1] - sub[-1][1]) < 1e-3:
+            sub = sub[:-1]
+        sp = cu.splines.new('POLY'); sp.points.add(len(sub) - 1); sp.use_cyclic_u = True
+        for pt, (px, py) in zip(sp.points, sub):
+            pt.co = ((px - vw / 2) * k, (vh / 2 - py) * k, 0, 1)
+    return from_curve(cu, loc, color, rot)
+
+
+def stand(angle, margin=0.02):
+    """Redresse la composition posée à plat, face à la caméra, puis la repose sur le sol."""
+    objs = [o for o in bpy.context.scene.objects if o.type == 'MESH' and o.name != 'ground']
+    bpy.context.view_layer.update()
+    R = Matrix.Rotation(math.radians(angle), 4, 'X')
+    for o in objs:
+        o.matrix_world = R @ o.matrix_world
+    bpy.context.view_layer.update()
+    low = min((o.matrix_world @ Vector(c)).z for o in objs for c in o.bound_box)
+    for o in objs:
+        o.location.z += margin - low
+
+
+# MyFrenchTool : tuiles blanches, bleu France, encre ; le rouge seulement pour le clin d'œil tricolore.
+MF = {'bg': '#ffffff', 'blue': '#0052CC', 'sky': '#1a6fe0', 'ink': '#050505', 'white': '#fbfbfd', 'mist': '#dfe5ef',
+      'line': '#b9c4d6', 'red': '#E1000F', 'gold': '#f5a623', 'teal': '#00b388', 'violet': '#7a3fe0', 'wood': '#e8c9a0'}
+COQ = 'assets/myfrenchtool/logo-mark.svg'
+
+
+def mf_scene(size, cam, target, lens):
+    # Sur tuile blanche : moins de lumière (le bleu France délavait, les gris clairs disparaissaient), pas de contre-jour
+    # (son ombre vers la caméra faisait une bande grise sous l'objet).
+    scene(MF['bg'], size, cam, target, lens=lens, key_power=420, ambient=0.35, back=0)
+
+
+def mf_check(loc, color, s=1.0):
+    ax, ay, bx, by, cx, cy, t = -0.12 * s, 0.01 * s, -0.03 * s, -0.08 * s, 0.13 * s, 0.08 * s, 0.06 * s
+    h, r = t / 2 / math.sqrt(2), t / math.sqrt(2)
+    pts = [(ax - h, ay - h), (bx, by - r), (cx + h, cy - h), (cx - h, cy + h), (bx, by + r), (ax + h, ay + h)]
+    return extrude(pts, 0.05, loc, color, bevel=0.012)
+
+
+def mf_tool():
+    # La fiche outil, c'est un bento : le coq, la note, le prix, posés sur leur plateau.
+    mf_scene('l', (0, -8.0, 3.4), (0, 0, 1.35), 50)
+    rrect(4.3, 3.1, 0.34, 0.14, (0, 0, 0.07), MF['mist'], bevel=0.05)
+    rrect(1.95, 2.7, 0.3, 0.32, (-0.97, 0, 0.3), MF['blue'], bevel=0.07)
+    svg_mark(COQ, 1.75, 0.05, (-0.97, 0, 0.53), MF['white'])
+    rrect(1.95, 1.27, 0.26, 0.24, (1.03, 0.715, 0.26), MF['white'], bevel=0.06)
+    extrude(star_pts(0.46, 0.2), 0.14, (1.03, 0.7, 0.45), MF['gold'], bevel=0.05)
+    rrect(1.95, 1.27, 0.26, 0.46, (1.03, -0.715, 0.37), MF['ink'], bevel=0.08)
+    # Le € dessiné (celui d'Arial a des contours qui se chevauchent : l'extrusion les montrait).
+    z = 0.66
+    torus(0.31, 0.07, (1.08, -0.715, z), MF['white'], arc=270, start=45)
+    for dy in (0.09, -0.09):
+        rrect(0.62, 0.11, 0.05, 0.1, (0.86, -0.715 + dy, z), MF['white'], bevel=0.03)
+    stand(54)
+    render('tool')
+
+
+def mf_quiz():
+    # Un point d'interrogation, trois réponses : la bonne est cochée.
+    mf_scene('w', (0, -8.4, 2.6), (0, 0, 1.3), 42)
+    # Le « ? » en boudin de pâte : un arc, une tige, un point.
+    qx, qy, qz, R, tube = -2.3, 0.72, 0.3, 0.72, 0.22
+    torus(R, tube, (qx, qy, qz), MF['blue'], arc=270, start=-90)
+    sphere(tube, (qx - R, qy, qz), MF['blue'])
+    sphere(tube, (qx, qy - R, qz), MF['blue'])    # le coude entre l'arc et la tige
+    cyl(tube, 0.5, (qx, qy - R - 0.25, qz), MF['blue'], rot=(math.radians(90), 0, 0), verts=48, bevel=0)
+    sphere(tube, (qx, qy - R - 0.5, qz), MF['blue'])
+    sphere(0.27, (qx, qy - R - 1.15, qz), MF['blue'])
+    for i, y in enumerate((1.05, 0, -1.05)):
+        on = i == 1
+        rrect(3.7, 0.84, 0.42, 0.3, (1.0, y, 0.15 + (0.14 if on else 0)), MF['blue'] if on else MF['mist'], bevel=0.08)
+        z = 0.32 + (0.14 if on else 0)
+        cyl(0.24, 0.1, (-0.5, y, z), MF['white'], verts=48, bevel=0.03)
+        w = 2.1 if i == 2 else 2.7
+        rrect(w, 0.16, 0.08, 0.05, (-0.1 + w / 2, y, z), MF['white'] if on else MF['line'], bevel=0.015)
+        if on:
+            mf_check((-0.5, y, z + 0.07), MF['blue'], s=1.1)
+    stand(58)
+    render('quiz')
+
+
+def mf_barometre():
+    # Le baromètre : un cadran sur son pied, l'échelle tricolore, l'aiguille.
+    mf_scene('t', (0, -8.8, 2.7), (0, 0, 1.75), 50)
+    X = (math.radians(90), 0, 0)
+    rrect(2.1, 1.3, 0.3, 0.22, (0, 0, 0.11), MF['ink'], bevel=0.06)
+    cyl(0.17, 0.55, (0, 0, 0.45), MF['ink'], bevel=0.01)
+    Z, F = 2.1, -0.24
+    cyl(1.5, 0.4, (0, 0, Z), MF['blue'], rot=X, verts=96, bevel=0.1)
+    cyl(1.22, 0.06, (0, F, Z), MF['white'], rot=X, verts=96, bevel=0.02)
+    for start, color in ((-25, MF['red']), (50.5, MF['line']), (126, MF['blue'])):
+        torus(0.92, 0.1, (0, F - 0.06, Z), color, rot=X, arc=72, start=start)
+    a = math.radians(62)
+    rbox(0.11, 0.06, 0.72, (0.36 * math.cos(a), F - 0.14, Z + 0.36 * math.sin(a)), MF['ink'], rot=(0, math.radians(90) - a, 0), bevel=0.025)
+    cyl(0.17, 0.12, (0, F - 0.14, Z), MF['ink'], rot=X, verts=32, bevel=0.03)
+    render('barometre')
+
+
+def mf_cover():
+    # Le duel : deux icônes aux couleurs de leurs outils, le VS entre les deux, comme sur les covers.
+    mf_scene('s', (0, -8.6, 2.1), (0, 0, 1.05), 50)
+    X, T, H = math.radians(90), math.radians(13), 1.08
+    for side, color in ((-1, MF['teal']), (1, MF['violet'])):
+        th = -side * T
+        nx, ny = math.sin(th), -math.cos(th)
+        cx = side * 1.75
+        rrect(2.0, 2.0, 0.52, 0.42, (cx, 0, H), color, rot=(X, 0, th), bevel=0.1)
+        glyph = (cx + nx * 0.25, ny * 0.25, H)
+        if side < 0:
+            torus(0.42, 0.13, glyph, MF['white'], rot=(X, 0, th))
+        else:
+            extrude(star_pts(0.62, 0.17, 4), 0.1, glyph, MF['white'], rot=(X, 0, th), bevel=0.035)
+    cyl(0.62, 0.26, (0, -0.55, H), MF['blue'], rot=(X, 0, 0), verts=64, bevel=0.07)
+    text3d('VS', 0.5, 0.03, (0, -0.72, H), MF['white'], rot=(X, 0, 0))
+    render('cover')
+
+
+def mf_blog():
+    # L'article : la page sur sa couverture bleue, le crayon posé dessus.
+    mf_scene('s', (0, -7.8, 2.6), (0, 0, 1.15), 50)
+    rrect(2.92, 3.52, 0.22, 0.14, (0, 0, 0.07), MF['blue'], bevel=0.05)
+    rrect(2.6, 3.2, 0.16, 0.14, (0, 0, 0.2), MF['white'], bevel=0.04)
+    z = 0.29
+    rrect(1.5, 0.22, 0.11, 0.05, (-0.35, 1.2, z), MF['ink'], bevel=0.015)
+    rrect(2.1, 1.0, 0.12, 0.05, (0, 0.45, z), MF['sky'], bevel=0.015)
+    for i, w in enumerate((2.1, 2.1, 1.7, 1.1)):
+        rrect(w, 0.13, 0.065, 0.05, (-1.05 + w / 2, -0.35 - i * 0.3, z), MF['line'], bevel=0.015)
+    # Le crayon, pointe en bas à gauche.
+    al = math.radians(-128)
+    d = Vector((math.cos(al), math.sin(al), 0))
+    rot = (math.radians(90), 0, al + math.radians(90))
+    o, zp = Vector((0.5, -0.3, 0)), 0.72
+    at = lambda t: (o.x + d.x * t, o.y + d.y * t, zp)
+    cyl(0.17, 2.1, at(0), MF['blue'], rot=rot, verts=6, bevel=0.03)
+    cyl(0.17, 0.45, at(1.27), MF['wood'], rot=rot, verts=32, bevel=0.005, r2=0.05)
+    cyl(0.05, 0.14, at(1.55), MF['ink'], rot=rot, verts=24, bevel=0.005, r2=0.0)
+    cyl(0.175, 0.2, at(-1.15), MF['line'], rot=rot, verts=32, bevel=0.01)
+    cyl(0.17, 0.26, at(-1.37), MF['red'], rot=rot, verts=32, bevel=0.06)
+    stand(55)
+    render('blog')
+
+
+SCENES = {
+    'vinyl-run': {'map': vr_map, 'chat': vr_chat, 'inventory': vr_inventory, 'player': vr_player, 'demande': vr_demande},
+    'myfrenchtool': {'tool': mf_tool, 'quiz': mf_quiz, 'barometre': mf_barometre, 'cover': mf_cover, 'blog': mf_blog},
+}
 for name, fn in SCENES[PROJECT].items():
     if not ONLY or name in ONLY:
         fn()

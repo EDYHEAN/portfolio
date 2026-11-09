@@ -249,7 +249,7 @@ export const BLOCKS = {
       return `${head(b.title || 'b.features', n)}
         <div class="bento ft-bento">${b.items.map((f) => `
           <article class="b-tile ft ft-${f.size || 's'}">
-            <div class="ft-img"${f.model ? ` data-model="${asset(f.model)}"` : ''}>${img(f.img, { alt: '', style: `object-fit:${f.fit || 'cover'};object-position:${f.pos || 'top'}` })}</div>
+            <div class="ft-img"${f.model ? ` data-model="${asset(f.model)}"${b.soft ? ' data-soft' : ''}` : ''}>${img(f.img, { alt: '', style: `object-fit:${f.fit || 'cover'};object-position:${f.pos || 'top'}` })}</div>
             <div class="ft-txt"><h3>${tx(f.t)}</h3><p>${tx(f.d)}</p></div>
           </article>`).join('')}
         </div>`;

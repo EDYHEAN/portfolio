@@ -356,12 +356,13 @@ export const PROJECTS = [
       },
       {
         type: 'features',
+        soft: true, // tuiles blanches : lumière douce pour garder le bleu France (feature3d.js)
         items: [
-          { img: 'myfrenchtool/features/tool-hero.webp', size: 'l', t: T('Fiches outil en bento', 'Bento tool pages'), d: T('Prix, avis et alternatives au même endroit.', 'Pricing, reviews and alternatives in one place.') },
-          { img: 'myfrenchtool/features/quiz.webp', size: 'w', t: T('Quiz de recommandation', 'Recommendation quiz'), d: T('Quelques questions, les outils adaptés.', 'A few questions, the right tools.') },
-          { img: 'myfrenchtool/features/barometre.webp', size: 't', t: T('Baromètre du SaaS français', 'French SaaS barometer'), d: T('Les données du catalogue, publiées en open data.', 'Catalog data, published as open data.') },
-          { img: 'myfrenchtool/features/cover-vs.webp', size: 's', t: T('Covers générées', 'Generated covers'), d: T('Chaque comparatif a sa cover, aux couleurs des outils.', 'Every comparison gets its cover, in the tools’ colors.') },
-          { img: 'myfrenchtool/features/article.webp', size: 's', t: T('Le blog', 'The blog'), d: T('Écrit pour Google, les lecteurs et les IA.', 'Written for Google, readers and AI.') },
+          { img: 'myfrenchtool/features3d/tool.webp', model: 'myfrenchtool/features3d/tool.glb', fit: 'contain', pos: 'center', size: 'l', t: T('Fiches outil en bento', 'Bento tool pages'), d: T('Prix, avis et alternatives au même endroit.', 'Pricing, reviews and alternatives in one place.') },
+          { img: 'myfrenchtool/features3d/quiz.webp', model: 'myfrenchtool/features3d/quiz.glb', fit: 'contain', pos: 'center', size: 'w', t: T('Quiz de recommandation', 'Recommendation quiz'), d: T('Quelques questions, les outils adaptés.', 'A few questions, the right tools.') },
+          { img: 'myfrenchtool/features3d/barometre.webp', model: 'myfrenchtool/features3d/barometre.glb', fit: 'contain', pos: 'center', size: 't', t: T('Baromètre du SaaS français', 'French SaaS barometer'), d: T('Les données du catalogue, publiées en open data.', 'Catalog data, published as open data.') },
+          { img: 'myfrenchtool/features3d/cover.webp', model: 'myfrenchtool/features3d/cover.glb', fit: 'contain', pos: 'center', size: 's', t: T('Covers générées', 'Generated covers'), d: T('Chaque comparatif a sa cover, aux couleurs des outils.', 'Every comparison gets its cover, in the tools’ colors.') },
+          { img: 'myfrenchtool/features3d/blog.webp', model: 'myfrenchtool/features3d/blog.glb', fit: 'contain', pos: 'center', size: 's', t: T('Le blog', 'The blog'), d: T('Écrit pour Google, les lecteurs et les IA.', 'Written for Google, readers and AI.') },
         ],
       },
       {

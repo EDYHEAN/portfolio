@@ -54,6 +54,7 @@ a été remplacée le 06/11/2026 ; elle reste dans l'historique git (avant le co
   (GLB Draco de 20 à 60 Ko + une affiche WebP transparente, `--glb-only` pour ne refaire que les modèles), animés en temps réel
   par `src/feature3d.js` : UN canvas fixe pour toute la page, chaque modèle dessiné dans le cadre de sa tuile (flottement,
   oscillation, se tourne vers le curseur, grossit au survol, parallaxe au scroll), rien hors écran, chargé à l'approche.
+  Sur tuiles claires, `soft: true` sur le bloc `features` (MFT) : lumière douce, sinon les couleurs de marque délavent.
 - **Bloc live** (Rhinov Studio) : les vrais prototypes en iframe (`assets/rhinov-studio/live`), rendus à 1440 / 390 px puis réduits
   au cadre, onglets, chargés à l'approche puis jamais rechargés en scrollant : hors écran ils sont en pause, et un seul
   cadre tourne à la fois (celui qu'on survole). Chaque prototype doit passer par `scripts/patch-live.mjs` (pause + densité

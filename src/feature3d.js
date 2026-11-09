@@ -47,9 +47,12 @@ function blob() {
 function addTile(el, src, i) {
   const scene = new THREE.Scene();
   scene.environment = env;
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x3a3530, 1.1));
-  const key = new THREE.DirectionalLight(0xfff4e6, 2.4); key.position.set(-3, 5, 4); scene.add(key);
-  const rim = new THREE.DirectionalLight(0xdfe8ff, 0.8); rim.position.set(4, 2, -3); scene.add(rim);
+  // data-soft : sur tuile claire, moins de lumière et de reflets (les couleurs de marque délavaient, le noir virait au gris).
+  const soft = 'soft' in el.dataset;
+  if (soft) scene.environmentIntensity = 0.4;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x3a3530, soft ? 0.6 : 1.1));
+  const key = new THREE.DirectionalLight(0xfff4e6, soft ? 1.9 : 2.4); key.position.set(-3, 5, 4); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xdfe8ff, soft ? 0.3 : 0.8); rim.position.set(4, 2, -3); scene.add(rim);
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
   const pivot = new THREE.Group(); scene.add(pivot);
   const t = { el, scene, camera, pivot, phase: i * 1.7, visible: false, ready: false, hover: 0, yaw: 0, pitch: 0 };

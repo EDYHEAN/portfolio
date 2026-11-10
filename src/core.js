@@ -8,6 +8,10 @@ import { HYENA_BODY, HYENA_PUPILS } from './hyena.js';
 import { wordmarkSVG } from './wordmark.js';
 import { UI } from './i18n.js';
 import { bindSounds, isSoundOn, setSound } from './sound.js';
+import { inject } from '@vercel/analytics';
+
+// Vercel Web Analytics : compte les visites en production (en local, le script ne fait que logguer).
+inject({ mode: import.meta.env.PROD ? 'production' : 'development' });
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 export { gsap, ScrollTrigger, SplitText };

@@ -66,7 +66,7 @@ export function packSVG(p = PACK) {
     + name(p.name, 1200, 774, 44, ink)
     + p.back.map((s, i) => mono(s, 1200, 854 + i * 26.5, { size: 17, ls: 0, anchor: 'middle', opacity: 0.68, fill: ink })).join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1400" width="1600" height="1400">
-<defs><linearGradient id="paper" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s.paperTop || '#E5E0D8'}"/><stop offset="1" stop-color="${s.paperBottom || '#D7CFC0'}"/></linearGradient></defs>
+<defs><linearGradient id="paper" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s.paperTop || '#E5E0D8'}"/>${s.paperMid ? `<stop offset="0.5" stop-color="${s.paperMid}"/>` : ''}<stop offset="1" stop-color="${s.paperBottom || '#D7CFC0'}"/></linearGradient></defs>
 ${front}${back}</svg>`;
 }
 
@@ -96,7 +96,7 @@ async function applicationPack(slug) {
   if (p.logo) {
     const svg = fs.readFileSync(path.join(ROOT, 'assets', p.logo), 'utf8');
     const vb = svg.match(/viewBox="([^"]+)"/)[1].split(/\s+/).map(Number);
-    const w = 330, h = (w * vb[3]) / vb[2];
+    const w = p.logoWidth || 330, h = (w * vb[3]) / vb[2];
     p.logoSvg = `<svg x="${400 - w / 2}" y="940" width="${w}" height="${h}" viewBox="${vb.join(' ')}">${svg.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '')}</svg>`;
   }
   return { pack: p, dir: path.join(ROOT, 'assets', 'apply', slug), glb: path.join(ROOT, 'assets', app.booster.glb) };

@@ -93,7 +93,7 @@ function render() {
         <div class="who-co">
           ${LOCK}
           <span class="who-x" aria-hidden="true">×</span>
-          <span class="who-co-logo"><img src="${asset(APP.logo)}" alt="${APP.company}"></span>
+          <span class="who-co-logo"${APP.logoRatio ? ` style="--co-ratio:${APP.logoRatio};--co-w:${APP.logoWidth || 39}"` : ''}><img src="${asset(APP.logo)}" alt="${APP.company}"></span>
         </div>
         <p class="who-us">${t('app.us')}</p>
         <div class="who-real"><a class="key key-ink" href="${ROOT}" data-page data-sound>${t('app.real')}<span aria-hidden="true">→</span></a></div>

@@ -84,6 +84,10 @@ Décliner pour une entreprise :
 2. Visuels dans `assets/apply/{slug}/` : `logo.svg`, `logo-dark.svg`, et pour la carte de chaque projet l'affiche 3D : une entrée `SCENES['apply/{slug}']` dans `scripts/blender/make-features.py`, puis `blender -b --factory-startup -P scripts/blender/make-features.py -- apply/{slug}` (seule l'affiche WebP sert).
 3. `node scripts/make-booster.mjs {slug}` (le paquet), `node scripts/make-cards.mjs apply:{slug}` (les cartes), `npm run pages` (la page, `scripts/make-applications.mjs`).
 
+Options par entreprise : `logoRatio` + `logoWidth` (cqi) pour le logo à côté du mien (défaut : celui de Lacoste), `cardArt.pattern` (`court` par défaut, `page` = page réglée), `skin.paperMid` (dégradé à trois arrêts sur le paquet), `pack.logoWidth`.
+
+Faites : `/lacoste/` (09/11), `/haiku/` (13/11, IA juridique : logo et dégradé rose / violet / bleu relevés sur haiku.fr, objets de cabinet d'avocats).
+
 Rester honnête : aucun chiffre ni résultat inventé présenté comme réel, des hypothèses à vérifier, pas de reproduction de créations de la marque. Lacoste : couleurs relevées dans le logo 2026 (Wikimedia Commons, « Logo Lacoste 2026.svg », source lacoste.com/fr ; marque déposée) ; la police de la marque est sur mesure, le site garde la sienne.
 
 ## Les pages projet

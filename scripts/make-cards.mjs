@@ -136,6 +136,11 @@ const CARDS = {
 };
 
 // node scripts/make-cards.mjs apply:{slug} : les cartes d'une candidature (config src/data/applications/{slug}.js).
+// Le fond : les lignes d'un court (Lacoste), ou une page réglée avec sa marge (Haiku).
+const PATTERNS = {
+  court: 'M90 -20V1520M810 -20V1520M90 330H810M90 1170H810M450 330V1170',
+  page: 'M150 -20V1520' + Array.from({ length: 14 }, (_, i) => `M-20 ${130 + i * 100}H920`).join(''),
+};
 const appCard = (a) => `<style>${BASE}
   body{background:${a.bg}}
   .art{position:absolute;left:50%;top:50%;height:1270px;width:auto;transform:translate(-50%,-50%);
@@ -143,7 +148,7 @@ const appCard = (a) => `<style>${BASE}
     mask-image:linear-gradient(90deg,transparent,#000 9% 91%,transparent),linear-gradient(transparent,#000 7% 90%,transparent);mask-composite:intersect}
   svg.court{position:absolute;inset:0;width:100%;height:100%}
   </style>
-  <svg class="court" viewBox="0 0 ${W} ${H}" fill="none" stroke="${a.lines}" stroke-width="5"><path d="M90 -20V1520M810 -20V1520M90 330H810M90 1170H810M450 330V1170"/></svg>
+  <svg class="court" viewBox="0 0 ${W} ${H}" fill="none" stroke="${a.lines}" stroke-width="5"><path d="${PATTERNS[a.pattern || 'court']}"/></svg>
   <img class="art" src="${dataUri(path.join(ROOT, 'assets', a.poster))}">
   ${GRAIN}`;
 const jobs = [];

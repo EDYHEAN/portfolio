@@ -680,7 +680,150 @@ def lc_club():
     lc_render('coupe')
 
 
+# --------------------------------------------------------------------------------------------------------------------
+# Candidature Haiku (projets imaginés) : des objets originaux, univers cabinet d'avocats. Encre #292929 et dégradé
+# rose / violet / bleu relevés sur haiku.fr ; le reste (papier, sable, laiton, bois) sont des couleurs d'objets.
+# Ni logo Haiku en volume, ni capture du produit.
+#   blender -b --factory-startup -P scripts/blender/make-features.py -- apply/haiku [nom…]
+HK = {'ink': '#292929', 'soft': '#4A4A4A', 'paper': '#F7F5F2', 'white': '#FFFFFF', 'pink': '#FF6CB3', 'violet': '#7834FF',
+      'blue': '#578CFF', 'sand': '#EADBC8', 'blush': '#F6D3E3', 'lilac': '#E4DAFF', 'grey': '#9BA1A5', 'brass': '#D9B15C',
+      'wood': '#C39A69', 'glass': '#DCE8F5'}
+
+
+def hk_book(w, d, h, loc, cover, rot_z=0.0, ribbon=None):
+    """Un livre posé à plat : la couverture, le bloc de pages en retrait sur trois côtés, un signet qui dépasse."""
+    x, y, z = loc
+    rbox(w, d, h, (x, y, z), cover, rot=(0, 0, rot_z), bevel=0.05)
+    c, s = math.cos(rot_z), math.sin(rot_z)
+    off = lambda u, v: (x + u * c - v * s, y + u * s + v * c)
+    px, py = off(0.06, 0)
+    rbox(w - 0.1, d + 0.02, h * 0.78, (px, py, z), HK['paper'], rot=(0, 0, rot_z), bevel=0.02)
+    if ribbon:
+        rx, ry = off(-w * 0.15, -d / 2 - 0.12)
+        rbox(0.12, 0.34, 0.02, (rx, ry, z - h / 2 + 0.04), ribbon, rot=(0, 0, rot_z), bevel=0.008)
+    return z + h / 2
+
+
+def hk_codes():
+    # Source sûre : la pile de codes, le signet, et la loupe qui vérifie.
+    lc_scene(HK['sand'], (1.1, -12.6, 4.0), (0.55, 0, 1.8), 50, 520)
+    top = hk_book(3.0, 2.2, 0.62, (0, 0, 0.31), HK['ink'], 0.0, HK['pink'])
+    top = hk_book(2.8, 2.05, 0.56, (0.08, 0.02, top + 0.28), HK['violet'], math.radians(-7), HK['white'])
+    top = hk_book(2.6, 1.9, 0.5, (-0.05, 0.0, top + 0.25), HK['blue'], math.radians(5), HK['pink'])
+    top = hk_book(2.3, 1.7, 0.44, (0.05, -0.02, top + 0.22), HK['paper'], math.radians(-3), HK['violet'])
+    # La loupe, appuyée contre la pile.
+    X = math.radians(90)
+    lx, lz = 1.65, 2.55
+    torus(0.78, 0.12, (lx, -1.15, lz), HK['ink'], rot=(X, math.radians(-24), math.radians(-14)))
+    cyl(0.74, 0.05, (lx, -1.15, lz), HK['glass'], rot=(X, math.radians(-24), math.radians(-14)), verts=64, bevel=0.02)
+    cyl(0.13, 1.7, (lx + 0.62, -1.3, lz - 1.42), HK['ink'], rot=(0, math.radians(-24), 0), verts=32, bevel=0.05)
+    cyl(0.16, 0.26, (lx + 0.3, -1.22, lz - 0.88), HK['brass'], rot=(0, math.radians(-24), 0), verts=32, bevel=0.03)
+    lc_render('codes')
+
+
+def hk_pieces():
+    # Le dossier d'un regard : la pile de pièces, les intercalaires de couleur, le surligneur posé dessus.
+    lc_scene(HK['ink'], (0, -9.8, 3.4), (0, 0, 1.75), 50, 460)
+    tabs = [HK['pink'], HK['violet'], HK['blue'], HK['lilac'], HK['pink'], HK['blue']]
+    z = 0.06
+    for i in range(9):
+        a = math.radians((i * 37 % 9 - 4) * 0.9)
+        rbox(2.7, 3.5, 0.05, (0.02 * (i % 3), 0.03 * (i % 2), z), HK['paper'] if i % 2 else HK['white'], rot=(0, 0, a), bevel=0.012)
+        if i in (1, 3, 5, 7):
+            k = (i - 1) // 2
+            rrect(0.52, 0.5, 0.1, 0.05, (1.42, 1.15 - k * 0.68, z), tabs[k], bevel=0.015)
+        z += 0.07
+    # La première pièce : des lignes de texte, une passage surligné.
+    for k, L in enumerate((2.0, 1.7, 2.1, 1.2, 1.9, 1.5, 2.0, 0.9)):
+        y = 1.3 - k * 0.32
+        if k == 3:
+            rbox(1.5, 0.2, 0.02, (-0.95 + 1.5 / 2, y, z), HK['pink'], bevel=0.008)
+        rbox(L, 0.07, 0.02, (-0.95 + L / 2, y, z + 0.012), HK['soft'], bevel=0.006)
+    # Le surligneur, en travers.
+    r = math.radians(-28)
+    cyl(0.2, 1.9, (0.35, -0.95, z + 0.24), HK['pink'], rot=(0, math.radians(90), r), verts=40, bevel=0.06)
+    cyl(0.21, 0.7, (1.35, -1.48, z + 0.24), HK['white'], rot=(0, math.radians(90), r), verts=40, bevel=0.06)
+    stand(52)
+    lc_render('pieces')
+
+
+def hk_tampon():
+    # Nos compétences : le tampon du cabinet, son encreur, et l'empreinte « validé » sur la feuille.
+    lc_scene(HK['violet'], (0.5, -10.8, 3.9), (0.05, 0, 1.1), 50, 560)
+    rrect(2.6, 3.2, 0.1, 0.06, (-0.6, -0.2, 0.03), HK['white'], rot=(0, 0, math.radians(6)), bevel=0.02)
+    for k, L in enumerate((1.6, 1.2, 1.5)):
+        rbox(L, 0.07, 0.02, (-1.55 + L / 2, 1.0 - k * 0.3, 0.065), HK['grey'], rot=(0, 0, math.radians(6)), bevel=0.006)
+    # L'empreinte : un anneau et une coche, en encre rose.
+    ring = torus(0.62, 0.06, (-0.75, -0.75, 0.07), HK['pink'])
+    ring.scale = (1, 1, 0.25)
+    extrude([(-0.3, 0.02), (-0.09, -0.22), (0.34, 0.24), (0.25, 0.32), (-0.09, -0.04), (-0.21, 0.1)], 0.03, (-0.75, -0.75, 0.075), HK['pink'], bevel=0.01)
+    # L'encreur, derrière.
+    rrect(1.5, 1.1, 0.14, 0.26, (1.2, 1.15, 0.13), HK['ink'], bevel=0.06)
+    rrect(1.2, 0.8, 0.1, 0.06, (1.2, 1.15, 0.27), HK['pink'], bevel=0.02)
+    # Le tampon debout : semelle, socle, col, poignée.
+    sx, sy = 1.05, -0.45
+    rbox(1.3, 0.9, 0.14, (sx, sy, 0.07), HK['pink'], bevel=0.04)
+    rbox(1.4, 1.0, 0.42, (sx, sy, 0.35), HK['ink'], bevel=0.08)
+    lathe([(0.0, 0.56), (0.38, 0.56), (0.3, 0.76), (0.2, 1.0), (0.17, 1.5), (0.22, 1.85), (0.0, 1.85)], (sx, sy, 0), HK['wood'])
+    sphere(0.5, (sx, sy, 2.2), HK['wood'], scale=(1, 1, 0.9))
+    lc_render('tampon')
+
+
+def hk_plume():
+    # Page blanche, plus jamais : la feuille, trois lignes déjà écrites (5, 7, 5), le stylo plume posé en travers.
+    lc_scene(HK['blush'], (0, -9.6, 3.2), (0, 0, 1.75), 50, 400)
+    rrect(2.9, 3.8, 0.08, 0.05, (0, 0, 0.03), HK['white'], bevel=0.015)
+    for k, L in enumerate((1.25, 1.75, 1.25)):
+        rbox(L, 0.09, 0.02, (-1.05 + L / 2, 0.95 - k * 0.42, 0.065), HK['ink'], bevel=0.008)
+    rbox(0.3, 0.09, 0.02, (-0.9, -0.55, 0.065), HK['violet'], bevel=0.008)
+    r = math.radians(-35)
+    c, s = math.cos(r), math.sin(r)
+    at = lambda u, z: (0.15 + u * c, -0.75 + u * s, z)
+    Y = (0, math.radians(90), r)
+    cyl(0.17, 1.9, at(0.2, 0.26), HK['ink'], rot=Y, verts=40, bevel=0.05)
+    cyl(0.18, 1.5, at(-1.45, 0.26), HK['violet'], rot=Y, verts=40, bevel=0.05)
+    cyl(0.185, 0.12, at(-0.75, 0.26), HK['brass'], rot=Y, verts=40, bevel=0.02)
+    rbox(0.9, 0.06, 0.05, at(-1.55, 0.47), HK['brass'], rot=(0, 0, r), bevel=0.02)
+    cyl(0.17, 0.5, at(1.4, 0.26), HK['brass'], rot=(0, math.radians(90), r), verts=40, bevel=0.01, r2=0.02)
+    stand(50)
+    lc_render('plume')
+
+
+def hk_coffre():
+    # Mes données, où ? Le coffre-fort, sa molette et son volant : la sécurité qu'on peut regarder en face.
+    lc_scene(HK['blue'], (2.4, -11.6, 3.6), (0.2, 0, 2.15), 50, 520)
+    X = math.radians(90)
+    W, D, H = 3.0, 2.6, 3.6
+    rbox(W, D, H, (0, 0, H / 2 + 0.3), HK['paper'], bevel=0.14)
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            cyl(0.16, 0.3, (sx * (W / 2 - 0.35), sy * (D / 2 - 0.35), 0.15), HK['ink'], verts=32, bevel=0.04)
+    rrect(W - 0.5, H - 0.5, 0.12, 0.08, (0, -D / 2 - 0.02, H / 2 + 0.3), HK['white'], rot=(X, 0, 0), bevel=0.03)
+    for z in (0.95, H - 0.35):
+        rbox(0.16, 0.2, 0.5, (-W / 2 + 0.18, -D / 2 - 0.05, z), HK['ink'], bevel=0.05)
+    # La molette, graduée.
+    mz, mx = H / 2 + 0.85, -0.25
+    cyl(0.62, 0.16, (mx, -D / 2 - 0.12, mz), HK['ink'], rot=(X, 0, 0), verts=64, bevel=0.04)
+    cyl(0.32, 0.2, (mx, -D / 2 - 0.25, mz), HK['violet'], rot=(X, 0, 0), verts=48, bevel=0.05)
+    for k in range(12):
+        a = 2 * math.pi * k / 12
+        rbox(0.04, 0.04, 0.14 if k % 3 else 0.2, (mx + 0.5 * math.sin(a), -D / 2 - 0.21, mz + 0.5 * math.cos(a)), HK['white'], rot=(0, a, 0), bevel=0)
+    # Le volant à trois branches.
+    vz = H / 2 - 0.45
+    cyl(0.12, 0.3, (mx, -D / 2 - 0.2, vz), HK['pink'], rot=(X, 0, 0), verts=32, bevel=0.04)
+    for k in range(3):
+        a = math.radians(90 + k * 120)
+        rbox(0.1, 0.1, 0.62, (mx + 0.3 * math.cos(a), -D / 2 - 0.3, vz + 0.3 * math.sin(a)), HK['pink'], rot=(0, -a + math.radians(90), 0), bevel=0.04)
+        sphere(0.13, (mx + 0.62 * math.cos(a), -D / 2 - 0.3, vz + 0.62 * math.sin(a)), HK['pink'])
+    # Une plaque, à droite : trois traits, comme une étiquette.
+    rrect(0.6, 0.8, 0.08, 0.04, (0.95, -D / 2 - 0.08, mz), HK['lilac'], rot=(X, 0, 0), bevel=0.012)
+    for k, L in enumerate((0.4, 0.3, 0.4)):
+        rbox(L, 0.02, 0.05, (0.95, -D / 2 - 0.11, mz + 0.2 - k * 0.2), HK['violet'], bevel=0)
+    lc_render('coffre')
+
+
 SCENES = {
+    'apply/haiku': {'codes': hk_codes, 'pieces': hk_pieces, 'tampon': hk_tampon, 'plume': hk_plume, 'coffre': hk_coffre},
     'apply/lacoste': {'raquette': lc_raquette, 'polo': lc_polo, 'cintre': lc_cintre, 'casier': lc_casier, 'coupe': lc_club},
     'vinyl-run': {'map': vr_map, 'chat': vr_chat, 'inventory': vr_inventory, 'player': vr_player, 'demande': vr_demande},
     'myfrenchtool': {'tool': mf_tool, 'quiz': mf_quiz, 'barometre': mf_barometre, 'cover': mf_cover, 'blog': mf_blog},

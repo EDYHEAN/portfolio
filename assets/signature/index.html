@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Signature mail</title>
+<style>
+  :root { --ink: #0B0B0B; --paper: #EFE9DD; --mute: #6b655d; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 40px 16px 64px; background: var(--paper); color: var(--ink); font: 15px/1.5 system-ui, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.02em; }
+  p.lead { margin: 0 0 28px; color: var(--mute); }
+  .box { border-radius: 14px; padding: 28px 24px; margin-bottom: 12px; overflow-x: auto; }
+  .light { background: #fff; }
+  .dark { background: #1f1f1f; }
+  .tag { font: 500 11px/1 ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute); margin: 18px 0 8px; }
+  button { font: 600 15px/1 system-ui, sans-serif; padding: 14px 20px; border-radius: 999px; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; margin: 20px 8px 0 0; }
+  button.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+  .ok { margin-left: 6px; font-weight: 600; opacity: 0; transition: opacity .2s; }
+  .ok.on { opacity: 1; }
+  ol { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  h2 { font-size: 17px; margin: 36px 0 6px; }
+  code { font: 13px ui-monospace, monospace; background: rgba(0,0,0,.06); padding: 1px 5px; border-radius: 4px; }
+  #clip { position: fixed; left: -9999px; top: 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Signature mail</h1>
+  <p class="lead">La hyène fait son tour de carte et change de rendu à chaque passage de profil (gravure, riso, trame, holo).
+    Image hébergée sur johantrigeard.com/signature/hyena.gif : le site doit être en ligne avec ce fichier avant de coller la signature.</p>
+
+  <div class="tag">Fond clair</div>
+  <div class="box light" id="preview-light"></div>
+  <div class="tag">Fond sombre (mode sombre des applis : le texte s'inverse, l'image garde son fond papier)</div>
+  <div class="box dark" id="preview-dark"></div>
+
+  <button id="copy">Copier la signature</button><button class="ghost" id="copy-html">Copier le code HTML</button><span class="ok" id="ok">Copié</span>
+
+  <h2>Gmail</h2>
+  <ol>
+    <li>Paramètres (roue dentée) → Voir tous les paramètres → Général → Signature → Créer.</li>
+    <li>« Copier la signature » ici, puis coller dans le cadre (Ctrl+V). La hyène apparaît.</li>
+    <li>En bas : choisir la signature pour les nouveaux messages et les réponses, puis « Enregistrer les modifications ».</li>
+  </ol>
+
+  <h2>Outlook (web et nouvel Outlook)</h2>
+  <ol>
+    <li>Paramètres → Comptes → Signatures → Nouvelle signature.</li>
+    <li>Coller la signature copiée ici, enregistrer, la choisir par défaut.</li>
+  </ol>
+
+  <h2>Outlook classique (Windows)</h2>
+  <ol>
+    <li>Fichier → Options → Courrier → Signatures → Nouveau, coller, OK.</li>
+    <li>Il n'affiche que la 1re image du GIF : la hyène en gravure, de face. Le reste de la signature est identique.</li>
+  </ol>
+</main>
+
+<div id="clip"></div>
+<script>
+  const SITE = 'https://johantrigeard.com';
+  const LINKEDIN = 'https://www.linkedin.com/in/hyrule-hero/';
+  // Le numéro n'est jamais écrit en clair dans la page (anti robots) : morceaux inversés, comme le mail du site.
+  const P = ['60', '23', '79', '23', '22'].map((s) => [...s].reverse().join(''));
+  const PHONE = [P.join(' '), '+33' + P.join('').slice(1)];
+  const FONT = "'Helvetica Neue',Helvetica,Arial,sans-serif";
+
+  // Tableaux + styles en ligne : c'est ce que Gmail et Outlook savent afficher.
+  const signature = (img) => `<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:${FONT};">
+  <tr>
+    <td style="vertical-align:middle;padding:0 16px 0 0;">
+      <a href="${SITE}/" style="text-decoration:none;"><img src="${img}" width="84" height="84" alt="Johan Trigeard" style="display:block;width:84px;height:84px;border:0;border-radius:14px;"></a>
+    </td>
+    <td style="vertical-align:middle;padding:0 0 0 16px;border-left:1px solid #D9D2C4;">
+      <div style="font-size:17px;line-height:22px;font-weight:700;color:#0B0B0B;letter-spacing:-0.2px;">Johan Trigeard</div>
+      <div style="font-size:13px;line-height:20px;color:#5B564F;">Lead UI/UX &amp; Product Designer · Bordeaux</div>
+      <div style="font-size:13px;line-height:20px;padding-top:6px;color:#5B564F;">
+        <a href="${SITE}/" style="color:#0B0B0B;font-weight:700;text-decoration:underline;">johantrigeard.com</a>&nbsp;&nbsp;·&nbsp;
+        <a href="${LINKEDIN}" style="color:#0B0B0B;text-decoration:underline;">LinkedIn</a>&nbsp;&nbsp;·&nbsp;
+        <a href="${SITE}/cv-johan-trigeard.pdf" style="color:#0B0B0B;text-decoration:underline;">CV</a>&nbsp;&nbsp;·&nbsp;
+        <a href="tel:${PHONE[1]}" style="color:#5B564F;text-decoration:none;">${PHONE[0]}</a>
+      </div>
+    </td>
+  </tr>
+</table>`;
+
+  // Aperçu : l'image locale (avant mise en ligne). La copie : toujours l'adresse sur le site.
+  const LOCAL = 'hyena.gif';
+  document.getElementById('preview-light').innerHTML = signature(LOCAL);
+  document.getElementById('preview-dark').innerHTML = signature(LOCAL)
+    .replace(/#0B0B0B/g, '#F2F2F2').replace(/#5B564F/g, '#B5B0A8').replace(/#D9D2C4/g, '#4a4640');
+
+  const done = () => { const ok = document.getElementById('ok'); ok.classList.add('on'); setTimeout(() => ok.classList.remove('on'), 1600); };
+  const final = signature(`${SITE}/signature/hyena.gif`);
+
+  // Copie « rendue » (ce qu'on colle dans l'éditeur de signature) : on sélectionne un vrai bloc de la page.
+  document.getElementById('copy').addEventListener('click', () => {
+    const clip = document.getElementById('clip');
+    clip.innerHTML = final;
+    const r = document.createRange(); r.selectNodeContents(clip);
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    document.execCommand('copy');
+    s.removeAllRanges(); clip.innerHTML = '';
+    done();
+  });
+  document.getElementById('copy-html').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(final); }
+    catch { const t = document.createElement('textarea'); t.value = final; document.body.append(t); t.select(); document.execCommand('copy'); t.remove(); }
+    done();
+  });
+</script>
+</body>
+</html>

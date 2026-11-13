@@ -67,6 +67,10 @@ Variante deux colonnes gardée en option : `node scripts/make-cv-aere.mjs` (`sou
 
 `npm run cv` (`scripts/make-cv.mjs`) : une page web (`sources/cv/index.html`) exportée en PDF A4 dans `assets/cv-johan-trigeard.pdf`, parti pris « carte tirée » (photo en gravure, nom énorme, talon à découper), en vrai texte (le HTML suit l'ordre de lecture, tous les blocs sont positionnés), QR vers johantrigeard.com (constante `SITE`).
 
+## La signature mail (13/11)
+
+johantrigeard.com/signature/ (`assets/signature/index.html`, `noindex`, liée nulle part, téléphone assemblé en JS) : aperçu clair / sombre, bouton « Copier la signature » à coller dans Gmail ou Outlook, et le mode d'emploi. Tableau HTML et styles en ligne, texte en vrai texte (Helvetica / Arial), liens site, LinkedIn, CV, téléphone. La hyène : `assets/signature/hyena.gif` (servi sur johantrigeard.com/signature/hyena.gif, donc en ligne avant de coller), fait par `node scripts/make-signature.mjs` : tour de carte et changement de rendu au passage de profil (gravure, riso, trame, holo), sur une tuile papier pour le mode sombre, 1re image = gravure de face (Outlook classique n'affiche qu'elle), environ 170 Ko.
+
 ## « C'est qui celui-là ? » (`/a-propos/`, 09/11)
 
 La page « qui suis-je », tout sur un écran au bureau (`src/about.js` + `about.css`) : ma carte « hors tirage » (mêmes inclinaison et reflet que le tirage ; au clic elle tourne et passe à la suivante, liste `SLIDES` dans about.js : moi, puis Warwick ; photos dans `assets/about/`), le texte, le parcours (`PATH`, data/home.js), les outils, les marques. Lien dans le header sur toutes les pages (sur la home, à droite avec le son et la langue, au téléphone aussi). Faits vérifiés uniquement.

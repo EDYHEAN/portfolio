@@ -2,7 +2,7 @@ import './style.css';
 import './home.css';
 import {
   gsap, ScrollTrigger, $, $$, REDUCE, t, tx, asset, pageUrl, onLang, ROOT,
-  boot, fillHyenas, curtainIn, navigate,
+  boot, fillHyenas, curtainIn, navigate, cvPick,
 } from './core.js';
 import { play } from './sound.js';
 import { mountLogo } from './logo.js';
@@ -102,7 +102,7 @@ function render() {
         <p class="who-role mono">${t('hero.role')} · Bordeaux</p>
         <p class="who-line">${t('me.l1')}</p>
         <div class="who-actions">
-          <a class="chip who-cv" href="${asset('cv-johan-trigeard.pdf')}" download="Johan-Trigeard-CV.pdf" data-sound>${t('contact.cv')} <i aria-hidden="true">↓</i></a>
+          ${cvPick({ cls: 'chip who-cv', inner: `${t('contact.cv')} <i aria-hidden="true">↓</i>` })}
           <button type="button" class="chip" data-booster-again data-sound>${t('booster.again')}</button>
         </div>`}
       </div>

@@ -1,4 +1,4 @@
-// Le CV : une page web (sources/cv/index.html) exportée en PDF A4 (assets/cv-johan-trigeard.pdf). `npm run cv`.
+// Le CV : une page web (sources/cv/index.html, index-en.html) exportée en PDF A4, en français (assets/cv-johan-trigeard.pdf) et en anglais (-en.pdf). `npm run cv`.
 // Parti pris « carte tirée » : ma carte du booster en grand (photo traitée en gravure), le nom énorme, du vide, l'expérience sur
 // trois colonnes, le contact et le QR dans un talon à découper.
 // En vrai texte : le HTML suit l'ordre de lecture. Tous les blocs sont positionnés : Chromium écrit le PDF dans l'ordre du HTML.
@@ -63,12 +63,13 @@ const job = (title, org, when, text, bullets = []) => `
   </article>`;
 const project = (name, text) => `<li><b>${name}</b><br>${text}</li>`;
 
-const html = `<!doctype html>
-<html lang="fr">
+// Deux langues : `L(fr, en)`. Le français dans assets/cv-johan-trigeard.pdf, l'anglais dans assets/cv-johan-trigeard-en.pdf.
+const build = (lang) => { const L = (fr, en) => (lang === 'en' ? en : fr); return `<!doctype html>
+<html lang="${lang}">
 <head>
 <meta charset="utf-8">
-<title>Johan Trigeard · CV · Lead UI/UX &amp; Product Designer</title>
-<meta name="description" content="CV de Johan Trigeard, Lead UI/UX et Product Designer à Bordeaux.">
+<title>Johan Trigeard · ${L('CV', 'Resume')} · Lead UI/UX &amp; Product Designer</title>
+<meta name="description" content="${L('CV de Johan Trigeard, Lead UI/UX et Product Designer à Bordeaux.', 'Resume of Johan Trigeard, Lead UI/UX and Product Designer in Bordeaux, France.')}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -134,89 +135,93 @@ const html = `<!doctype html>
   <header class="head">
     <h1><span>Johan</span><span>Trigeard</span></h1>
     <p class="role">Lead UI/UX &amp; Product Designer</p>
-    <p class="city">Bordeaux</p>
-    <p class="hook">Je conçois des produits web et mobile, du parcours au <em>prototype codé</em>. Chez Rhinov, je pilote l'UX <em>entre produit et tech</em>.</p>
+    <p class="city">${L('Bordeaux', 'Bordeaux, France')}</p>
+    <p class="hook">${L(
+      "Je conçois des produits web et mobile, du parcours au <em>prototype codé</em>. Chez Rhinov, je pilote l'UX <em>entre produit et tech</em>.",
+      'I design web and mobile products, from user flow to <em>coded prototype</em>. At Rhinov, I lead UX <em>between product and tech</em>.')}</p>
     <section class="brands">
-      <h2>Marques</h2>
+      <h2>${L('Marques', 'Brands')}</h2>
       <ul>${BRANDS.map((b) => `<li>${logo(b)}</li>`).join('')}</ul>
     </section>
   </header>
 
   <footer class="talon">
-    <span class="cut" aria-hidden="true">Bon pour un entretien</span>
+    <span class="cut" aria-hidden="true">${L('Bon pour un entretien', 'Good for one interview')}</span>
     <div>
-      <h2>On prend<br>un café&nbsp;?</h2>
+      <h2>${L('On prend<br>un café&nbsp;?', 'Shall we grab<br>a coffee?')}</h2>
     </div>
     <p class="links"><a href="mailto:${mail}">${mail}</a><a href="${CONTACT.linkedin}">${bare(CONTACT.linkedin)}</a><a href="${SITE}">${bare(SITE)}</a></p>
-    <a class="qr" href="${SITE}" aria-label="Portfolio de Johan Trigeard : ${bare(SITE)}"><span>Le<br>portfolio</span>${qr}</a>
+    <a class="qr" href="${SITE}" aria-label="${L('Portfolio de Johan Trigeard', "Johan Trigeard's portfolio")} : ${bare(SITE)}"><span>${L('Le<br>portfolio', 'The<br>portfolio')}</span>${qr}</a>
   </footer>
 
   <div class="body">
     <section class="col">
       <div>
-        <h2>Expérience</h2>
-        ${job('Lead UI/UX', 'Rhinov · Maisons du Monde', 'Depuis 2023', 'Graphic Designer en 2023, Lead UI Designer en 2024.', [
-          "<b>rhinov.fr</b>, repensé de l'accueil au panier, en binôme avec le PO/PM.",
-          "<b>iA Déco</b>, assistant déco par IA, de la landing au chat.",
-          "<b>Système Rhinov</b>, logo et design system pour trois marques.",
-          "<b>Rhinov Studio</b>, landings et app <em>prototypées en code</em>.",
-          "Management d'une petite équipe.",
+        <h2>${L('Expérience', 'Experience')}</h2>
+        ${job('Lead UI/UX', 'Rhinov · Maisons du Monde', L('Depuis 2023', 'Since 2023'), L('Graphic Designer en 2023, Lead UI Designer en 2024.', 'Graphic Designer in 2023, Lead UI Designer in 2024.'), [
+          L("<b>rhinov.fr</b>, repensé de l'accueil au panier, en binôme avec le PO/PM.", '<b>rhinov.fr</b>, redesigned from home page to cart, with the PO/PM.'),
+          L('<b>iA Déco</b>, assistant déco par IA, de la landing au chat.', '<b>iA Déco</b>, an AI decor assistant, from landing to chat.'),
+          L('<b>Système Rhinov</b>, logo et design system pour trois marques.', '<b>Système Rhinov</b>, logo and design system for three brands.'),
+          L('<b>Rhinov Studio</b>, landings et app <em>prototypées en code</em>.', '<b>Rhinov Studio</b>, landings and an app <em>prototyped in code</em>.'),
+          L("Management d'une petite équipe.", 'Managing a small team.'),
         ])}
       </div>
       <div>
-        <h2>Formation</h2>
-        ${job('Master Web Design', 'ECV Bordeaux, Bac+5', '2013 – 2018', '')}
+        <h2>${L('Formation', 'Education')}</h2>
+        ${job(L('Master Web Design', "Master's in Web Design"), L('ECV Bordeaux, Bac+5', 'ECV Bordeaux'), '2013 – 2018', '')}
       </div>
     </section>
     <section class="col">
       <div>
-        <h2>Avant ça</h2>
-        ${job('Designer indépendant', 'Auto-entreprise', 'Depuis 2019', 'Design UI et UX à mon compte.')}
-        ${job('Motion Designer', 'Infograpik', '2020 – 2022', 'Animation 2D, logotypes et chartes pour Twitch, Activision, Microsoft.')}
-        ${job('Web Designer', 'Intento &amp; Fière Allure', '2018 – 2020', 'Wireframes, sites WordPress, chartes et print.')}
+        <h2>${L('Avant ça', 'Before that')}</h2>
+        ${job(L('Designer indépendant', 'Freelance designer'), L('Auto-entreprise', 'Self-employed'), L('Depuis 2019', 'Since 2019'), L('Design UI et UX à mon compte.', 'Freelance UI and UX design.'))}
+        ${job('Motion Designer', 'Infograpik', '2020 – 2022', L('Animation 2D, logotypes et chartes pour Twitch, Activision, Microsoft.', '2D animation, logos and guidelines for Twitch, Activision, Microsoft.'))}
+        ${job('Web Designer', 'Intento &amp; Fière Allure', '2018 – 2020', L('Wireframes, sites WordPress, chartes et print.', 'Wireframes, WordPress sites, brand guidelines and print.'))}
       </div>
       <div>
-        <h2>Hors écran</h2>
-        <p>Échecs, moto, Final Fantasy et un ptit café.</p>
+        <h2>${L('Hors écran', 'Off screen')}</h2>
+        <p>${L('Échecs, moto, Final Fantasy et un ptit café.', 'Chess, motorbikes, Final Fantasy and a little coffee.')}</p>
       </div>
     </section>
     <section class="col">
       <div>
-        <h2>Projets</h2>
+        <h2>${L('Projets', 'Projects')}</h2>
         <ul class="list">
-          ${project('Maisons du Monde · Labo', 'Trois parcours e-commerce, maquettés puis codés.')}
-          ${project('Vinyl Run', "Site d'un disquaire, conçu et développé.")}
-          ${project('NookDex', 'Collection Pokémon illustrée et codée.')}
-          ${project('MyFrenchTool', "L'annuaire des SaaS français, de A à Z.")}
+          ${project('Maisons du Monde · Labo', L('Trois parcours e-commerce, maquettés puis codés.', 'Three e-commerce journeys, designed then coded.'))}
+          ${project('Vinyl Run', L("Site d'un disquaire, conçu et développé.", "A record shop's website, designed and built."))}
+          ${project('NookDex', L('Collection Pokémon illustrée et codée.', 'An illustrated, coded Pokémon collection.'))}
+          ${project('MyFrenchTool', L("L'annuaire des SaaS français, de A à Z.", 'The directory of French SaaS, end to end.'))}
         </ul>
       </div>
       <div>
-        <h2>Outils</h2>
+        <h2>${L('Outils', 'Tools')}</h2>
         <p>Figma, Claude Code, Photoshop, Illustrator, After Effects, HTML/CSS.</p>
       </div>
     </section>
   </div>
 
   <figure class="card">
-    <img src="johan-gravure.png" alt="Portrait de Johan Trigeard en gravure">
+    <img src="johan-gravure.png" alt="${L('Portrait de Johan Trigeard en gravure', 'Engraved portrait of Johan Trigeard')}">
     <p aria-hidden="true"><span>${hyena('#EFE9DD')}</span><span>★</span></p>
   </figure>
 </main>
 </body>
 </html>
-`;
-
-const page = path.join(DIR, 'index.html');
-fs.writeFileSync(page, html);
+`; };
 
 const pg = await browser.newPage({ viewport: { width: 794, height: 1123 } });
-await pg.goto(pathToFileURL(page).href, { waitUntil: 'networkidle' });
-await pg.evaluate(() => document.fonts.ready);
-const over = await pg.evaluate(() => [...document.querySelectorAll('.col, .head')].map((e) => {
-  const box = e.closest('.body, .head').getBoundingClientRect(), end = Math.max(...[...e.children].map((c) => c.getBoundingClientRect().bottom));
-  return Math.round(box.bottom - end);
-}));
-console.log('marge restante en px (head, colonnes) :', over.join(' / '));
-await pg.pdf({ path: OUT, preferCSSPageSize: true, printBackground: true, tagged: true });
+for (const lang of ['fr', 'en']) {
+  const page = path.join(DIR, lang === 'en' ? 'index-en.html' : 'index.html');
+  const out = lang === 'en' ? OUT.replace(/\.pdf$/, '-en.pdf') : OUT;
+  fs.writeFileSync(page, build(lang));
+  await pg.goto(pathToFileURL(page).href, { waitUntil: 'networkidle' });
+  await pg.evaluate(() => document.fonts.ready);
+  const over = await pg.evaluate(() => [...document.querySelectorAll('.col, .head')].map((e) => {
+    const box = e.closest('.body, .head').getBoundingClientRect(), end = Math.max(...[...e.children].map((c) => c.getBoundingClientRect().bottom));
+    return Math.round(box.bottom - end);
+  }));
+  console.log(lang, 'marge restante en px (head, colonnes) :', over.join(' / '));
+  await pg.pdf({ path: out, preferCSSPageSize: true, printBackground: true, tagged: true });
+  console.log('cv', path.relative(ROOT, out), `${(fs.statSync(out).size / 1024).toFixed(0)} Ko`);
+}
 await browser.close();
-console.log('cv', path.relative(ROOT, OUT), `${(fs.statSync(OUT).size / 1024).toFixed(0)} Ko`);

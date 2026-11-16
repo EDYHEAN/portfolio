@@ -65,6 +65,9 @@ Au téléphone, chaque fonctionnalité est repensée pour le doigt, le bureau ne
 
 Variante deux colonnes gardée en option : `node scripts/make-cv-aere.mjs` (`sources/cv-aere/`).
 
+Deux versions, au choix dans un petit menu sous chaque bouton « Télécharger le CV » (`cvPick`, core.js : `details` natif, se ferme au clic ailleurs et à Échap) : la graphique et la version ATS, dans la langue du site (sur le site EN, les deux en anglais : fichiers `-en.pdf`).
+Version ATS (16/11) : `npm run cv:ats` (`scripts/make-cv-ats.mjs`, source `sources/cv-ats/`) → `assets/cv-johan-trigeard-ats.pdf` + `-ats-en.pdf`, pour les logiciels de tri et les IA : une colonne, titres standard, une ligne « poste | entreprise | dates » par poste (Rhinov : Graphic Designer 2023, Lead UI Designer 2024, Lead UI/UX 2026, confirmé par Johan), Arial, ni image ni tableau, une page A4 (vérifier avec `pdftotext` qu'il n'y a pas de page 2). Seul CV avec le téléphone (Johan, 16/11 ; chiffres inversés dans le script, comme la signature). Mêmes faits que la graphique. `npm run cv` refait les quatre PDF ; la graphique est bilingue via `L(fr, en)` dans `make-cv.mjs`, surveiller la marge des colonnes affichée (négative = ça déborde).
+
 `npm run cv` (`scripts/make-cv.mjs`) : une page web (`sources/cv/index.html`) exportée en PDF A4 dans `assets/cv-johan-trigeard.pdf`, parti pris « carte tirée » (photo en gravure, nom énorme, talon à découper), en vrai texte (le HTML suit l'ordre de lecture, tous les blocs sont positionnés), QR vers johantrigeard.com (constante `SITE`).
 
 ## La signature mail (13/11)

@@ -414,6 +414,35 @@ function loadJaws() {
     .catch((e) => { console.warn('Crâne 3D indisponible :', e); dropJaws(); return null; }); // le contact s'affiche
 }
 
+/* ------------------------------------------------------------------ */
+/* Le CV : la version graphique (la carte tirée) ou la version ATS     */
+/* ------------------------------------------------------------------ */
+/** Le bouton « Télécharger le CV » ouvre un petit menu à deux choix, dans la langue du site (les PDF `-en` en anglais). `details` natif : il marche sans JS et au clavier.
+ *  `cls` / `inner` : l'habit et le contenu du bouton, `up` : le menu s'ouvre au-dessus (bas de page). */
+export function cvPick({ cls, inner, up = false }) {
+  const item = (file, name, k) => `
+    <a href="${asset(file)}" download="${name}" data-sound><b>${t(`cv.${k}`)}</b><span>${t(`cv.${k}Sub`)}</span><i aria-hidden="true">↓</i></a>`;
+  return `<details class="cv-pick${up ? ' cv-pick-up' : ''}">
+    <summary class="${cls}" data-sound>${inner}</summary>
+    <div class="cv-menu">${lang === 'en'
+      ? `${item('cv-johan-trigeard-en.pdf', 'Johan-Trigeard-Resume.pdf', 'design')}${item('cv-johan-trigeard-ats-en.pdf', 'Johan-Trigeard-Resume-ATS.pdf', 'ats')}`
+      : `${item('cv-johan-trigeard.pdf', 'Johan-Trigeard-CV.pdf', 'design')}${item('cv-johan-trigeard-ats.pdf', 'Johan-Trigeard-CV-ATS.pdf', 'ats')}`}</div>
+  </details>`;
+}
+
+/** Un seul menu ouvert à la fois ; il se ferme au clic ailleurs, à Échap et une fois le fichier choisi. */
+function initCvPick() {
+  const close = (except) => $$('.cv-pick[open]').forEach((d) => { if (d !== except) d.open = false; });
+  document.addEventListener('toggle', (e) => { if (e.target.matches?.('.cv-pick') && e.target.open) close(e.target); }, true);
+  document.addEventListener('pointerdown', (e) => close(e.target.closest?.('.cv-pick')));
+  document.addEventListener('click', (e) => { if (e.target.closest?.('.cv-menu a')) setTimeout(close, 0); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const open = $('.cv-pick[open]');
+    if (open) { open.open = false; open.querySelector('summary').focus(); }
+  });
+}
+
 export function renderOutro({ jaws = true } = {}) {
   const el = $('#outro');
   jaws = jaws && !jawsBroken && canJaws();
@@ -428,7 +457,7 @@ export function renderOutro({ jaws = true } = {}) {
       <div class="contact-ctas">
         <!-- TODO Johan : ajouter un mailto si tu veux un email public -->
         <a class="btn btn-primary" href="https://www.linkedin.com/in/hyrule-hero/" target="_blank" rel="noopener" data-magnetic data-sound data-cursor data-cursor-key="cursor.go"><span>${t('contact.li')}</span><span aria-hidden="true">↗</span></a>
-        <a class="btn" href="${asset('cv-johan-trigeard.pdf')}" download="Johan-Trigeard-CV.pdf" data-magnetic data-sound><span>${t('contact.cv')}</span><span aria-hidden="true">↓</span></a>
+        ${cvPick({ cls: 'btn', inner: `<span>${t('contact.cv')}</span><span aria-hidden="true">↓</span>`, up: true })}
         <a class="btn" href="https://www.instagram.com/edyhean/" target="_blank" rel="noopener" data-magnetic data-sound><span>Instagram</span><span aria-hidden="true">↗</span></a>
       </div>
       <footer class="foot mono"><span>© 2026 Johan Trigeard</span>${jaws ? `<a class="foot-credit" href="https://sketchfab.com/3d-models/brown-hyena-skull-db5a9af4646344c3b69fb6cad5a7a2b2" target="_blank" rel="noopener">${t('foot.skull')}</a>` : ''}</footer>
@@ -473,6 +502,7 @@ export function boot() {
   initBoil();
   initCursor();
   initMagnetic();
+  initCvPick();
   bindSounds();
   if (import.meta.env.DEV) window.ST = ScrollTrigger; // debug : ST.getAll()
 }

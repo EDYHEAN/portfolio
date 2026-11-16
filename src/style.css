@@ -187,6 +187,36 @@ html.came .curtain { visibility: visible; }
 @media (hover: hover) { .btn:hover { background: var(--paper); color: var(--ink); } }
 .btn-primary { background: var(--paper); color: var(--ink); border-color: var(--paper); }
 @media (hover: hover) { .btn-primary:hover { background: #fff; } }
+/* Le CV en deux versions : le bouton ouvre un petit menu (papier, bord encre), sous le bouton ou au-dessus (`.cv-pick-up`). */
+.cv-pick { position: relative; display: inline-flex; }
+.cv-pick > summary { list-style: none; cursor: pointer; user-select: none; }
+.cv-pick > summary::-webkit-details-marker { display: none; }
+.cv-pick > summary i, .cv-pick > summary span[aria-hidden] { transition: transform 0.3s var(--ease-out); }
+.cv-pick-up[open] > summary span[aria-hidden] { transform: rotate(180deg); } /* la flèche montre le menu, au-dessus */
+.cv-menu {
+  position: absolute; left: 0; top: calc(100% + 8px); z-index: 30; width: max-content; max-width: min(340px, calc(100vw - 2 * var(--gutter)));
+  display: grid; padding: 6px; border-radius: 18px; border: 1px solid var(--ink);
+  background: var(--paper); color: var(--ink); box-shadow: 0 14px 34px -14px rgba(11, 11, 11, 0.45);
+  font-family: var(--f-display); text-transform: none; letter-spacing: 0;
+}
+.cv-pick-up .cv-menu { top: auto; bottom: calc(100% + 8px); }
+.cv-menu a {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 18px; align-items: center;
+  padding: 10px 14px; border-radius: 12px; color: inherit; text-decoration: none; transition: background 0.2s, color 0.2s;
+}
+.cv-menu b { font-size: 15px; font-weight: 700; line-height: 1.25; }
+.cv-menu span { grid-column: 1; font-family: var(--f-mono); font-size: 11px; line-height: 1.4; opacity: 0.66; }
+.cv-menu i { grid-column: 2; grid-row: 1 / 3; font-style: normal; }
+.cv-menu a:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+@media (hover: hover) { .cv-menu a:hover { background: var(--ink); color: var(--paper); } }
+.cv-menu a:active { background: var(--ink); color: var(--paper); }
+@media (prefers-reduced-motion: no-preference) {
+  .cv-pick[open] .cv-menu { animation: cv-menu-in 0.28s var(--ease-out); }
+  .cv-pick-up[open] .cv-menu { animation-name: cv-menu-up; }
+}
+@keyframes cv-menu-in { from { opacity: 0; transform: translateY(-6px); } }
+@keyframes cv-menu-up { from { opacity: 0; transform: translateY(6px); } }
+
 .foot { grid-column: 1 / -1; align-self: end; display: flex; justify-content: space-between; gap: 16px; margin-top: 12vh; padding-top: 16px; border-top: 1px solid rgba(239, 233, 221, 0.2); opacity: 0.7; }
 .foot-credit { text-decoration: none; opacity: 0.75; } /* crédit du scan du crâne (licence CC BY) */
 @media (hover: hover) { .foot-credit:hover { opacity: 1; text-decoration: underline; } }
@@ -261,6 +291,8 @@ html.came .curtain { visibility: visible; }
 
   .contact-ctas { flex-direction: column; gap: 10px; }
   .contact-ctas .btn { justify-content: space-between; }
+  .contact-ctas .cv-pick { display: grid; }
+  .contact-ctas .cv-menu { right: 0; width: auto; max-width: none; }
 }
 
 /* Téléphone à l'horizontale : le contact passe en deux colonnes pour tenir dans la hauteur. */

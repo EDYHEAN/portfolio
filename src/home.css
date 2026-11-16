@@ -52,7 +52,8 @@ body[data-page='home'] .hdr-logo, body[data-page='home'] .hdr-nav { visibility: 
 }
 /* Le bloc de gauche part du haut, à hauteur du « Ton tirage » : centré, il descendait trop bas. */
 .home > .who { align-self: start; margin-top: clamp(4px, 1.5vh, 16px); }
-.who { display: flex; flex-direction: column; align-items: flex-start; container-type: inline-size; }
+.who { position: relative; display: flex; flex-direction: column; align-items: flex-start; container-type: inline-size; }
+.who:has(.cv-pick[open]) { z-index: 50; } /* le menu du CV passe au-dessus du tirage (au téléphone, le tirage est dessous) */
 /* Le bloc logo en colonne : la hyène (--hy = sa boîte), puis « Johan / Trigeard » aussi large que son encre
    (Trigeard = 3,545 em, l'encre = 0,893 boîte : corps 0,252 boîte). Tout le bloc s'aligne sur l'encre de la hyène. */
 .who-lock {
